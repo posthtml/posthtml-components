@@ -117,8 +117,6 @@ function findPathByNamespace(tag, [namespace, fileNameFromTag], options) {
 function findPathByRoot(tag, fileNameFromTag, options) {
   let root = options.roots.find(root => fs.existsSync(path.join(options.root, root, fileNameFromTag)));
 
-  options.roots.find(root => console.warn(path.join(options.root, root, fileNameFromTag)));
-
   if (!root) {
     // Check if module exist in folder `tag-name/index.html`
     fileNameFromTag = fileNameFromTag

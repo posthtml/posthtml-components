@@ -67,3 +67,12 @@ test('Must output html of component with custom tag', async t => {
 
   t.is(html, expected);
 });
+
+test('Must output html of component with mapped attributes', async t => {
+  const actual = `<component src="components/component-mapped-attributes.html" class="bg-light p-2" title="My Title"></component>`;
+  const expected = `<div class="text-dark m-3" $attributes="">My Title Default body</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates/', roots: 'components/'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});

@@ -3,7 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 const expressions = require('posthtml-expressions');
+const scriptDataLocals = require('posthtml-expressions/lib/locals');
 const {parser: parseToPostHtml} = require('posthtml-parser');
+const parseAttrs = require('posthtml-attrs-parser')
 const {match} = require('posthtml/lib/api');
 const merge = require('deepmerge');
 const findPathFromTagName = require('./find-path');
@@ -32,12 +34,24 @@ function processNodes(tree, options, messages) {
 
     delete attributes.locals;
 
-    options.expressions.locals = merge(options.expressions.locals, attributes);
-    const plugins = [...options.plugins, expressions(options.expressions)];
+    attributes = merge(options.expressions.locals, attributes);
 
     const layoutPath = path.resolve(options.root, node.attrs.src);
     const layoutHtml = fs.readFileSync(layoutPath, options.encoding);
-    const layoutTree = processNodes(applyPluginsToTree(parseToPostHtml(layoutHtml), plugins), options, messages);
+    const parsedHtml = parseToPostHtml(layoutHtml);
+
+    // Retrieve default locals from <script defaultLocals> and merge with attributes
+    const {locals: defaultLocals} = scriptDataLocals(parsedHtml, {localsAttr: options.scriptLocalAttribute, removeScriptLocals: true, locals: attributes});
+    if (defaultLocals) {
+      attributes = merge(defaultLocals, attributes);
+    }
+
+    console.log(`defaultLocals %s`, defaultLocals);
+
+    options.expressions.locals = attributes;
+    const plugins = [...options.plugins, expressions(options.expressions)];
+
+    const layoutTree = processNodes(applyPluginsToTree(parsedHtml, plugins), options, messages);
 
     node.tag = false;
     node.content = mergeSlots(layoutTree, node, options.strict, options.slotTagName);
@@ -162,7 +176,8 @@ module.exports = (options = {}) => {
       expressions: {},
       plugins: [],
       encoding: 'utf8',
-      strict: false
+      strict: false,
+      scriptLocalAttribute: 'defaultLocals'
     },
     ...options
   };
