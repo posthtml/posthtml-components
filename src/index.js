@@ -5,7 +5,7 @@ const path = require('path');
 const expressions = require('posthtml-expressions');
 const scriptDataLocals = require('posthtml-expressions/lib/locals');
 const {parser: parseToPostHtml} = require('posthtml-parser');
-const parseAttrs = require('posthtml-attrs-parser')
+const parseAttrs = require('posthtml-attrs-parser');
 const {match} = require('posthtml/lib/api');
 const merge = require('deepmerge');
 const findPathFromTagName = require('./find-path');
@@ -14,47 +14,50 @@ function processNodes(tree, options, messages) {
   tree = applyPluginsToTree(tree, options.plugins);
 
   match.call(tree, [{tag: options.tagName}, {tag: options.tagRegExp}], node => {
-    if (!node.attrs || !node.attrs.src) {
-      const path = findPathFromTagName(node, options);
-
-      if (path !== false) {
-        node.attrs.src = path;
-      }
+    if (!node.attrs) {
+      node.attrs = {};
     }
 
-    let attributes = {...node.attrs};
+    const filePath = node.attrs.src || findPathFromTagName(node, options);
 
-    delete attributes.src;
-
-    Object.keys(attributes).forEach(attribute => {
-      try {
-        attributes = {...attributes, ...JSON.parse(attributes[attribute])};
-      } catch {}
-    });
-
-    delete attributes.locals;
-
-    attributes = merge(options.expressions.locals, attributes);
-
-    const layoutPath = path.resolve(options.root, node.attrs.src);
-    const layoutHtml = fs.readFileSync(layoutPath, options.encoding);
-    const parsedHtml = parseToPostHtml(layoutHtml);
-
-    // Retrieve default locals from <script defaultLocals> and merge with attributes
-    const {locals: defaultLocals} = scriptDataLocals(parsedHtml, {localsAttr: options.scriptLocalAttribute, removeScriptLocals: true, locals: attributes});
-    if (defaultLocals) {
-      attributes = merge(defaultLocals, attributes);
+    // Return node as-is when strict mode is disabled
+    //  otherwise raise error happen in find-path.js
+    if (!filePath) {
+      return node;
     }
 
-    console.log(`defaultLocals %s`, defaultLocals);
+    delete node.attrs.src;
+
+    const layoutPath = path.resolve(options.root, filePath);
+
+    const html = parseToPostHtml(fs.readFileSync(layoutPath, options.encoding));
+
+    const {attributes, defaultLocals} = parseLocals(options, node, html);
 
     options.expressions.locals = attributes;
+
     const plugins = [...options.plugins, expressions(options.expressions)];
 
-    const layoutTree = processNodes(applyPluginsToTree(parsedHtml, plugins), options, messages);
+    const layoutTree = processNodes(applyPluginsToTree(html, plugins), options, messages);
 
     node.tag = false;
     node.content = mergeSlots(layoutTree, node, options.strict, options.slotTagName);
+
+    const index = node.content.findIndex(content => typeof content === 'object');
+
+    const nodeAttrs = parseAttrs(node.content[index].attrs);
+
+    Object.keys(attributes).forEach(attr => {
+      if (typeof defaultLocals[attr] === 'undefined') {
+        if (['class'].includes(attr)) {
+          nodeAttrs[attr].push(attributes[attr]);
+        } else if (['style'].includes(attr)) {
+          nodeAttrs[attr] = attributes[attr];
+        }
+      }
+    });
+
+    node.content[index].attrs = nodeAttrs.compose();
 
     messages.push({
       type: 'dependency',
@@ -66,6 +69,31 @@ function processNodes(tree, options, messages) {
   });
 
   return tree;
+}
+
+function parseLocals(options, {attrs}, html) {
+  let attributes = {...attrs};
+
+  Object.keys(attributes).forEach(attribute => {
+    try {
+      // Use merge()
+      attributes = {...attributes, ...JSON.parse(attributes[attribute])};
+    } catch {}
+  });
+
+  delete attributes.locals;
+
+  attributes = merge(options.expressions.locals, attributes);
+
+  // Retrieve default locals from <script defaultLocals> and merge with attributes
+  const {locals: defaultLocals} = scriptDataLocals(html, {localsAttr: options.scriptLocalAttribute, removeScriptLocals: true, locals: attributes});
+
+  // Merge default locals and attributes
+  if (defaultLocals) {
+    attributes = merge(defaultLocals, attributes);
+  }
+
+  return {attributes, defaultLocals};
 }
 
 function mergeSlots(tree, component, strict, slotTagName) {
@@ -103,14 +131,14 @@ function mergeSlots(tree, component, strict, slotTagName) {
   }
 
   if (strict) {
-    let errors = '';
+    const unexpectedSlots = [];
 
     for (const fillSlotName of Object.keys(fillSlots)) {
-      errors += `Unexpected slot "${fillSlotName}". `;
+      unexpectedSlots.push(fillSlotName);
     }
 
-    if (errors) {
-      throw new Error(errors);
+    if (unexpectedSlots.length > 0) {
+      throw new Error(`[components] Unexpected slot: ${unexpectedSlots.join(', ')}.`);
     }
   }
 
@@ -135,7 +163,7 @@ function getSlots(tag, content = []) {
 
   match.call(content, {tag}, node => {
     if (!node.attrs || !node.attrs.name) {
-      throw new Error('Missing slot name');
+      throw new Error('[components] Missing slot name');
     }
 
     const {name} = node.attrs;
@@ -163,7 +191,7 @@ module.exports = (options = {}) => {
   options = {
     ...{
       root: './',
-      roots: '/',
+      roots: '',
       namespaces: [], // Array of namespaces path or single namespaces as object
       namespaceSeparator: '::',
       namespaceFallback: false,
@@ -176,13 +204,19 @@ module.exports = (options = {}) => {
       expressions: {},
       plugins: [],
       encoding: 'utf8',
-      strict: false,
+      strict: true,
       scriptLocalAttribute: 'defaultLocals'
     },
     ...options
   };
 
+  options.root = path.resolve(options.root);
+
   options.roots = Array.isArray(options.roots) ? options.roots : [options.roots];
+
+  options.roots.forEach((root, index) => {
+    options.roots[index] = path.join(options.root, root);
+  });
 
   options.namespaces = Array.isArray(options.namespaces) ? options.namespaces : [options.namespaces];
   options.namespaces.forEach((namespace, index) => {

@@ -50,7 +50,7 @@ function findPathByNamespace(tag, [namespace, fileNameFromTag], options) {
 
   if (!customTagNamespace) {
     if (options.strict) {
-      throw new Error(`[custom-tag] Unknown module namespace ${namespace}.`);
+      throw new Error(`[components] Unknown module namespace ${namespace}.`);
     } else {
       return false;
     }
@@ -90,20 +90,18 @@ function findPathByNamespace(tag, [namespace, fileNameFromTag], options) {
       } catch {
         // With disabled strict mode we will never enter here as findPathByRoot() return false
         //  so we don't need to check if options.strict is true
-        throw new Error(`[custom-tag] For the tag ${tag} was not found the template in the defined namespace's root ${customTagNamespace.root} nor in any defined custom tag roots.`);
+        throw new Error(`[components] For the tag ${tag} was not found the template in the defined namespace's root ${customTagNamespace.root} nor in any defined custom tag roots.`);
       }
     } else if (options.strict) {
-      throw new Error(`[custom-tag] For the tag ${tag} was not found the template in the defined namespace's path ${customTagNamespace.root}.`);
+      throw new Error(`[components] For the tag ${tag} was not found the template in the defined namespace's path ${customTagNamespace.root}.`);
     } else {
       return false;
     }
   }
 
-  // Return dirname + filename
-  return customTagNamespace.root
-    .replace(options.root, '')
-    .replace(options.absolute ? '' : path.sep, '')
-    .concat(path.sep, fileNameFromTag);
+  // Set root to namespace root
+  options.root = customTagNamespace.root;
+  return fileNameFromTag;
 }
 
 /**
@@ -115,7 +113,7 @@ function findPathByNamespace(tag, [namespace, fileNameFromTag], options) {
  * @return {String|boolean} [custom tag root where the module is found]
  */
 function findPathByRoot(tag, fileNameFromTag, options) {
-  let root = options.roots.find(root => fs.existsSync(path.join(options.root, root, fileNameFromTag)));
+  let root = options.roots.find(root => fs.existsSync(path.join(root, fileNameFromTag)));
 
   if (!root) {
     // Check if module exist in folder `tag-name/index.html`
@@ -123,12 +121,12 @@ function findPathByRoot(tag, fileNameFromTag, options) {
       .replace(`.${options.fileExtension}`, '')
       .concat(path.sep, 'index.', options.fileExtension);
 
-    root = options.roots.find(root => fs.existsSync(path.join(options.root, root, fileNameFromTag)));
+    root = options.roots.find(root => fs.existsSync(path.join(root, fileNameFromTag)));
   }
 
   if (!root) {
     if (options.strict) {
-      throw new Error(`[custom-tag] For the tag ${tag} was not found the template in any defined root path ${options.roots.join(', ')}`);
+      throw new Error(`[components] For the tag ${tag} was not found the template in any defined root path ${options.roots.join(', ')}`);
     } else {
       return false;
     }
