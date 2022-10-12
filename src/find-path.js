@@ -12,13 +12,7 @@ const folderSeparator = '.';
  * @param  {Object} options [posthtml options]
  * @return {String|boolean}
  */
-function findPathFromTagName(node, options) {
-  if (!node.attrs) {
-    node.attrs = {};
-  }
-
-  const {tag} = node;
-
+function findPathFromTagName({tag}, options) {
   // Get module filename from tag name
   //  remove prefix "x-"
   //  replace dot "." with slash "/"
@@ -29,8 +23,8 @@ function findPathFromTagName(node, options) {
     .join(path.sep)
     .concat(folderSeparator, options.fileExtension);
 
-  // Find module by defined namespace in options.namespaces
-  //  or by defined roots in options.roots
+  // Find module by defined namespace in options.namespaces when tag has '::'
+  //  otherwise by defined roots in options.roots
   return tag.includes(options.namespaceSeparator) ?
     findPathByNamespace(tag, fileNameFromTag.split(options.namespaceSeparator), options) :
     findPathByRoot(tag, fileNameFromTag, options);
