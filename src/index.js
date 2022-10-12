@@ -212,7 +212,7 @@ function getSlots(tag, content = []) {
     }
 
     if (!node.attrs.name) {
-      node.attrs.name = Object.keys({...node.attrs}).find(name => !Object.keys(slotTypes).includes(name) && name !== 'type');
+      node.attrs.name = Object.keys({...node.attrs}).find(name => !Object.keys(slotTypes).includes(name) && name !== 'type' && name !== defaultSlotType);
     }
 
     if (!node.attrs.name) {
