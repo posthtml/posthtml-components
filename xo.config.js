@@ -9,6 +9,7 @@ module.exports = {
     'promise/prefer-await-to-then': 0,
     'unicorn/no-array-reduce': 0,
     'import/extensions': 0,
+    'prefer-regex-literals': 0,
     quotes: ['error', 'single', {allowTemplateLiterals: true}]
   }
 };

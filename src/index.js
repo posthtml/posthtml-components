@@ -6,6 +6,7 @@ const expressions = require('posthtml-expressions');
 const scriptDataLocals = require('posthtml-expressions/lib/locals');
 const {parser: parseToPostHtml} = require('posthtml-parser');
 const parseAttrs = require('posthtml-attrs-parser');
+// const matchHelper = require('posthtml-match-helper');
 const {match} = require('posthtml/lib/api');
 const merge = require('deepmerge');
 const findPathFromTagName = require('./find-path');
@@ -61,19 +62,24 @@ function processNodes(tree, options, messages) {
 
     const index = node.content.findIndex(content => typeof content === 'object');
 
-    const nodeAttrs = parseAttrs(node.content[index].attrs);
+    if (index !== -1) {
+      // Map component attributes that it's not defined
+      //  as locals to first element of node
+      //  for now only class and style
+      const nodeAttrs = parseAttrs(node.content[index].attrs);
 
-    Object.keys(attributes).forEach(attr => {
-      if (typeof defaultLocals[attr] === 'undefined') {
-        if (['class'].includes(attr)) {
-          nodeAttrs[attr].push(attributes[attr]);
-        } else if (['style'].includes(attr)) {
-          nodeAttrs[attr] = attributes[attr];
+      Object.keys(attributes).forEach(attr => {
+        if (typeof defaultLocals[attr] === 'undefined') {
+          if (['class'].includes(attr)) {
+            nodeAttrs[attr].push(attributes[attr]);
+          } else if (['style'].includes(attr)) {
+            nodeAttrs[attr] = attributes[attr];
+          }
         }
-      }
-    });
+      });
 
-    node.content[index].attrs = nodeAttrs.compose();
+      node.content[index].attrs = nodeAttrs.compose();
+    }
 
     messages.push({
       type: 'dependency',
@@ -89,9 +95,9 @@ function processNodes(tree, options, messages) {
 
 /**
  * Parse locals from attributes, globals and via script
- * @param {Object} tree - posthtml tree
  * @param {Object} options - plugin options
- * @param {Object} html  - posthtml tree
+ * @param {Object} tree - PostHTML Node
+ * @param {Array} html - PostHTML Tree Nodes
  * @return {Object} merged locals and default
  */
 function parseLocals(options, {attrs}, html) {
@@ -99,7 +105,7 @@ function parseLocals(options, {attrs}, html) {
 
   Object.keys(attributes).forEach(attribute => {
     try {
-      // Use merge()
+      // Use merge() ?
       attributes = {...attributes, ...JSON.parse(attributes[attribute])};
     } catch {}
   });
@@ -122,14 +128,22 @@ function parseLocals(options, {attrs}, html) {
 /**
  * Merge slots content
  * @param {Object} tree
- * @param {Object} component
+ * @param {Object} node
  * @param {Boolean} strict
  * @param {String} slotTagName
  * @return {Object} tree
  */
-function mergeSlots(tree, component, strict, slotTagName) {
+function mergeSlots(tree, node, strict, slotTagName) {
   const slots = getSlots(slotTagName, tree); // Slot in component.html
-  const fillSlots = getSlots(slotTagName, component.content); // Slot in page.html
+  const fillSlots = getSlots(slotTagName, node.content); // Slot in page.html
+
+  // Retrieve main content, means everything that is not inside slots
+  if (node.content) {
+    const contentOutsideSlots = node.content.filter(content => content.tag !== 'slot');
+    if (contentOutsideSlots.length > 0) {
+      fillSlots[defaultSlotName] = [{tag: 'slot', attrs: {name: defaultSlotName}, content: [...contentOutsideSlots]}];
+    }
+  }
 
   for (const slotName of Object.keys(slots)) {
     const fillSlotNodes = fillSlots[slotName];
@@ -143,6 +157,12 @@ function mergeSlots(tree, component, strict, slotTagName) {
 
     if (!slotNode) {
       continue;
+    }
+
+    if (!slotNode.attrs) {
+      slotNode.attrs = {
+        type: defaultSlotType
+      };
     }
 
     let slotType = slotTypes[(slotNode.attrs.type || defaultSlotType).toLowerCase()] || defaultSlotType;
@@ -211,6 +231,8 @@ function getSlots(tag, content = []) {
       node.attrs = {};
     }
 
+    // When missing name try to retrieve from attribute
+    //  so slot name can be shorthands like <slot content> => <slot name="content">
     if (!node.attrs.name) {
       node.attrs.name = Object.keys({...node.attrs}).find(name => !Object.keys(slotTypes).includes(name) && name !== 'type' && name !== defaultSlotType);
     }
@@ -257,6 +279,7 @@ module.exports = (options = {}) => {
       fileExtension: 'html',
       tagPrefix: 'x-',
       tagRegExp: new RegExp(`^${options.tagPrefix || 'x-'}`, 'i'),
+      defaultSlotRegex: new RegExp('^((?!(slot)).)*$'),
       slotTagName: 'slot',
       tagName: 'component',
       locals: {},

@@ -76,3 +76,12 @@ test('Must process with default slot', async t => {
 
   t.is(html, expected);
 });
+
+test('Must process with default slot without defining slot tag', async t => {
+  const actual = `<component src="layouts/default-slot.html"><div>Default Slot Content</div><slot footer>Footer</slot></component>`;
+  const expected = `<html><head><title>Default Slot Layout</title></head><body><main><div>Default Slot Content</div></main><footer>Footer</footer></body></html>`;
+
+  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
