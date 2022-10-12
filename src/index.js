@@ -12,7 +12,7 @@ const merge = require('deepmerge');
 const findPathFromTagName = require('./find-path');
 
 // Used for slot without name
-const defaultSlotName = '___default__slot__name___';
+const defaultSlotName = '__default-slot';
 
 const defaultSlotType = 'replace';
 
@@ -52,6 +52,8 @@ function processNodes(tree, options, messages) {
     const {attributes, defaultLocals} = parseLocals(options, node, html);
 
     options.expressions.locals = attributes;
+
+    options.expressions.locals.slots = getFilledSlotNames(options.slotTagName, node.content);
 
     const plugins = [...options.plugins, expressions(options.expressions)];
 
@@ -235,24 +237,53 @@ function getSlots(tag, content = []) {
     //  so slot name can be shorthands like <slot content> => <slot name="content">
     if (!node.attrs.name) {
       node.attrs.name = Object.keys({...node.attrs}).find(name => !Object.keys(slotTypes).includes(name) && name !== 'type' && name !== defaultSlotType);
-    }
 
-    if (!node.attrs.name) {
-      node.attrs.name = defaultSlotName;
+      if (!node.attrs.name) {
+        node.attrs.name = defaultSlotName;
+      }
     }
 
     const {name} = node.attrs;
 
-    if (Array.isArray(slots[name])) {
-      slots[name].push(node);
-    } else {
-      slots[name] = [node];
+    if (!Array.isArray(slots[name])) {
+      slots[name] = [];
     }
+
+    slots[name].push(node);
 
     return node;
   });
 
   return slots;
+}
+
+/**
+ * Get all filled slots names so we can
+ * pass as locals to check if slot is filled
+ * @param {String} tag
+ * @param {Object} content
+ * @return {Object}
+ */
+function getFilledSlotNames(tag, content = []) {
+  const slotNames = [];
+
+  match.call(content, {tag}, node => {
+    let name = node.attrs && node.attrs.name;
+
+    if (!name) {
+      name = Object.keys({...node.attrs}).find(name => !Object.keys(slotTypes).includes(name) && name !== 'type' && name !== defaultSlotType);
+
+      if (!name) {
+        name = defaultSlotName;
+      }
+    }
+
+    slotNames[name] = true;
+
+    return node;
+  });
+
+  return slotNames;
 }
 
 /**

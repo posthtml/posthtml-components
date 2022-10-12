@@ -6,8 +6,8 @@ const posthtml = require('posthtml');
 const clean = html => html.replace(/(\n|\t)/g, '').trim();
 
 test('Must process with slots', async t => {
-  const actual = `<component src="layouts/base.html"><slot name="content">Content</slot><slot name="footer">Footer</slot></component>`;
-  const expected = `<html><head><title>Base Layout</title></head><body><main>Content</main><footer>Footer</footer></body></html>`;
+  const actual = `<component src="layouts/base.html"><slot name="content"><h1>Content</h1></slot><slot name="footer">Footer</slot></component>`;
+  const expected = `<html><head><title>Base Layout</title></head><body><main><h1>Content</h1></main><footer>Footer</footer></body></html>`;
 
   const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
 
@@ -82,6 +82,22 @@ test('Must process with default slot without defining slot tag', async t => {
   const expected = `<html><head><title>Default Slot Layout</title></head><body><main><div>Default Slot Content</div></main><footer>Footer</footer></body></html>`;
 
   const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must process slots conditional rendering by using slot name', async t => {
+  let actual = `<component src="layouts/slot-condition.html"><slot name="content"><h1>Content</h1></slot></component>`;
+  let expected = `<html><head><title>Slot Condition Layout</title></head><body><main><h1>Content</h1></main><p>There is not footer defined.</p></body></html>`;
+
+  let html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+
+  actual = `<component src="layouts/slot-condition.html"><slot name="content"><h1>Content</h1></slot><slot name="footer">There is now footer defined</slot></component>`;
+  expected = `<html><head><title>Slot Condition Layout</title></head><body><main><h1>Content</h1></main><footer>There is now footer defined</footer></body></html>`;
+
+  html = await posthtml([plugin({root: './test/templates', strict: false})]).process(actual).then(result => clean(result.html));
 
   t.is(html, expected);
 });
