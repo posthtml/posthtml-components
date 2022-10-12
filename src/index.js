@@ -139,9 +139,9 @@ function mergeSlots(tree, node, strict, slotTagName) {
 
   // Retrieve main content, means everything that is not inside slots
   if (node.content) {
-    const contentOutsideSlots = node.content.filter(content => content.tag !== 'slot');
+    const contentOutsideSlots = node.content.filter(content => content.tag !== slotTagName);
     if (contentOutsideSlots.length > 0) {
-      fillSlots[defaultSlotName] = [{tag: 'slot', attrs: {name: defaultSlotName}, content: [...contentOutsideSlots]}];
+      fillSlots[defaultSlotName] = [{tag: slotTagName, attrs: {name: defaultSlotName}, content: [...contentOutsideSlots]}];
     }
   }
 
