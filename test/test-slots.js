@@ -5,7 +5,7 @@ const plugin = require('../src');
 const posthtml = require('posthtml');
 const clean = html => html.replace(/(\n|\t)/g, '').trim();
 
-test('Must process layout with slots', async t => {
+test('Must process with slots', async t => {
   const actual = `<component src="layouts/base.html"><slot name="content">Content</slot><slot name="footer">Footer</slot></component>`;
   const expected = `<html><head><title>Base Layout</title></head><body><main>Content</main><footer>Footer</footer></body></html>`;
 
@@ -35,6 +35,42 @@ test('Must process multiple slots', async t => {
 test('Must process append and prepend content to slot', async t => {
   const actual = `<component src="components/component-append-prepend.html"><slot name="title" type="append"> Append</slot><slot name="body" type="prepend">Prepend </slot></component>`;
   const expected = `<div>Title Append</div><div>Prepend Body</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must process with slots using shorthands names syntax', async t => {
+  const actual = `<component src="layouts/base.html"><slot content>Content</slot><slot footer>Footer</slot></component>`;
+  const expected = `<html><head><title>Base Layout</title></head><body><main>Content</main><footer>Footer</footer></body></html>`;
+
+  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must process append and prepend using shorthands types syntax', async t => {
+  const actual = `<component src="components/component-append-prepend.html"><slot name="title" append> Append</slot><slot name="body" prepend>Prepend </slot></component>`;
+  const expected = `<div>Title Append</div><div>Prepend Body</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must process with slots using shorthands names and types syntax together', async t => {
+  const actual = `<component src="components/component-append-prepend.html"><slot title append> Append</slot><slot body prepend>Prepend </slot></component>`;
+  const expected = `<div>Title Append</div><div>Prepend Body</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must process with default slot', async t => {
+  const actual = `<component src="layouts/default-slot.html"><slot>Default Slot Content</slot><slot footer>Footer</slot></component>`;
+  const expected = `<html><head><title>Default Slot Layout</title></head><body><main>Default Slot Content</main><footer>Footer</footer></body></html>`;
 
   const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
 

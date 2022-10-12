@@ -10,6 +10,22 @@ const {match} = require('posthtml/lib/api');
 const merge = require('deepmerge');
 const findPathFromTagName = require('./find-path');
 
+// Used for slot without name
+const defaultSlotName = '___default__slot__name___';
+
+const defaultSlotType = 'replace';
+
+const slotTypes = {
+  append: 'append',
+  prepend: 'prepend'
+};
+
+/**
+ * Process tree's nodes
+ * @param {Object} tree - posthtml tree
+ * @param {Object} options - plugin options
+ * @param {Object} messages - posthtml tree messages
+ */
 function processNodes(tree, options, messages) {
   tree = applyPluginsToTree(tree, options.plugins);
 
@@ -71,6 +87,13 @@ function processNodes(tree, options, messages) {
   return tree;
 }
 
+/**
+ * Parse locals from attributes, globals and via script
+ * @param {Object} tree - posthtml tree
+ * @param {Object} options - plugin options
+ * @param {Object} html  - posthtml tree
+ * @return {Object} merged locals and default
+ */
 function parseLocals(options, {attrs}, html) {
   let attributes = {...attrs};
 
@@ -96,6 +119,14 @@ function parseLocals(options, {attrs}, html) {
   return {attributes, defaultLocals};
 }
 
+/**
+ * Merge slots content
+ * @param {Object} tree
+ * @param {Object} component
+ * @param {Boolean} strict
+ * @param {String} slotTagName
+ * @return {Object} tree
+ */
 function mergeSlots(tree, component, strict, slotTagName) {
   const slots = getSlots(slotTagName, tree); // Slot in component.html
   const fillSlots = getSlots(slotTagName, component.content); // Slot in page.html
@@ -114,9 +145,8 @@ function mergeSlots(tree, component, strict, slotTagName) {
       continue;
     }
 
-    const slotType = ['replace', 'prepend', 'append'].includes(((slotNode.attrs && slotNode.attrs.type) || '').toLowerCase()) ?
-      ((slotNode.attrs && slotNode.attrs.type) || '').toLowerCase() :
-      'replace';
+    let slotType = slotTypes[(slotNode.attrs.type || defaultSlotType).toLowerCase()] || defaultSlotType;
+    slotType = typeof slotNode.attrs.append === 'undefined' ? (typeof slotNode.attrs.prepend === 'undefined' ? slotType : slotTypes.prepend) : slotTypes.append;
 
     const layoutBlockNodeList = slots[slotName];
     for (const layoutBlockNode of layoutBlockNodeList) {
@@ -145,25 +175,48 @@ function mergeSlots(tree, component, strict, slotTagName) {
   return tree;
 }
 
+/**
+ * Prepend, append or replace slot content
+ * @param {Object} slotContent
+ * @param {Object} defaultContent
+ * @param {String} slotType
+ * @return {Object}
+ */
 function mergeContent(slotContent, defaultContent, slotType) {
   slotContent = slotContent || [];
   defaultContent = defaultContent || [];
 
-  if (!['append', 'prepend'].includes(slotType)) {
+  // Replace
+  if (!Object.keys(slotTypes).includes(slotType)) {
     return slotContent;
   }
 
-  return slotType === 'prepend' ?
+  // Prepend or append
+  return slotType === slotTypes.prepend ?
     slotContent.concat(defaultContent) :
     defaultContent.concat(slotContent);
 }
 
+/**
+ * Get all slots from content
+ * @param {String} tag
+ * @param {Object} content
+ * @return {Object}
+ */
 function getSlots(tag, content = []) {
   const slots = {};
 
   match.call(content, {tag}, node => {
-    if (!node.attrs || !node.attrs.name) {
-      throw new Error('[components] Missing slot name');
+    if (!node.attrs) {
+      node.attrs = {};
+    }
+
+    if (!node.attrs.name) {
+      node.attrs.name = Object.keys({...node.attrs}).find(name => !Object.keys(slotTypes).includes(name) && name !== 'type');
+    }
+
+    if (!node.attrs.name) {
+      node.attrs.name = defaultSlotName;
     }
 
     const {name} = node.attrs;
@@ -180,6 +233,12 @@ function getSlots(tag, content = []) {
   return slots;
 }
 
+/**
+ * Apply plugins to tree
+ * @param {Object} tree
+ * @param {Array} plugins
+ * @return {Object}
+ */
 function applyPluginsToTree(tree, plugins) {
   return plugins.reduce((tree, plugin) => {
     tree = plugin(tree);
