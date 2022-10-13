@@ -45,7 +45,7 @@ Use the component:
 Init PostHTML:
 
 ```js
-<!-- index.js -->
+// index.js
 const { readFileSync, writeFileSync } = require('fs')
 
 const posthtml = require('posthtml')
