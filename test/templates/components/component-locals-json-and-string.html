@@ -1,0 +1,14 @@
+<script defaultLocals>
+    module.exports = {
+        title: 'Default title',
+        items: ['default first item', 'default second item'],
+        titles: {
+            title: 'This is default main title',
+            subtitle: 'This is default subtitle',
+            suptitle: 'This is default suptitle'
+        }
+    }
+</script>
+<div><h1>{{title}}</h1></div>
+<div><each loop="item in items"><span>{{ item }}</span></each></div>
+<div><each loop="t, i in titles"><span>{{ i }}: {{ t }}</span></each></div>

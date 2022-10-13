@@ -111,4 +111,4 @@ See [PostHTML Guidelines](https://github.com/posthtml/posthtml/tree/master/docs)
 
 ## Credits
 
-Thanks to all PostHTML contributors and especially to `posthtml-extends` and `posthtml-modules` contributors, as part of code are ~~stolen~~ borrowed from these plugins.
+Thanks to all PostHTML contributors and especially to `posthtml-extend` and `posthtml-modules` contributors, as part of code are ~~stolen~~ borrowed from these plugins.

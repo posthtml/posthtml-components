@@ -31,3 +31,19 @@ test('Must process default attributes and map style and class for the first node
 
   t.is(html, expected);
 });
+
+test('Must process component with locals as JSON and string', async t => {
+  const actual = `<component src="components/component-locals-json-and-string.html"
+                    subsomething2='{"items": [{"one": "First", "two": "Second", "three": "Third"}]}'
+                    merge:titles='{ "suptitle": "This is custom suptitle" }'
+                    something='["one", "two", "three"]'
+                    something2='{"one": "First", "two": "Second", "three": "Third"}'
+                    title="Custom title from JSON and String"
+                    items='["another item", "yet another"]'
+                    merge:locals='{ "items": ["first item", "second item"] }'></component>`;
+  const expected = `<div><h1>Custom title from JSON and String</h1></div><div><span>another item</span><span>yet another</span><span>first item</span><span>second item</span></div><div><span>title: This is default main title</span><span>subtitle: This is default subtitle</span><span>suptitle: This is custom suptitle</span></div>`;
+
+  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});

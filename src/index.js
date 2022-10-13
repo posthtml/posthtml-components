@@ -53,7 +53,7 @@ function processNodes(tree, options, messages) {
 
     const html = parseToPostHtml(fs.readFileSync(filePath, options.encoding));
 
-    const {attributes, defaultLocals} = parseLocals(options, node, html);
+    const {attributes, locals} = parseLocals(options, node, html);
 
     options.expressions.locals = attributes;
 
@@ -75,7 +75,7 @@ function processNodes(tree, options, messages) {
       const nodeAttrs = parseAttrs(node.content[index].attrs);
 
       Object.keys(attributes).forEach(attr => {
-        if (typeof defaultLocals[attr] === 'undefined') {
+        if (typeof locals[attr] === 'undefined') {
           if (['class'].includes(attr)) {
             nodeAttrs[attr].push(attributes[attr]);
           } else if (['style'].includes(attr)) {
@@ -109,26 +109,56 @@ function processNodes(tree, options, messages) {
 function parseLocals(options, {attrs}, html) {
   let attributes = {...attrs};
 
+  // Handle attributes to be merged with default
+  //  only for Array or Objects
+  const mergeAttributeWithDefault = [];
+  Object.keys(attributes).forEach(attribute => {
+    if (attribute.startsWith('merge:')) {
+      const newAttributeName = attribute.replace('merge:', '');
+      attributes[newAttributeName] = attributes[attribute];
+      delete attributes[attribute];
+      mergeAttributeWithDefault.push(newAttributeName);
+    }
+  });
+
+  // Parse JSON attributes
   Object.keys(attributes).forEach(attribute => {
     try {
       // Use merge() ?
-      attributes = {...attributes, ...JSON.parse(attributes[attribute])};
+      const parsed = JSON.parse(attributes[attribute]);
+      if (attribute === 'locals') {
+        if (mergeAttributeWithDefault.includes(attribute)) {
+          attributes = merge(attributes, parsed);
+        } else {
+          Object.assign(attributes, parsed);
+        }
+      } else {
+        attributes[attribute] = parsed;
+      }
     } catch {}
   });
 
   delete attributes.locals;
 
+  // Merge with global
   attributes = merge(options.expressions.locals, attributes);
 
   // Retrieve default locals from <script defaultLocals> and merge with attributes
-  const {locals: defaultLocals} = scriptDataLocals(html, {localsAttr: options.scriptLocalAttribute, removeScriptLocals: true, locals: attributes});
+  const {locals} = scriptDataLocals(html, {localsAttr: options.scriptLocalAttribute, removeScriptLocals: true, locals: attributes});
 
   // Merge default locals and attributes
-  if (defaultLocals) {
-    attributes = merge(defaultLocals, attributes);
+  //  or overrides locals with attributes
+  if (locals) {
+    Object.keys(locals).forEach(local => {
+      if (mergeAttributeWithDefault.includes(local)) {
+        attributes[local] = merge({...locals[local]}, {...attributes[local]});
+      } else if (typeof attributes[local] === 'undefined') {
+        attributes[local] = locals[local];
+      }
+    });
   }
 
-  return {attributes, defaultLocals};
+  return {attributes, locals};
 }
 
 /**
