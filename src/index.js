@@ -39,7 +39,7 @@ function processNodes(tree, options, messages) {
     //  we want to support multiple attributes for define path
     const attributePath = (options.attributes.length > 0 && options.attributes.find(attribute => node.attrs[attribute])) || options.attribute;
 
-    const filePath = node.attrs[attributePath] || findPathFromTagName(node, options);
+    let filePath = node.attrs[attributePath] || findPathFromTagName(node, options);
 
     // Return node as-is when strict mode is disabled
     //  otherwise raise error happen in find-path.js
@@ -49,9 +49,9 @@ function processNodes(tree, options, messages) {
 
     delete node.attrs[attributePath];
 
-    const layoutPath = path.resolve(options.root, filePath);
+    filePath = path.resolve(options.root, filePath);
 
-    const html = parseToPostHtml(fs.readFileSync(layoutPath, options.encoding));
+    const html = parseToPostHtml(fs.readFileSync(filePath, options.encoding));
 
     const {attributes, defaultLocals} = parseLocals(options, node, html);
 
@@ -89,7 +89,7 @@ function processNodes(tree, options, messages) {
 
     messages.push({
       type: 'dependency',
-      file: layoutPath,
+      file: filePath,
       from: options.from
     });
 
@@ -326,13 +326,12 @@ module.exports = (options = {}) => {
       tagNames: [],
       attribute: 'src',
       attributes: [],
-      locals: {},
       expressions: {},
       plugins: [],
       encoding: 'utf8',
-      strict: true,
       scriptLocalAttribute: 'defaultLocals',
-      matcher: []
+      matcher: [],
+      strict: true
     },
     ...options
   };

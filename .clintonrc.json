@@ -5,7 +5,8 @@
     "src/**",
     "lib/**",
     ".idea/**",
-    "*.{html,jpg}"
+    "*.{html,jpg}",
+    "cache.json"
   ],
   "rules": {
     "pkg-main": "off",
