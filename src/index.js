@@ -30,12 +30,16 @@ const slotTypes = {
 function processNodes(tree, options, messages) {
   tree = applyPluginsToTree(tree, options.plugins);
 
-  match.call(tree, [{tag: options.tagName}, {tag: options.tagRegExp}], node => {
+  match.call(tree, options.matcher, node => {
     if (!node.attrs) {
       node.attrs = {};
     }
 
-    const filePath = node.attrs.src || findPathFromTagName(node, options);
+    // For compatibility with extends and modules plugins
+    //  we want to support multiple attributes for define path
+    const attributePath = (options.attributes.length > 0 && options.attributes.find(attribute => node.attrs[attribute])) || options.attribute;
+
+    const filePath = node.attrs[attributePath] || findPathFromTagName(node, options);
 
     // Return node as-is when strict mode is disabled
     //  otherwise raise error happen in find-path.js
@@ -43,7 +47,7 @@ function processNodes(tree, options, messages) {
       return node;
     }
 
-    delete node.attrs.src;
+    delete node.attrs[attributePath];
 
     const layoutPath = path.resolve(options.root, filePath);
 
@@ -60,7 +64,7 @@ function processNodes(tree, options, messages) {
     const layoutTree = processNodes(applyPluginsToTree(html, plugins), options, messages);
 
     node.tag = false;
-    node.content = mergeSlots(layoutTree, node, options.strict, options.slotTagName);
+    node.content = mergeSlots(layoutTree, node, options.strict, options);
 
     const index = node.content.findIndex(content => typeof content === 'object');
 
@@ -133,10 +137,11 @@ function parseLocals(options, {attrs}, html) {
  * @param {Object} node
  * @param {Boolean} strict
  * @param {String} slotTagName
+ * @param {Boolean|String} fallbackSlotTagName
  * @return {Object} tree
  */
-function mergeSlots(tree, node, strict, slotTagName) {
-  const slots = getSlots(slotTagName, tree); // Slot in component.html
+function mergeSlots(tree, node, strict, {slotTagName, fallbackSlotTagName}) {
+  const slots = getSlots(slotTagName, tree, fallbackSlotTagName); // Slot in component.html
   const fillSlots = getSlots(slotTagName, node.content); // Slot in page.html
 
   // Retrieve main content, means everything that is not inside slots
@@ -223,12 +228,16 @@ function mergeContent(slotContent, defaultContent, slotType) {
  * Get all slots from content
  * @param {String} tag
  * @param {Object} content
+ * @param {Boolean|String} fallbackSlotTagName
  * @return {Object}
  */
-function getSlots(tag, content = []) {
+function getSlots(tag, content = [], fallbackSlotTagName = false) {
   const slots = {};
 
-  match.call(content, {tag}, node => {
+  // For compatibility with module slot name <content>
+  const matcher = fallbackSlotTagName === false ? {tag} : [{tag}, {tag: fallbackSlotTagName === true ? 'content' : fallbackSlotTagName}];
+
+  match.call(content, matcher, node => {
     if (!node.attrs) {
       node.attrs = {};
     }
@@ -310,19 +319,25 @@ module.exports = (options = {}) => {
       fileExtension: 'html',
       tagPrefix: 'x-',
       tagRegExp: new RegExp(`^${options.tagPrefix || 'x-'}`, 'i'),
-      defaultSlotRegex: new RegExp('^((?!(slot)).)*$'),
       slotTagName: 'slot',
+      // Used for compatibility with modules plugin <content> slot, set to true only if you have migrated from modules plugin
+      fallbackSlotTagName: false,
       tagName: 'component',
+      tagNames: [],
+      attribute: 'src',
+      attributes: [],
       locals: {},
       expressions: {},
       plugins: [],
       encoding: 'utf8',
       strict: true,
-      scriptLocalAttribute: 'defaultLocals'
+      scriptLocalAttribute: 'defaultLocals',
+      matcher: []
     },
     ...options
   };
 
+  /** Set root, roots and namespace's roots */
   options.root = path.resolve(options.root);
 
   options.roots = Array.isArray(options.roots) ? options.roots : [options.roots];
@@ -344,10 +359,41 @@ module.exports = (options = {}) => {
     }
   });
 
+  if (!Array.isArray(options.attributes)) {
+    options.attributes = [];
+  }
+
+  if (!Array.isArray(options.matcher)) {
+    options.matcher = options.matcher ? [options.matcher] : [];
+  }
+
+  if (!Array.isArray(options.tagNames)) {
+    options.tagNames = [];
+  }
+
+  /** Set one or multiple matcher */
+  if (options.matcher.length === 0) {
+    if (options.tagRegExp) {
+      options.matcher.push({tag: options.tagRegExp});
+    }
+
+    if (options.tagNames.length > 0) {
+      options.tagNames.forEach(tagName => {
+        options.matcher.push({tag: tagName});
+      });
+    } else if (options.tagName) {
+      options.matcher.push({tag: options.tagName});
+    }
+
+    if (options.matcher.length === 0) {
+      throw new Error('[components] No matcher found in options. Please to define almost one.');
+    }
+  }
+
   return function (tree) {
     tree = processNodes(tree, options, tree.messages);
 
-    const slots = getSlots(options.slotTagName, tree);
+    const slots = getSlots(options.slotTagName, tree, options.fallbackSlotTagName);
 
     for (const slotName of Object.keys(slots)) {
       const nodes = slots[slotName];
