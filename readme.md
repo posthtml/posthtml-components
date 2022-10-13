@@ -1,12 +1,12 @@
+[![NPM][npm]][npm-url]
+[![Coverage][cover]][cover-badge]
+[![XO code style][style]][style-url]
+
 <div align="center">
   <img width="300" title="PostHTML" src="http://posthtml.github.io/posthtml/logo.svg">
   <h1>PostHTML Components </h1>
   <p>HTML-friendly syntax component with slots, attributes as locals and more!</p>
 </div>
-
-[![NPM][npm]][npm-url]
-[![Coverage][cover]][cover-badge]
-[![XO code style][style]][style-url]
 
 ## Install
 
