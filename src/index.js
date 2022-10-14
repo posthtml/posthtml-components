@@ -57,7 +57,7 @@ function processNodes(tree, options, messages) {
 
     options.expressions.locals = attributes;
 
-    options.expressions.locals.slots = getFilledSlotNames(options.slotTagName, node.content);
+    options.expressions.locals.$slots = parseSlotsLocals(options.slotTagName, html, node.content);
 
     const plugins = [...options.plugins, expressions(options.expressions)];
 
@@ -170,6 +170,64 @@ function parseLocals(options, {attrs}, html) {
 }
 
 /**
+ * Parse slots locals and set which one is filled
+ * @param {String} tag
+ * @param html
+ * @param {Object} content
+ * @return {Object}
+ */
+function parseSlotsLocals(tag, html, content = []) {
+  const slots = [];
+  const getNodeName = (node) => {
+    let name = node.attrs && node.attrs.name;
+
+    if (!name) {
+      name = Object.keys({...node.attrs}).find(name => !Object.keys(slotTypes).includes(name) && name !== 'type' && name !== defaultSlotType);
+
+      if (!name) {
+        name = defaultSlotName;
+      }
+    }
+
+    return name;
+  }
+
+  match.call(html, {tag}, node => {
+    const name = getNodeName(node);
+
+    slots[name] = {
+      filled: false
+    };
+
+    return node;
+  });
+
+  match.call(content, {tag}, node => {
+    const name = getNodeName(node);
+
+    const locals = Object.fromEntries(Object.entries(node.attrs).filter(([attribute]) => ![name, 'type'].includes(attribute)));
+
+    if (locals) {
+      // Parse JSON locals
+      Object.keys(locals).forEach(local => {
+        try {
+          locals[local] = JSON.parse(locals[local]);
+        } catch {}
+      });
+    }
+
+    slots[name] = {
+      filled: true,
+      locals: locals
+    };
+
+    return node;
+  });
+
+  return slots;
+}
+
+/**
  * Merge slots content
  * @param {Object} tree
  * @param {Object} node
@@ -181,11 +239,12 @@ function parseLocals(options, {attrs}, html) {
 function mergeSlots(tree, node, strict, {slotTagName, fallbackSlotTagName}) {
   const slots = getSlots(slotTagName, tree, fallbackSlotTagName); // Slot in component.html
   const fillSlots = getSlots(slotTagName, node.content); // Slot in page.html
+  const clean = content => content.replace(/(\n|\t)/g, '').trim();
 
   // Retrieve main content, means everything that is not inside slots
   if (node.content) {
-    const contentOutsideSlots = node.content.filter(content => content.tag !== slotTagName);
-    if (contentOutsideSlots.length > 0) {
+    const contentOutsideSlots = node.content.filter(content => (content.tag !== slotTagName));
+    if (contentOutsideSlots.filter(c => typeof c !== 'string' || clean(c) !== '').length > 0) {
       fillSlots[defaultSlotName] = [{tag: slotTagName, attrs: {name: defaultSlotName}, content: [...contentOutsideSlots]}];
     }
   }
@@ -221,6 +280,7 @@ function mergeSlots(tree, node, strict, {slotTagName, fallbackSlotTagName}) {
         slotType
       );
     }
+
 
     delete fillSlots[slotName];
   }
@@ -302,35 +362,6 @@ function getSlots(tag, content = [], fallbackSlotTagName = false) {
   });
 
   return slots;
-}
-
-/**
- * Get all filled slots names so we can
- * pass as locals to check if slot is filled
- * @param {String} tag
- * @param {Object} content
- * @return {Object}
- */
-function getFilledSlotNames(tag, content = []) {
-  const slotNames = [];
-
-  match.call(content, {tag}, node => {
-    let name = node.attrs && node.attrs.name;
-
-    if (!name) {
-      name = Object.keys({...node.attrs}).find(name => !Object.keys(slotTypes).includes(name) && name !== 'type' && name !== defaultSlotType);
-
-      if (!name) {
-        name = defaultSlotName;
-      }
-    }
-
-    slotNames[name] = true;
-
-    return node;
-  });
-
-  return slotNames;
 }
 
 /**
