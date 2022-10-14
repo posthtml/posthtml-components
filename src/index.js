@@ -112,12 +112,18 @@ function parseLocals(options, {attrs}, html) {
   // Handle attributes to be merged with default
   //  only for Array or Objects
   const mergeAttributeWithDefault = [];
+  const computedAttributes = [];
   Object.keys(attributes).forEach(attribute => {
     if (attribute.startsWith('merge:')) {
       const newAttributeName = attribute.replace('merge:', '');
       attributes[newAttributeName] = attributes[attribute];
       delete attributes[attribute];
       mergeAttributeWithDefault.push(newAttributeName);
+    } else if (attribute.startsWith('computed:')) {
+      const newAttributeName = attribute.replace('computed:', '');
+      attributes[newAttributeName] = attributes[attribute];
+      delete attributes[attribute];
+      computedAttributes.push(newAttributeName);
     }
   });
 
@@ -152,6 +158,8 @@ function parseLocals(options, {attrs}, html) {
     Object.keys(locals).forEach(local => {
       if (mergeAttributeWithDefault.includes(local)) {
         attributes[local] = merge({...locals[local]}, {...attributes[local]});
+      } else if (computedAttributes.includes(local)) {
+        attributes[local] = locals[local];
       } else if (typeof attributes[local] === 'undefined') {
         attributes[local] = locals[local];
       }
