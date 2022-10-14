@@ -53,6 +53,8 @@ function processNodes(tree, options, messages) {
 
     const html = parseToPostHtml(fs.readFileSync(filePath, options.encoding));
 
+    options.expressions.locals = {...options.locals}
+
     const {attributes, locals} = parseLocals(options, node, html);
 
     options.expressions.locals = attributes;
@@ -77,8 +79,12 @@ function processNodes(tree, options, messages) {
       Object.keys(attributes).forEach(attr => {
         if (typeof locals[attr] === 'undefined') {
           if (['class'].includes(attr)) {
+            if (typeof nodeAttrs[attr] === 'undefined') {
+              nodeAttrs[attr] = [];
+            }
             nodeAttrs[attr].push(attributes[attr]);
           } else if (['style'].includes(attr)) {
+            // TODO append style ?
             nodeAttrs[attr] = attributes[attr];
           }
         }
@@ -150,17 +156,23 @@ function parseLocals(options, {attrs}, html) {
   attributes = merge(options.expressions.locals, attributes);
 
   // Retrieve default locals from <script defaultLocals> and merge with attributes
-  const {locals} = scriptDataLocals(html, {localsAttr: options.scriptLocalAttribute, removeScriptLocals: true, locals: attributes});
+  const {locals} = scriptDataLocals(html, {localsAttr: options.scriptLocalAttribute, removeScriptLocals: true, locals: {...attributes}});
 
   // Merge default locals and attributes
   //  or overrides locals with attributes
   if (locals) {
+    if (mergeAttributeWithDefault.length > 0) {
+      const attributesToBeMerged = Object.fromEntries(Object.entries(attributes).filter(([attribute]) => mergeAttributeWithDefault.includes(attribute)));
+      const localsToBeMerged = Object.fromEntries(Object.entries(locals).filter(([local]) => mergeAttributeWithDefault.includes(local)));
+      if (Object.keys(localsToBeMerged).length > 0) {
+        mergeAttributeWithDefault.forEach(attribute => {
+          attributes[attribute] = merge(localsToBeMerged[attribute], attributesToBeMerged[attribute]);
+        });
+      }
+    }
+
     Object.keys(locals).forEach(local => {
-      if (mergeAttributeWithDefault.includes(local)) {
-        attributes[local] = merge({...locals[local]}, {...attributes[local]});
-      } else if (computedAttributes.includes(local)) {
-        attributes[local] = locals[local];
-      } else if (typeof attributes[local] === 'undefined') {
+      if (computedAttributes.includes(local) || typeof attributes[local] === 'undefined') {
         attributes[local] = locals[local];
       }
     });
@@ -457,6 +469,8 @@ module.exports = (options = {}) => {
       throw new Error('[components] No matcher found in options. Please to define almost one.');
     }
   }
+
+  options.locals = {...options.expressions.locals}
 
   return function (tree) {
     tree = processNodes(tree, options, tree.messages);
