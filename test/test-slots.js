@@ -69,7 +69,7 @@ test('Must process with slots using shorthands names and types syntax together',
 });
 
 test('Must process with default slot', async t => {
-  const actual = `<component src="layouts/default-slot.html"><slot>Default Slot Content</slot><slot footer>Footer</slot></component>`;
+  const actual = `<component src="layouts/default-slot.html">Default Slot Content<slot footer>Footer</slot></component>`;
   const expected = `<html><head><title>Default Slot Layout</title></head><body><main>Default Slot Content</main><footer>Footer</footer></body></html>`;
 
   const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));

@@ -53,13 +53,13 @@ function processNodes(tree, options, messages) {
 
     const html = parseToPostHtml(fs.readFileSync(filePath, options.encoding));
 
-    options.expressions.locals = {...options.locals}
+    options.expressions.locals = {...options.locals};
 
-    const {attributes, locals} = parseLocals(options, node, html);
+    const slotsLocals = parseSlotsLocals(options.slotTagName, html, node.content);
+    const {attributes, locals} = parseLocals(options, slotsLocals, node, html);
 
     options.expressions.locals = attributes;
-
-    options.expressions.locals.$slots = parseSlotsLocals(options.slotTagName, html, node.content);
+    options.expressions.locals.$slots = slotsLocals;
 
     const plugins = [...options.plugins, expressions(options.expressions)];
 
@@ -82,9 +82,10 @@ function processNodes(tree, options, messages) {
             if (typeof nodeAttrs[attr] === 'undefined') {
               nodeAttrs[attr] = [];
             }
+
             nodeAttrs[attr].push(attributes[attr]);
           } else if (['style'].includes(attr)) {
-            // TODO append style ?
+            // Append style ?
             nodeAttrs[attr] = attributes[attr];
           }
         }
@@ -107,12 +108,13 @@ function processNodes(tree, options, messages) {
 
 /**
  * Parse locals from attributes, globals and via script
- * @param {Object} options - plugin options
+ * @param {Object} options - Plugin options
+ * @param {Object} slotsLocals - Slot locals
  * @param {Object} tree - PostHTML Node
  * @param {Array} html - PostHTML Tree Nodes
- * @return {Object} merged locals and default
+ * @return {Object} - Merged locals and default
  */
-function parseLocals(options, {attrs}, html) {
+function parseLocals(options, slotsLocals, {attrs}, html) {
   let attributes = {...attrs};
 
   // Handle attributes to be merged with default
@@ -141,6 +143,7 @@ function parseLocals(options, {attrs}, html) {
       if (attribute === 'locals') {
         if (mergeAttributeWithDefault.includes(attribute)) {
           attributes = merge(attributes, parsed);
+          mergeAttributeWithDefault.splice(mergeAttributeWithDefault.indexOf('locals'), 1);
         } else {
           Object.assign(attributes, parsed);
         }
@@ -155,8 +158,8 @@ function parseLocals(options, {attrs}, html) {
   // Merge with global
   attributes = merge(options.expressions.locals, attributes);
 
-  // Retrieve default locals from <script defaultLocals> and merge with attributes
-  const {locals} = scriptDataLocals(html, {localsAttr: options.scriptLocalAttribute, removeScriptLocals: true, locals: {...attributes}});
+  // Retrieve default locals from <script props> and merge with attributes
+  const {locals} = scriptDataLocals(html, {localsAttr: options.scriptLocalAttribute, removeScriptLocals: true, locals: {...attributes, $slots: slotsLocals}});
 
   // Merge default locals and attributes
   //  or overrides locals with attributes
@@ -165,7 +168,12 @@ function parseLocals(options, {attrs}, html) {
       const attributesToBeMerged = Object.fromEntries(Object.entries(attributes).filter(([attribute]) => mergeAttributeWithDefault.includes(attribute)));
       const localsToBeMerged = Object.fromEntries(Object.entries(locals).filter(([local]) => mergeAttributeWithDefault.includes(local)));
       if (Object.keys(localsToBeMerged).length > 0) {
+        console.log({localsToBeMerged, attributesToBeMerged});
+        console.log(attributes);
         mergeAttributeWithDefault.forEach(attribute => {
+          console.log(attribute);
+          console.log(typeof localsToBeMerged[attribute]);
+          console.log(typeof attributesToBeMerged[attribute]);
           attributes[attribute] = merge(localsToBeMerged[attribute], attributesToBeMerged[attribute]);
         });
       }
@@ -189,8 +197,9 @@ function parseLocals(options, {attrs}, html) {
  * @return {Object}
  */
 function parseSlotsLocals(tag, html, content = []) {
-  const slots = [];
-  const getNodeName = (node) => {
+  const slots = {};
+
+  const getNodeName = node => {
     let name = node.attrs && node.attrs.name;
 
     if (!name) {
@@ -202,7 +211,7 @@ function parseSlotsLocals(tag, html, content = []) {
     }
 
     return name;
-  }
+  };
 
   match.call(html, {tag}, node => {
     const name = getNodeName(node);
@@ -230,7 +239,7 @@ function parseSlotsLocals(tag, html, content = []) {
 
     slots[name] = {
       filled: true,
-      locals: locals
+      locals
     };
 
     return node;
@@ -292,7 +301,6 @@ function mergeSlots(tree, node, strict, {slotTagName, fallbackSlotTagName}) {
         slotType
       );
     }
-
 
     delete fillSlots[slotName];
   }
@@ -410,7 +418,7 @@ module.exports = (options = {}) => {
       expressions: {},
       plugins: [],
       encoding: 'utf8',
-      scriptLocalAttribute: 'defaultLocals',
+      scriptLocalAttribute: 'props',
       matcher: [],
       strict: true
     },
@@ -470,7 +478,7 @@ module.exports = (options = {}) => {
     }
   }
 
-  options.locals = {...options.expressions.locals}
+  options.locals = {...options.expressions.locals};
 
   return function (tree) {
     tree = processNodes(tree, options, tree.messages);

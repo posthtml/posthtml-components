@@ -69,28 +69,28 @@ Result:
 
 ## Options
 
-|          Option          |              Default              | Description                                                                                                    |
-|:------------------------:|:---------------------------------:|:---------------------------------------------------------------------------------------------------------------|
-|         **root**         |              `'./'`               | String value as root path for components lookup.                                                               |
-|        **roots**         |               `''`                | Array of additional multi roots path from `options.root`.                                                      |
-|      **namespaces**      |               `[]`                | Array of namespace's root path, fallback path and custom path for override.                                    |
-|  **namespaceSeparator**  |               `::`                | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                 |
-|  **namespaceFallback**   |              `false`              | Boolean value for use fallback path to defined roots in `options.roots`.                                       |
-|    **fileExtension**     |              `html`               | String value for file extension of the components used for retrieve x-tag file.                                |
-|      **tagPrefix**       |               `x-`                | String for tag prefix.                                                                                         |
-|      **tagRegExp**       |     `new RegExp('^x-'), 'i')`     | Object for regex used to match x-tag. Set only `options.tagPrefix` to keep default.                            |
-|     **slotTagName**      |              `slot`               | String value for slot tag name.                                                                                |
-| **fallbackSlotTagName**  |              `false`              | Boolean or string value used to support posthtml-modules slot. Set to true to use `<content>` or set a string. |
-|       **tagName**        |            `component`            | String value for component tag.                                                                                |
-|       **tagNames**       |               `[]`                | Array of additional component tag. Useful if you are migrating from extend and modules.                        |
-|      **attribute**       |               `src`               | String value for component attribute for set path.                                                             |
-|      **attributes**      |               `[]`                | Array of additional component path to be used for migrating from extend and modules.                           |
-|     **expressions**      |               `{}`                | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.    |
-|       **plugins**        |               `[]`                | PostHTML plugins to apply for every parsed components.                                                         |
-|       **encoding**       |              `utf8`               | String value for the encoding of the component.                                                                |
-| **scriptLocalAttribute** |          `defaultLocals`          | String value for set custom attribute parsed by the plugin to retrieve default locals in the components.       |
-|       **matcher**        |               `[]`                | Array of object used to match the tags. Useful if you are migrating from extend and modules.                   |
-|        **strict**        |              `true`               | Boolean value for enable or disable throw an exception.                                                        |
+|          Option          |          Default          | Description                                                                                                    |
+|:------------------------:|:-------------------------:|:---------------------------------------------------------------------------------------------------------------|
+|         **root**         |          `'./'`           | String value as root path for components lookup.                                                               |
+|        **roots**         |           `''`            | Array of additional multi roots path from `options.root`.                                                      |
+|      **namespaces**      |           `[]`            | Array of namespace's root path, fallback path and custom path for override.                                    |
+|  **namespaceSeparator**  |           `::`            | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                 |
+|  **namespaceFallback**   |          `false`          | Boolean value for use fallback path to defined roots in `options.roots`.                                       |
+|    **fileExtension**     |          `html`           | String value for file extension of the components used for retrieve x-tag file.                                |
+|      **tagPrefix**       |           `x-`            | String for tag prefix.                                                                                         |
+|      **tagRegExp**       | `new RegExp('^x-'), 'i')` | Object for regex used to match x-tag. Set only `options.tagPrefix` to keep default.                            |
+|     **slotTagName**      |          `slot`           | String value for slot tag name.                                                                                |
+| **fallbackSlotTagName**  |          `false`          | Boolean or string value used to support posthtml-modules slot. Set to true to use `<content>` or set a string. |
+|       **tagName**        |        `component`        | String value for component tag.                                                                                |
+|       **tagNames**       |           `[]`            | Array of additional component tag. Useful if you are migrating from extend and modules.                        |
+|      **attribute**       |           `src`           | String value for component attribute for set path.                                                             |
+|      **attributes**      |           `[]`            | Array of additional component path to be used for migrating from extend and modules.                           |
+|     **expressions**      |           `{}`            | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.    |
+|       **plugins**        |           `[]`            | PostHTML plugins to apply for every parsed components.                                                         |
+|       **encoding**       |          `utf8`           | String value for the encoding of the component.                                                                |
+| **scriptLocalAttribute** |          `props`          | String value for set custom attribute parsed by the plugin to retrieve locals in the components.               |
+|       **matcher**        |           `[]`            | Array of object used to match the tags. Useful if you are migrating from extend and modules.                   |
+|        **strict**        |          `true`           | Boolean value for enable or disable throw an exception.                                                        |
 
 ## Feature
 

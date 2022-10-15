@@ -47,3 +47,30 @@ test('Must process component with locals as JSON and string', async t => {
 
   t.is(html, expected);
 });
+
+test('Must process parent and child locals via component', async t => {
+  const actual = `<x-parent aString="I am custom aString for PARENT via component (1)"><x-child></x-child></x-parent>`;
+  const expected = `PARENT:<div>  aBoolean  value: true  type: boolean  aString  value: I am custom aString for PARENT via component (1)  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>  <div>  aBoolean  value: true  type: boolean  aString  value: My String  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must process parent and child locals via slots', async t => {
+  const actual = `<x-parent aString="I am custom aString for PARENT via component (1)"><slot name="child"></slot></x-parent>`;
+  const expected = `PARENT:<div>  aBoolean  value: true  type: boolean  aString  value: I am custom aString for PARENT via component (1)  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>  <div>  aBoolean  value: true  type: boolean  aString  value: I am custom aString for PARENT via component (1)  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must has access to $slots in script locals', async t => {
+  const actual = `<x-script-locals><slot first>first slot content...</slot></x-script-locals>`;
+  const expected = `{"first":{"filled":true,"locals":{}},"second":{"filled":false}}object{"first":{"filled":true,"locals":{}},"second":{"filled":false}}object<div>first slot content...</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});

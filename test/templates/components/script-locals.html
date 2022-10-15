@@ -1,0 +1,8 @@
+<script props>
+  module.exports = {
+    hasSlot: locals.$slots
+  };
+</script>
+{{hasSlot}}{{typeof hasSlot}}
+{{$slots}}{{typeof $slots}}
+<div><slot first></slot><slot second></slot></div>

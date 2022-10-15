@@ -2,7 +2,7 @@
 <head><title>Slot Condition Layout</title></head>
 <body>
 <main><slot name="content"></slot></main>
-<if condition="slots.footer"><footer><slot name="footer">footer content</slot></footer></if>
+<if condition="$slots.footer.filled"><footer><slot name="footer">footer content</slot></footer></if>
 <else><p>There is not footer defined.</p></else>
 </body>
 </html>

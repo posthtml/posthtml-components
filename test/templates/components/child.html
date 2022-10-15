@@ -1,0 +1,48 @@
+<script props>
+  module.exports = {
+    aBoolean: true,
+    aString: 'My String',
+    aString2: locals.aString2 === 'yes' ? 'I am string 2' : 'I am not string 2',
+    anArray: ['one', 'two', 'three'],
+    anArray2: ['one2', 'two2', 'three2'],
+    anObject: { one: 'One', two: 'Two', three: 'Three'},
+    anObject2: { one: 'One2', two: 'Two2', three: 'Three2'}
+  };
+</script>
+<div>
+  aBoolean
+  value: {{ aBoolean }}
+  type: {{ typeof aBoolean }}
+
+  aString
+  value: {{ aString }}
+  type: {{ typeof aString }}
+
+  aString2
+  value: {{ aString2 }}
+  type: {{ typeof aString2 }}
+
+  anArray
+  value: {{ anArray }}
+  type: {{ typeof anArray }}
+
+  anObject
+  value: {{ anObject }}
+  type: {{ typeof anObject }}
+
+  anArray2
+  value: {{ anArray2 }}
+  type: {{ typeof anArray2 }}
+
+  anObject2
+  value: {{ anObject2 }}
+  type: {{ typeof anObject2 }}
+</div>
+
+<if condition="$slots.child.filled">
+  <slot child></slot>
+</if>
+
+<else>
+  <slot></slot>
+</else>
