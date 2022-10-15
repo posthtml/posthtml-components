@@ -53,7 +53,7 @@ function processNodes(tree, options, messages) {
 
     const html = parseToPostHtml(fs.readFileSync(filePath, options.encoding));
 
-    options.expressions.locals = {...options.locals};
+    options.expressions.locals = {...options.locals, ...options.aware};
 
     const slotsLocals = parseSlotsLocals(options.slotTagName, html, node.content);
     const {attributes, locals} = parseLocals(options, slotsLocals, node, html);
@@ -121,6 +121,7 @@ function parseLocals(options, slotsLocals, {attrs}, html) {
   //  only for Array or Objects
   const mergeAttributeWithDefault = [];
   const computedAttributes = [];
+  const awareAttributes = [];
   Object.keys(attributes).forEach(attribute => {
     if (attribute.startsWith('merge:')) {
       const newAttributeName = attribute.replace('merge:', '');
@@ -132,6 +133,11 @@ function parseLocals(options, slotsLocals, {attrs}, html) {
       attributes[newAttributeName] = attributes[attribute];
       delete attributes[attribute];
       computedAttributes.push(newAttributeName);
+    } else if (attribute.startsWith('aware:')) {
+      const newAttributeName = attribute.replace('aware:', '');
+      attributes[newAttributeName] = attributes[attribute];
+      delete attributes[attribute];
+      awareAttributes.push(newAttributeName);
     }
   });
 
@@ -168,12 +174,7 @@ function parseLocals(options, slotsLocals, {attrs}, html) {
       const attributesToBeMerged = Object.fromEntries(Object.entries(attributes).filter(([attribute]) => mergeAttributeWithDefault.includes(attribute)));
       const localsToBeMerged = Object.fromEntries(Object.entries(locals).filter(([local]) => mergeAttributeWithDefault.includes(local)));
       if (Object.keys(localsToBeMerged).length > 0) {
-        console.log({localsToBeMerged, attributesToBeMerged});
-        console.log(attributes);
         mergeAttributeWithDefault.forEach(attribute => {
-          console.log(attribute);
-          console.log(typeof localsToBeMerged[attribute]);
-          console.log(typeof attributesToBeMerged[attribute]);
           attributes[attribute] = merge(localsToBeMerged[attribute], attributesToBeMerged[attribute]);
         });
       }
@@ -184,6 +185,10 @@ function parseLocals(options, slotsLocals, {attrs}, html) {
         attributes[local] = locals[local];
       }
     });
+  }
+
+  if (awareAttributes.length > 0) {
+    options.aware = Object.fromEntries(Object.entries(attributes).filter(([attribute]) => awareAttributes.includes(attribute)));
   }
 
   return {attributes, locals};
@@ -479,6 +484,7 @@ module.exports = (options = {}) => {
   }
 
   options.locals = {...options.expressions.locals};
+  options.aware = {};
 
   return function (tree) {
     tree = processNodes(tree, options, tree.messages);
