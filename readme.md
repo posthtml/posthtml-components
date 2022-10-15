@@ -114,14 +114,10 @@ Init PostHTML:
 
 ```js
 // index.js
-const { readFileSync, writeFileSync } = require('fs')
 
-const posthtml = require('posthtml')
-const components = require('posthtml-components')
-
-posthtml(components({ root: './src', tagName: 'component', attribute: 'src' }))
-  .process(readFileSync('src/index.html', 'utf8'))
-  .then((result) => writeFileSync('dist/index.html', result.html, 'utf8'))
+require('posthtml')(require('posthtml-components')({ root: './src', tagName: 'component', attribute: 'src' }))
+  .process(/* ... */)
+  .then(/* ... */)
 ```
 
 We can also set multiple tag names by passing an array of component name and an array of attribute name, this is useful if you need to migrate from `posthtml-extend` and `posthtml-modules` where you are using different tag name.
@@ -144,7 +140,7 @@ Init PostHTML with multiple tag names and attributes:
 const options = { 
   root: './src', 
   tagNames: ['extends', 'module'], 
-  attribute: ['src', 'href']
+  attributes: ['src', 'href']
 };
 
 require('posthtml')(require('posthtml-components')(options))
