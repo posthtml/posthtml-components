@@ -14,15 +14,6 @@ test('Must process component to html', async t => {
   t.is(html, expected);
 });
 
-test('Must process all nested component to html', async t => {
-  const actual = `<div><x-nested-one></x-nested-one></div>`;
-  const expected = `<div><div class="nested-one"><div class="nested-two"><div class="nested-three">Nested works!</div></div></div></div>`;
-
-  const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
-
-  t.is(html, expected);
-});
-
 test('Must process component with namespace to html', async t => {
   const actual = `<x-dark::button><slot name="content">My button</slot></x-dark::button>`;
   const expected = `<button class="bg-dark text-light">My button</button>`;
