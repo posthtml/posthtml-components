@@ -2,6 +2,8 @@
 
 const fs = require('fs');
 const path = require('path');
+const {inspect} = require('util');
+const {sha256} = require('js-sha256');
 const expressions = require('posthtml-expressions');
 const scriptDataLocals = require('posthtml-expressions/lib/locals');
 const {parser: parseToPostHtml} = require('posthtml-parser');
@@ -11,8 +13,13 @@ const {match} = require('posthtml/lib/api');
 const merge = require('deepmerge');
 const findPathFromTagName = require('./find-path');
 
-// Used for slot without name
-const defaultSlotName = '__default-slot';
+const debug = true;
+
+const log = (object, what) => {
+  if (debug) {
+    console.log(what, inspect(object, false, null, true));
+  }
+};
 
 const defaultSlotType = 'replace';
 
@@ -55,7 +62,8 @@ function processNodes(tree, options, messages) {
 
     options.expressions.locals = {...options.locals, ...options.aware};
 
-    const slotsLocals = parseSlotsLocals(options.slotTagName, html, node.content);
+    const defaultSlotName = sha256(filePath);
+    const slotsLocals = parseSlotsLocals(options.slotTagName, html, node.content, defaultSlotName);
     const {attributes, locals} = parseLocals(options, slotsLocals, node, html);
 
     options.expressions.locals = attributes;
@@ -66,7 +74,7 @@ function processNodes(tree, options, messages) {
     const layoutTree = processNodes(applyPluginsToTree(html, plugins), options, messages);
 
     node.tag = false;
-    node.content = mergeSlots(layoutTree, node, options.strict, options);
+    node.content = mergeSlots(layoutTree, node, options.strict, options, defaultSlotName);
 
     const index = node.content.findIndex(content => typeof content === 'object');
 
@@ -199,13 +207,18 @@ function parseLocals(options, slotsLocals, {attrs}, html) {
  * @param {String} tag
  * @param html
  * @param {Object} content
+ * @param {String} defaultSlotName
  * @return {Object}
  */
-function parseSlotsLocals(tag, html, content = []) {
+function parseSlotsLocals(tag, html, content, defaultSlotName) {
   const slots = {};
 
   const getNodeName = node => {
-    let name = node.attrs && node.attrs.name;
+    if (!node.attrs) {
+      node.attrs = {};
+    }
+
+    let {name} = node.attrs;
 
     if (!name) {
       name = Object.keys({...node.attrs}).find(name => !Object.keys(slotTypes).includes(name) && name !== 'type' && name !== defaultSlotType);
@@ -260,11 +273,12 @@ function parseSlotsLocals(tag, html, content = []) {
  * @param {Boolean} strict
  * @param {String} slotTagName
  * @param {Boolean|String} fallbackSlotTagName
+ * @param defaultSlotName
  * @return {Object} tree
  */
-function mergeSlots(tree, node, strict, {slotTagName, fallbackSlotTagName}) {
-  const slots = getSlots(slotTagName, tree, fallbackSlotTagName); // Slot in component.html
-  const fillSlots = getSlots(slotTagName, node.content); // Slot in page.html
+function mergeSlots(tree, node, strict, {slotTagName, fallbackSlotTagName}, defaultSlotName) {
+  const slots = getSlots(slotTagName, tree, defaultSlotName, fallbackSlotTagName); // Slot in component.html
+  const fillSlots = getSlots(slotTagName, node.content, defaultSlotName); // Slot in page.html
   const clean = content => content.replace(/(\n|\t)/g, '').trim();
 
   // Retrieve main content, means everything that is not inside slots
@@ -272,6 +286,18 @@ function mergeSlots(tree, node, strict, {slotTagName, fallbackSlotTagName}) {
     const contentOutsideSlots = node.content.filter(content => (content.tag !== slotTagName));
     if (contentOutsideSlots.filter(c => typeof c !== 'string' || clean(c) !== '').length > 0) {
       fillSlots[defaultSlotName] = [{tag: slotTagName, attrs: {name: defaultSlotName}, content: [...contentOutsideSlots]}];
+    }
+
+    // Replace <content> with <block>
+    //  required only when using extend + module syntax
+    if (fallbackSlotTagName && slots[defaultSlotName]) {
+      slots[defaultSlotName].map(slot => {
+        if (slot.tag === (fallbackSlotTagName === true ? 'content' : fallbackSlotTagName)) {
+          slot.tag = slotTagName;
+        }
+
+        return slot;
+      });
     }
   }
 
@@ -351,10 +377,11 @@ function mergeContent(slotContent, defaultContent, slotType) {
  * Get all slots from content
  * @param {String} tag
  * @param {Object} content
+ * @param defaultSlotName
  * @param {Boolean|String} fallbackSlotTagName
  * @return {Object}
  */
-function getSlots(tag, content = [], fallbackSlotTagName = false) {
+function getSlots(tag, content, defaultSlotName, fallbackSlotTagName = false) {
   const slots = {};
 
   // For compatibility with module slot name <content>
@@ -485,6 +512,10 @@ module.exports = (options = {}) => {
 
   options.locals = {...options.expressions.locals};
   options.aware = {};
+
+  // options.locals.$isUndefined = value => value === void 0
+
+  log(debug, 'Debug enabled?');
 
   return function (tree) {
     tree = processNodes(tree, options, tree.messages);
