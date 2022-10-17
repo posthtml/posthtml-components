@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const {inspect} = require('util');
 const {sha256} = require('js-sha256');
+const styleToObject = require('style-to-object');
 const expressions = require('posthtml-expressions');
 const scriptDataLocals = require('posthtml-expressions/lib/locals');
 const {parser: parseToPostHtml} = require('posthtml-parser');
@@ -12,6 +13,7 @@ const parseAttrs = require('posthtml-attrs-parser');
 const {match} = require('posthtml/lib/api');
 const merge = require('deepmerge');
 const findPathFromTagName = require('./find-path');
+// const posthtml = require('posthtml');
 
 const debug = true;
 
@@ -63,7 +65,7 @@ function processNodes(tree, options, messages) {
     options.expressions.locals = {...options.locals, ...options.aware};
 
     const defaultSlotName = sha256(filePath);
-    const slotsLocals = parseSlotsLocals(options.slotTagName, html, node.content, defaultSlotName);
+    const slotsLocals = parseSlotsLocals(options.fillTagName, html, node.content, defaultSlotName);
     const {attributes, locals} = parseLocals(options, slotsLocals, node, html);
 
     options.expressions.locals = attributes;
@@ -74,33 +76,9 @@ function processNodes(tree, options, messages) {
     const layoutTree = processNodes(applyPluginsToTree(html, plugins), options, messages);
 
     node.tag = false;
-    node.content = mergeSlots(layoutTree, node, options.strict, options, defaultSlotName);
+    node.content = mergeSlots(layoutTree, node, options, defaultSlotName);
 
-    const index = node.content.findIndex(content => typeof content === 'object');
-
-    if (index !== -1) {
-      // Map component attributes that it's not defined
-      //  as locals to first element of node
-      //  for now only class and style
-      const nodeAttrs = parseAttrs(node.content[index].attrs);
-
-      Object.keys(attributes).forEach(attr => {
-        if (typeof locals[attr] === 'undefined') {
-          if (['class'].includes(attr)) {
-            if (typeof nodeAttrs[attr] === 'undefined') {
-              nodeAttrs[attr] = [];
-            }
-
-            nodeAttrs[attr].push(attributes[attr]);
-          } else if (['style'].includes(attr)) {
-            // Append style ?
-            nodeAttrs[attr] = attributes[attr];
-          }
-        }
-      });
-
-      node.content[index].attrs = nodeAttrs.compose();
-    }
+    parseAttributes(node, attributes, locals, options);
 
     messages.push({
       type: 'dependency',
@@ -267,25 +245,76 @@ function parseSlotsLocals(tag, html, content, defaultSlotName) {
 }
 
 /**
+ * Map component attributes that it's not defined as locals to first element of node
+ * @param {Object} node
+ * @param {Object} attributes
+ * @param {Object} locals
+ * @param {Object} options
+ * @return {void}
+ */
+function parseAttributes(node, attributes, locals, options) {
+  const index = node.content.findIndex(content => typeof content === 'object');
+
+  if (index !== -1) {
+    const nodeAttrs = parseAttrs(node.content[index].attrs, options.attrsParserRules);
+
+    Object.keys(attributes).forEach(attr => {
+      if (typeof locals[attr] === 'undefined') {
+        if (['class'].includes(attr)) {
+          // Merge class
+          if (typeof nodeAttrs.class === 'undefined') {
+            nodeAttrs.class = [];
+          }
+
+          nodeAttrs.class.push(attributes.class);
+
+          delete attributes.class;
+        } else if (['override:class'].includes(attr)) {
+          // Override class
+          nodeAttrs.class = attributes['override:class'];
+
+          delete attributes['override:class'];
+        } else if (['style'].includes(attr)) {
+          // Merge style
+          if (typeof nodeAttrs.style === 'undefined') {
+            nodeAttrs.style = {};
+          }
+
+          nodeAttrs.style = Object.assign(nodeAttrs.style, styleToObject(attributes.style));
+          delete attributes.style;
+        } else if (['override:style'].includes(attr)) {
+          // Override style
+          nodeAttrs.style = attributes['override:style'];
+          delete attributes['override:style'];
+        }
+      }
+    });
+
+    node.content[index].attrs = nodeAttrs.compose();
+  }
+}
+
+/**
  * Merge slots content
  * @param {Object} tree
  * @param {Object} node
  * @param {Boolean} strict
  * @param {String} slotTagName
+ * @param {String} fillTagName
  * @param {Boolean|String} fallbackSlotTagName
  * @param defaultSlotName
  * @return {Object} tree
  */
-function mergeSlots(tree, node, strict, {slotTagName, fallbackSlotTagName}, defaultSlotName) {
+function mergeSlots(tree, node, {strict, slotTagName, fillTagName, fallbackSlotTagName}, defaultSlotName) {
   const slots = getSlots(slotTagName, tree, defaultSlotName, fallbackSlotTagName); // Slot in component.html
-  const fillSlots = getSlots(slotTagName, node.content, defaultSlotName); // Slot in page.html
+  const fillSlots = getSlots(fillTagName, node.content, defaultSlotName); // Slot in page.html
   const clean = content => content.replace(/(\n|\t)/g, '').trim();
 
   // Retrieve main content, means everything that is not inside slots
   if (node.content) {
-    const contentOutsideSlots = node.content.filter(content => (content.tag !== slotTagName));
+    const contentOutsideSlots = node.content.filter(content => (content.tag !== fillTagName));
     if (contentOutsideSlots.filter(c => typeof c !== 'string' || clean(c) !== '').length > 0) {
-      fillSlots[defaultSlotName] = [{tag: slotTagName, attrs: {name: defaultSlotName}, content: [...contentOutsideSlots]}];
+      fillSlots[defaultSlotName] = [{tag: fillTagName, attrs: {name: defaultSlotName}, content: [...contentOutsideSlots]}];
     }
 
     // Replace <content> with <block>
@@ -429,6 +458,12 @@ function applyPluginsToTree(tree, plugins) {
   }, tree);
 }
 
+// function processWithPostHtml(html, options = {}, plugins = []) {
+//   return posthtml(plugins)
+//     .process(html, options)
+//     .then(result => result.tree);
+// }
+
 module.exports = (options = {}) => {
   options = {
     ...{
@@ -441,6 +476,7 @@ module.exports = (options = {}) => {
       tagPrefix: 'x-',
       tagRegExp: new RegExp(`^${options.tagPrefix || 'x-'}`, 'i'),
       slotTagName: 'slot',
+      fillTagName: 'slot',
       // Used for compatibility with modules plugin <content> slot, set to true only if you have migrated from modules plugin
       fallbackSlotTagName: false,
       tagName: 'component',
@@ -452,7 +488,8 @@ module.exports = (options = {}) => {
       encoding: 'utf8',
       scriptLocalAttribute: 'props',
       matcher: [],
-      strict: true
+      strict: true,
+      attrsParserRules: {}
     },
     ...options
   };

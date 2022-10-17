@@ -24,8 +24,8 @@ test('Must process attributes as locals', async t => {
 });
 
 test('Must process default attributes and map style and class for the first node', async t => {
-  const actual = `<component src="components/component-mapped-attributes.html" title="My Title" class="bg-light p-2" style="display: flex; font-size: 20px;"></component>`;
-  const expected = `<div class="text-dark m-3 bg-light p-2" style="display: flex; font-size: 20px;">My Title Default body</div>`;
+  const actual = `<component src="components/component-mapped-attributes.html" title="My Title" class="bg-light p-2" style="display: flex; font-size: 20px"></component>`;
+  const expected = `<div class="text-dark m-3 bg-light p-2" style="display: flex; font-size: 20px">My Title Default body</div>`;
 
   const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
 
