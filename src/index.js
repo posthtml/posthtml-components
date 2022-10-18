@@ -231,11 +231,24 @@ function setFilledSlots(currentNode, slots, {slot}) {
  */
 function processPushes(tree, content, {push}) {
   match.call(tree, {tag: push}, pushNode => {
+    if (!pushNode.attrs || !pushNode.attrs.name) {
+      throw new Error(`[components] Push <${push}> tag must have an attribute "name".`);
+    }
+
     if (!content[pushNode.attrs.name]) {
       content[pushNode.attrs.name] = [];
     }
 
-    content[pushNode.attrs.name].push(pushNode.content);
+    const pushContent = render(pushNode.content);
+
+    if (typeof pushNode.attrs.once === 'undefined' || !content[pushNode.attrs.name].includes(pushContent)) {
+      if (typeof pushNode.attrs.prepend  === 'undefined') {
+        content[pushNode.attrs.name].push(pushContent);
+      } else {
+        content[pushNode.attrs.name].unshift(pushContent);
+      }
+    }
+
     pushNode.tag = false;
     pushNode.content = null;
 
