@@ -3,4 +3,4 @@
         title: 'Default title'
     }
 </script>
-<html><head><title>{{ title }}</title></head><body><main><slot name="content"></slot></main><footer><slot name="footer">footer content</slot></footer></body></html>
+<html><head><title>{{ title }}</title></head><body><main><yield></yield></main><footer><fill:footer></fill:footer></footer></body></html>

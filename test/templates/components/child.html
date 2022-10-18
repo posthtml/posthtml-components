@@ -1,7 +1,7 @@
 <script props>
   module.exports = {
     aBoolean: true,
-    aString: 'My String',
+    aString: 'My String Child',
     aString2: locals.aString2 === 'yes' ? 'I am string 2' : 'I am not string 2',
     anArray: ['one', 'two', 'three'],
     anArray2: ['one2', 'two2', 'three2'],
@@ -39,11 +39,3 @@ CHILD:
   value: {{ anObject2 }}
   type: {{ typeof anObject2 }}
 </div>
-
-<if condition="$slots.child.filled">
-  <slot child></slot>
-</if>
-
-<else>
-  <slot></slot>
-</else>

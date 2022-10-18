@@ -1,7 +1,8 @@
 <html>
 <head><title>Base Layout</title></head>
 <body>
-<main><slot name="content"></slot></main>
-<footer><slot name="footer">footer content</slot></footer>
+<header><fill:header></fill:header></header>
+<main><yield></yield></main>
+<footer><fill:footer>footer content</fill:footer></footer>
 </body>
 </html>

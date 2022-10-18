@@ -15,8 +15,8 @@ test('Must process all nested component to html', async t => {
 });
 
 test('Must process all nested component with slots to html', async t => {
-  const actual = `<div><x-nested-one-slot><x-nested-two-slot>nested-two content<slot before>nested-two before</slot><slot after>nested-two after</slot></x-nested-two-slot><slot before>nested-one before</slot><slot after>nested-one after</slot></x-nested-one-slot></div>`;
-  const expected = `<div><div class="nested-one">  nested-one before  <div>  nested-two before  nested-two content  nested-two after</div>  nested-one after</div></div>`;
+  const actual = `<x-nested-one-slot><x-nested-two-slot>yield content<slot:before2>nested-two before</slot:before2><slot:after2>nested-two after</slot:after2></x-nested-two-slot><slot:before>nested-one before</slot:before><slot:after>nested-one after</slot:after></x-nested-one-slot>`;
+  const expected = `<div class="nested-one"><div class="nested-one-before">nested-one before</div><div class="nested-one-yield"><div class="nested-two"><div class="nested-two-before">nested-two before</div><div class="nested-two-yield">yield content</div><div class="nested-two-after">nested-two after</div></div></div><div class="nested-one-after">nested-one after</div></div>`;
 
   const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
 

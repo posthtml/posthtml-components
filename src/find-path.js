@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const fs = require('fs');
+const {existsSync} = require('fs');
 
 const folderSeparator = '.';
 
@@ -57,17 +57,17 @@ function findPathByNamespace(tag, [namespace, fileNameFromTag], options) {
 
   // First check in defined namespace's custom root if module was overridden
   let foundByIndexFile = false;
-  if (customTagNamespace.custom && (fs.existsSync(path.join(customTagNamespace.custom, fileNameFromTag)) || (foundByIndexFile = fs.existsSync(path.join(customTagNamespace.custom, indexFileNameFromTag))))) {
+  if (customTagNamespace.custom && (existsSync(path.join(customTagNamespace.custom, fileNameFromTag)) || (foundByIndexFile = existsSync(path.join(customTagNamespace.custom, indexFileNameFromTag))))) {
     customTagNamespace.root = customTagNamespace.custom;
     if (foundByIndexFile) {
       fileNameFromTag = indexFileNameFromTag;
     }
     // Then check in defined namespace's or fallback path
-  } else if (!fs.existsSync(path.join(customTagNamespace.root, fileNameFromTag))) {
-    if (fs.existsSync(path.join(customTagNamespace.root, indexFileNameFromTag))) {
+  } else if (!existsSync(path.join(customTagNamespace.root, fileNameFromTag))) {
+    if (existsSync(path.join(customTagNamespace.root, indexFileNameFromTag))) {
       // Module found in folder `tag-name/index.html`
       fileNameFromTag = indexFileNameFromTag;
-    } else if (customTagNamespace.fallback && (fs.existsSync(path.join(customTagNamespace.fallback, fileNameFromTag)) || (foundByIndexFile = fs.existsSync(path.join(customTagNamespace.fallback, indexFileNameFromTag))))) {
+    } else if (customTagNamespace.fallback && (existsSync(path.join(customTagNamespace.fallback, fileNameFromTag)) || (foundByIndexFile = existsSync(path.join(customTagNamespace.fallback, indexFileNameFromTag))))) {
       // Module found in defined namespace fallback
       customTagNamespace.root = customTagNamespace.fallback;
       if (foundByIndexFile) {
@@ -107,7 +107,7 @@ function findPathByNamespace(tag, [namespace, fileNameFromTag], options) {
  * @return {String|boolean} [custom tag root where the module is found]
  */
 function findPathByRoot(tag, fileNameFromTag, options) {
-  let root = options.roots.find(root => fs.existsSync(path.join(root, fileNameFromTag)));
+  let root = options.roots.find(root => existsSync(path.join(root, fileNameFromTag)));
 
   if (!root) {
     // Check if module exist in folder `tag-name/index.html`
@@ -115,7 +115,7 @@ function findPathByRoot(tag, fileNameFromTag, options) {
       .replace(`.${options.fileExtension}`, '')
       .concat(path.sep, 'index.', options.fileExtension);
 
-    root = options.roots.find(root => fs.existsSync(path.join(root, fileNameFromTag)));
+    root = options.roots.find(root => existsSync(path.join(root, fileNameFromTag)));
   }
 
   if (!root) {

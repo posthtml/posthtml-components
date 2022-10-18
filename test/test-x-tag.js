@@ -5,7 +5,7 @@ const plugin = require('../src');
 const posthtml = require('posthtml');
 const clean = html => html.replace(/(\n|\t)/g, '').trim();
 
-test('Must process component to html', async t => {
+test('Must process component with x-tag', async t => {
   const actual = `<x-modal></x-modal>`;
   const expected = `<div>Modal</div>`;
 
@@ -14,8 +14,8 @@ test('Must process component to html', async t => {
   t.is(html, expected);
 });
 
-test('Must process component with namespace to html', async t => {
-  const actual = `<x-dark::button><slot name="content">My button</slot></x-dark::button>`;
+test('Must process component with namespace', async t => {
+  const actual = `<x-dark::button>My button</x-dark::button>`;
   const expected = `<button class="bg-dark text-light">My button</button>`;
 
   const html = await posthtml([plugin({root: './test/templates', namespaces: [{name: 'dark', root: './test/templates/dark/components'}]})]).process(actual).then(result => clean(result.html));
@@ -23,7 +23,7 @@ test('Must process component with namespace to html', async t => {
   t.is(html, expected);
 });
 
-test('Must process component with namespace to html using index file', async t => {
+test('Must process component with namespace using index file', async t => {
   const actual = `<x-dark::label></x-dark::label>`;
   const expected = `<label class="bg-dark text-light">My Dark Label</label>`;
 
@@ -51,7 +51,7 @@ test(`Must process component with namespace's fallback path using index file`, a
 });
 
 test(`Must process component with namespace's custom path`, async t => {
-  const actual = `<x-dark::button><slot name="content">My button</slot></x-dark::button>`;
+  const actual = `<x-dark::button>My button</x-dark::button>`;
   const expected = `<button class="bg-dark-custom text-light-custom">My button</button>`;
 
   const html = await posthtml([plugin({root: './test/templates', namespaces: [{name: 'dark', root: './test/templates/dark/components', custom: './test/templates/custom/dark/components'}]})]).process(actual).then(result => clean(result.html));

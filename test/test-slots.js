@@ -6,8 +6,8 @@ const posthtml = require('posthtml');
 const clean = html => html.replace(/(\n|\t)/g, '').trim();
 
 test('Must process with slots', async t => {
-  const actual = `<component src="layouts/base.html"><slot name="content"><h1>Content</h1></slot><slot name="footer">Footer</slot></component>`;
-  const expected = `<html><head><title>Base Layout</title></head><body><main><h1>Content</h1></main><footer>Footer</footer></body></html>`;
+  const actual = `<component src="layouts/base.html"><div>Main content</div><slot:header><h1>My header</h1></slot:header><slot:footer>My footer</slot:footer></component>`;
+  const expected = `<html><head><title>Base Layout</title></head><body><header><h1>My header</h1></header><main><div>Main content</div></main><footer>My footer</footer></body></html>`;
 
   const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
 
@@ -15,7 +15,7 @@ test('Must process with slots', async t => {
 });
 
 test('Must process the same component multiple times', async t => {
-  const actual = `<component src="components/component.html"><slot name="title">Title</slot><slot name="body">Body</slot></component><component src="components/component.html"><slot name="title">Title 2</slot><slot name="body">Body 2</slot></component>`;
+  const actual = `<component src="components/component.html"><slot:title>Title</slot:title><slot:body>Body</slot:body></component><component src="components/component.html"><slot:title>Title 2</slot:title><slot:body>Body 2</slot:body></component>`;
   const expected = `<div>Title</div><div>Body</div><div>Title 2</div><div>Body 2</div>`;
 
   const html = await posthtml([plugin({root: './test/templates/'})]).process(actual).then(result => clean(result.html));
@@ -23,63 +23,27 @@ test('Must process the same component multiple times', async t => {
   t.is(html, expected);
 });
 
-test('Must process multiple slots', async t => {
-  const actual = `<component src="components/component-multiple-slot.html"><slot name="title">Title</slot><slot name="body">Body</slot></component>`;
-  const expected = `<div>Title</div><div>Body</div><div>Title</div>`;
+test('Must process multiple time a slot with aware attribute', async t => {
+  // With aware
+  let actual = `<component src="components/component-multiple-slot.html"><slot:title aware>Title</slot:title><slot:body>Body</slot:body></component>`;
+  let expected = `<div>Title</div><div>Body</div><div>Title</div>`;
 
-  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+  let html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+
+  // Without aware
+  actual = `<component src="components/component-multiple-slot.html"><slot:title>Title</slot:title><slot:body>Body</slot:body></component>`;
+  expected = `<div>Title</div><div>Body</div><div></div>`;
+
+  html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
 
   t.is(html, expected);
 });
 
 test('Must process append and prepend content to slot', async t => {
-  const actual = `<component src="components/component-append-prepend.html"><slot name="title" type="append"> Append</slot><slot name="body" type="prepend">Prepend </slot></component>`;
-  const expected = `<div>Title Append</div><div>Prepend Body</div>`;
-
-  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
-
-  t.is(html, expected);
-});
-
-test('Must process with slots using shorthands names syntax', async t => {
-  const actual = `<component src="layouts/base.html"><slot content>Content</slot><slot footer>Footer</slot></component>`;
-  const expected = `<html><head><title>Base Layout</title></head><body><main>Content</main><footer>Footer</footer></body></html>`;
-
-  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
-
-  t.is(html, expected);
-});
-
-test('Must process append and prepend using shorthands types syntax', async t => {
-  const actual = `<component src="components/component-append-prepend.html"><slot name="title" append> Append</slot><slot name="body" prepend>Prepend </slot></component>`;
-  const expected = `<div>Title Append</div><div>Prepend Body</div>`;
-
-  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
-
-  t.is(html, expected);
-});
-
-test('Must process with slots using shorthands names and types syntax together', async t => {
-  const actual = `<component src="components/component-append-prepend.html"><slot title append> Append</slot><slot body prepend>Prepend </slot></component>`;
-  const expected = `<div>Title Append</div><div>Prepend Body</div>`;
-
-  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
-
-  t.is(html, expected);
-});
-
-test('Must process with default slot', async t => {
-  const actual = `<component src="layouts/default-slot.html">Default Slot Content<slot footer>Footer</slot></component>`;
-  const expected = `<html><head><title>Default Slot Layout</title></head><body><main>Default Slot Content</main><footer>Footer</footer></body></html>`;
-
-  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
-
-  t.is(html, expected);
-});
-
-test('Must process with default slot without defining slot tag', async t => {
-  const actual = `<component src="layouts/default-slot.html"><div>Default Slot Content</div><slot footer>Footer</slot></component>`;
-  const expected = `<html><head><title>Default Slot Layout</title></head><body><main><div>Default Slot Content</div></main><footer>Footer</footer></body></html>`;
+  const actual = `<component src="components/component-append-prepend.html"><slot:title append><span>Append</span></slot:title><slot:body prepend><span>Prepend</span></slot:body></component>`;
+  const expected = `<div>Title<span>Append</span></div><div><span>Prepend</span>Body</div>`;
 
   const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
 
@@ -87,17 +51,26 @@ test('Must process with default slot without defining slot tag', async t => {
 });
 
 test('Must process slots conditional rendering by using slot name', async t => {
-  let actual = `<component src="layouts/slot-condition.html"><slot name="content"><h1>Content</h1></slot></component>`;
+  let actual = `<component src="layouts/slot-condition.html"><h1>Content</h1></component>`;
   let expected = `<html><head><title>Slot Condition Layout</title></head><body><main><h1>Content</h1></main><p>There is not footer defined.</p></body></html>`;
 
   let html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
 
   t.is(html, expected);
 
-  actual = `<component src="layouts/slot-condition.html"><slot name="content"><h1>Content</h1></slot><slot name="footer">There is now footer defined</slot></component>`;
+  actual = `<component src="layouts/slot-condition.html"><h1>Content</h1><slot:footer>There is now footer defined</slot:footer></component>`;
   expected = `<html><head><title>Slot Condition Layout</title></head><body><main><h1>Content</h1></main><footer>There is now footer defined</footer></body></html>`;
 
-  html = await posthtml([plugin({root: './test/templates', strict: false})]).process(actual).then(result => clean(result.html));
+  html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must render slots using $slots locals', async t => {
+  const actual = `<component src="layouts/base-render-slots-locals.html"><div>Main content</div><slot:header><h1>My header</h1></slot:header><slot:footer>My footer</slot:footer></component>`;
+  const expected = `<html><head><title>Base Render Slots Locals Layout</title></head><body><header><h1>My header</h1></header><main><div>Main content</div></main><footer>My footer</footer></body></html>`;
+
+  const html = await posthtml([plugin({root: './test/templates'})]).process(actual).then(result => clean(result.html));
 
   t.is(html, expected);
 });

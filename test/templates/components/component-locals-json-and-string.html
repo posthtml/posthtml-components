@@ -6,9 +6,13 @@
             title: 'This is default main title',
             subtitle: 'This is default subtitle',
             suptitle: 'This is default suptitle'
-        }
+        },
+        mycomputed: locals.mycomputed === true ? 'Computed is true' : 'Computed is false'
     }
 </script>
-<div><h1>{{title}}</h1></div>
+<div>
+<div>{{ mycomputed }}</div>
+<div><h1>{{ title }}</h1></div>
 <div><each loop="item in items"><span>{{ item }}</span></each></div>
 <div><each loop="t, i in titles"><span>{{ i }}: {{ t }}</span></each></div>
+</div>

@@ -1,8 +1,8 @@
 <html>
 <head><title>Slot Condition Layout</title></head>
 <body>
-<main><slot name="content"></slot></main>
-<if condition="$slots.footer.filled"><footer><slot name="footer">footer content</slot></footer></if>
+<main><yield></yield></main>
+<if condition="$slots.footer?.filled"><footer><fill:footer></fill:footer></footer></if>
 <else><p>There is not footer defined.</p></else>
 </body>
 </html>

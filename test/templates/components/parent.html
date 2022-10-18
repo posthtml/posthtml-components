@@ -39,15 +39,4 @@ PARENT:
   value: {{ anObject2 }}
   type: {{ typeof anObject2 }}
 </div>
-
-<if condition="$slots.child.filled">
-  <x-child
-    aBoolean="{{ typeof $slots.child.locals?.aBoolean !== 'undefined' ? $slots.child.locals.aBoolean : aBoolean }}"
-    aString="{{ $slots.child.locals?.aString || aString }}"
-  >
-    <slot child></slot>
-  </x-child>
-</if>
-<else>
-  <slot></slot>
-</else>
+<yield></yield>

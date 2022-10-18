@@ -1,8 +1,8 @@
 <script props>
   module.exports = {
-    hasSlot: locals.$slots
-  };
+    title: 'Default title'
+  }
 </script>
-{{hasSlot}}{{typeof hasSlot}}
-{{$slots}}{{typeof $slots}}
-<div><slot first></slot><slot second></slot></div>
+{{ $slots }}
+<div>{{ $slots }}</div>
+<div><h1>{{title}}</h1></div><div><fill:filled></fill:filled><fill:notfilled></fill:notfilled></div>
