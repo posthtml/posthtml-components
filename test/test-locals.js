@@ -57,7 +57,7 @@ test('Must process parent and child locals via component', async t => {
 
 test('Must has access to $slots in script locals', async t => {
   const actual = `<x-script-locals><slot:filled>filled slot content...</slot:filled></x-script-locals>`;
-  const expected = `<div>{"filled":{"filled":true,"rendered":false,"tag":"slot:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","locals":{}}}</div><div><h1>Default title</h1></div><div>filled slot content...</div>`;
+  const expected = `{"filled":{"filled":true,"rendered":false,"tag":"slot:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","locals":{}}}<div>{"filled":{"filled":true,"rendered":false,"tag":"slot:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","locals":{}}}</div><div><h1>Default title</h1></div><div>filled slot content...</div>`;
 
   const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
 

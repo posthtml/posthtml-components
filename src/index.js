@@ -71,6 +71,9 @@ module.exports = (options = {}) => tree => {
 
   log(options, 'options', 'init');
 
+  // Apply expressions to initial tree
+  tree = expressions(options.expressions)(tree);
+
   tree = processTree(options)(tree);
 
   return tree;
@@ -115,7 +118,7 @@ function processTree(options) {
 
       log(`${++processCounter} ${componentPath}`, 'Processing component', 'processTree');
 
-      const nextNode = parser(readFileSync(componentPath, 'utf8'));
+      let nextNode = parser(readFileSync(componentPath, 'utf8'));
 
       // Set filled slots
       setFilledSlots(currentNode, slotContent, options);
@@ -133,7 +136,8 @@ function processTree(options) {
 
       log({attributes, locals, slotContent}, 'Processed attributes, locals and slots', 'processTree');
 
-      expressions(options.expressions)(nextNode);
+      nextNode = expressions(options.expressions)(nextNode);
+      // process.exit(0);
 
       // Process <stack> tag
       processPushes(nextNode, pushedContent, options);
