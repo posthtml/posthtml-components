@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const {inspect} = require('util');
 const {sha256} = require('js-sha256');
 const styleToObject = require('style-to-object');
 const expressions = require('posthtml-expressions');
@@ -13,15 +12,6 @@ const parseAttrs = require('posthtml-attrs-parser');
 const {match} = require('posthtml/lib/api');
 const merge = require('deepmerge');
 const findPathFromTagName = require('./find-path');
-// const posthtml = require('posthtml');
-
-const debug = true;
-
-const log = (object, what) => {
-  if (debug) {
-    console.log(what, inspect(object, false, null, true));
-  }
-};
 
 const defaultSlotType = 'replace';
 
@@ -66,6 +56,7 @@ function processNodes(tree, options, messages) {
 
     const defaultSlotName = sha256(filePath);
     const slotsLocals = parseSlotsLocals(options.fillTagName, html, node.content, defaultSlotName);
+
     const {attributes, locals} = parseLocals(options, slotsLocals, node, html);
 
     options.expressions.locals = attributes;
@@ -298,14 +289,14 @@ function parseAttributes(node, attributes, locals, options) {
  * Merge slots content
  * @param {Object} tree
  * @param {Object} node
- * @param {Boolean} strict
+ * @param {Boolean} strictNames
  * @param {String} slotTagName
  * @param {String} fillTagName
  * @param {Boolean|String} fallbackSlotTagName
  * @param defaultSlotName
  * @return {Object} tree
  */
-function mergeSlots(tree, node, {strict, slotTagName, fillTagName, fallbackSlotTagName}, defaultSlotName) {
+function mergeSlots(tree, node, {strictNames, slotTagName, fillTagName, fallbackSlotTagName}, defaultSlotName) {
   const slots = getSlots(slotTagName, tree, defaultSlotName, fallbackSlotTagName); // Slot in component.html
   const fillSlots = getSlots(fillTagName, node.content, defaultSlotName); // Slot in page.html
   const clean = content => content.replace(/(\n|\t)/g, '').trim();
@@ -365,7 +356,7 @@ function mergeSlots(tree, node, {strict, slotTagName, fillTagName, fallbackSlotT
     delete fillSlots[slotName];
   }
 
-  if (strict) {
+  if (strictNames) {
     const unexpectedSlots = [];
 
     for (const fillSlotName of Object.keys(fillSlots)) {
@@ -458,12 +449,6 @@ function applyPluginsToTree(tree, plugins) {
   }, tree);
 }
 
-// function processWithPostHtml(html, options = {}, plugins = []) {
-//   return posthtml(plugins)
-//     .process(html, options)
-//     .then(result => result.tree);
-// }
-
 module.exports = (options = {}) => {
   options = {
     ...{
@@ -489,6 +474,7 @@ module.exports = (options = {}) => {
       scriptLocalAttribute: 'props',
       matcher: [],
       strict: true,
+      strictNames: false,
       attrsParserRules: {}
     },
     ...options
@@ -551,8 +537,6 @@ module.exports = (options = {}) => {
   options.aware = {};
 
   // options.locals.$isUndefined = value => value === void 0
-
-  log(debug, 'Debug enabled?');
 
   return function (tree) {
     tree = processNodes(tree, options, tree.messages);
