@@ -42,21 +42,17 @@ module.exports = (options = {}) => tree => {
   options.plugins = options.plugins || [];
   options.strict = typeof options.strict === 'undefined' ? true : options.strict;
   options.attrsParserRules = options.attrsParserRules || {};
-
   options.slot = new RegExp(`^${options.slot}:`, 'i');
   options.fill = new RegExp(`^${options.fill}:`, 'i');
   options.tagPrefix = new RegExp(`^${options.tagPrefix}`, 'i');
   options.matcher = options.matcher || [{tag: options.tag}, {tag: options.tagPrefix}];
-
   options.roots = Array.isArray(options.roots) ? options.roots : [options.roots];
   options.roots.forEach((root, index) => {
     options.roots[index] = path.join(options.root, root);
   });
-
   options.namespaces = Array.isArray(options.namespaces) ? options.namespaces : [options.namespaces];
   options.namespaces.forEach((namespace, index) => {
     options.namespaces[index].root = path.resolve(namespace.root);
-
     if (namespace.fallback) {
       options.namespaces[index].fallback = path.resolve(namespace.fallback);
     }
@@ -69,11 +65,7 @@ module.exports = (options = {}) => tree => {
   options.locals = {...options.expressions.locals};
   options.aware = {};
 
-  log(options, 'options', 'init');
-
-  // Apply expressions to initial tree
   tree = expressions(options.expressions)(tree);
-
   tree = processTree(options)(tree);
 
   return tree;
@@ -111,10 +103,8 @@ function processTree(options) {
         return currentNode;
       }
 
-      // Process <stack> tag
+      // Process <push> tag
       processPushes(currentNode, pushedContent, options);
-
-      // log(componentNode, 'componentNode');
 
       log(`${++processCounter} ${componentPath}`, 'Processing component', 'processTree');
 
@@ -129,17 +119,11 @@ function processTree(options) {
       const {attributes, locals} = processLocals(currentNode, nextNode, slotContent, options);
 
       options.expressions.locals = attributes;
-
       options.expressions.locals.$slots = slotContent;
-
       // const plugins = [...options.plugins, expressions(options.expressions)];
-
-      log({attributes, locals, slotContent}, 'Processed attributes, locals and slots', 'processTree');
-
       nextNode = expressions(options.expressions)(nextNode);
-      // process.exit(0);
 
-      // Process <stack> tag
+      // Process <push> tag
       processPushes(nextNode, pushedContent, options);
 
       // Process <stack> tag
@@ -192,8 +176,6 @@ function setFilledSlots(currentNode, slots, {slot}) {
 
     const name = fillNode.tag.split(':')[1];
 
-    log(name, 'found filled slot', 'setFilledSlots');
-
     /** @var {Object} locals */
     const locals = Object.fromEntries(Object.entries(fillNode.attrs).filter(([attributeName]) => ![name, 'type'].includes(attributeName)));
 
@@ -217,8 +199,6 @@ function setFilledSlots(currentNode, slots, {slot}) {
 
     return fillNode;
   });
-
-  log(slots, 'all filled slots found', 'setFilledSlots');
 }
 
 /**
@@ -242,7 +222,7 @@ function processPushes(tree, content, {push}) {
     const pushContent = render(pushNode.content);
 
     if (typeof pushNode.attrs.once === 'undefined' || !content[pushNode.attrs.name].includes(pushContent)) {
-      if (typeof pushNode.attrs.prepend  === 'undefined') {
+      if (typeof pushNode.attrs.prepend === 'undefined') {
         content[pushNode.attrs.name].push(pushContent);
       } else {
         content[pushNode.attrs.name].unshift(pushContent);
@@ -254,8 +234,6 @@ function processPushes(tree, content, {push}) {
 
     return pushNode;
   });
-
-  log(Object.keys(content), 'Found pushes', 'processPushes');
 }
 
 /**
@@ -267,8 +245,6 @@ function processPushes(tree, content, {push}) {
  * @return {void}
  */
 function processStacks(tree, content, {stack}) {
-  log(Object.keys(content), 'Process stacks for this push', 'processStacks');
-
   match.call(tree, {tag: stack}, stackNode => {
     stackNode.tag = false;
     stackNode.content = content[stackNode.attrs.name];
@@ -292,8 +268,6 @@ function processSlotContent(tree, content, {slot}) {
       content[name] = {};
     }
 
-    log(name, 'processing slot', 'processSlotContent');
-
     content[name].tag = slotNode.tag;
     content[name].attrs = slotNode.attrs;
     content[name].content = slotNode.content;
@@ -305,8 +279,6 @@ function processSlotContent(tree, content, {slot}) {
 
     return slotNode;
   });
-
-  log(content, 'Slots processed', 'processSlotContent');
 }
 
 /**
@@ -320,8 +292,6 @@ function processSlotContent(tree, content, {slot}) {
 function processFillContent(tree, content, {fill}) {
   match.call(tree, {tag: fill}, fillNode => {
     const name = fillNode.tag.split(':')[1];
-
-    log(name, 'Processing fill', 'processFillContent');
 
     fillNode.tag = false;
 
@@ -341,8 +311,6 @@ function processFillContent(tree, content, {fill}) {
 
     return fillNode;
   });
-
-  log(content, 'Processed fill', 'processFillContent');
 }
 
 /**
@@ -360,6 +328,7 @@ function processLocals(currentNode, nextNode, slotContent, options) {
   const merged = [];
   const computed = [];
   const aware = [];
+
   Object.keys(attributes).forEach(attributeName => {
     const newAttributeName = attributeName
       .replace('merge:', '')
@@ -368,22 +337,18 @@ function processLocals(currentNode, nextNode, slotContent, options) {
 
     switch (true) {
       case attributeName.startsWith('merge:'):
-        log(attributeName, 'merge', 'processLocals');
         attributes[newAttributeName] = attributes[attributeName];
         delete attributes[attributeName];
         merged.push(newAttributeName);
-
         break;
 
       case attributeName.startsWith('computed:'):
-        log(attributeName, 'computed', 'processLocals');
         attributes[newAttributeName] = attributes[attributeName];
         delete attributes[attributeName];
         computed.push(newAttributeName);
         break;
 
       case attributeName.startsWith('aware:'):
-        log(attributeName, 'aware', 'processLocals');
         attributes[newAttributeName] = attributes[attributeName];
         delete attributes[attributeName];
         aware.push(newAttributeName);
@@ -419,8 +384,6 @@ function processLocals(currentNode, nextNode, slotContent, options) {
   // Retrieve default locals from <script props> and merge with attributes
   const {locals} = scriptDataLocals(nextNode, {localsAttr: options.localsAttr, removeScriptLocals: true, locals: {...attributes, $slots: slotContent}});
 
-  log(locals, 'locals parsed in tag ' + currentNode.tag, 'processLocals');
-
   // Merge default locals and attributes or overrides props with attributes
   if (locals) {
     if (merged.length > 0) {
@@ -448,8 +411,6 @@ function processLocals(currentNode, nextNode, slotContent, options) {
     options.aware = Object.fromEntries(Object.entries(attributes).filter(([attributeName]) => aware.includes(attributeName)));
   }
 
-  log({locals, attributes}, 'locals and attributes processed for tag ' + currentNode.tag, 'processLocals');
-
   return {attributes, locals};
 }
 
@@ -472,44 +433,29 @@ function processAttributes(currentNode, attributes, locals, options) {
 
   const nodeAttrs = parseAttrs(currentNode.content[index].attrs, options.attrsParserRules);
 
-  log(nodeAttrs, 'nodeAttrs in processAttributes', 'processAttributes');
-  log(locals, 'locals in processAttributes', 'processAttributes');
-  log(options.aware, 'options aware in processAttributes', 'processAttributes');
-
   Object.keys(attributes).forEach(attr => {
-    log(attr, 'processing attribute', 'processAttributes');
-    log(typeof locals[attr] === 'undefined', 'not in locals?', 'processAttributes');
-
     if (typeof locals[attr] === 'undefined' && !Object.keys(options.aware).includes(attr)) {
       if (['class'].includes(attr)) {
-        // Merge class
         if (typeof nodeAttrs.class === 'undefined') {
           nodeAttrs.class = [];
         }
 
         nodeAttrs.class.push(attributes.class);
-
         delete attributes.class;
       } else if (['override:class'].includes(attr)) {
-        // Override class
         nodeAttrs.class = attributes['override:class'];
-
         delete attributes['override:class'];
       } else if (['style'].includes(attr)) {
-        // Merge style
         if (typeof nodeAttrs.style === 'undefined') {
           nodeAttrs.style = {};
         }
 
         nodeAttrs.style = Object.assign(nodeAttrs.style, styleToObject(attributes.style));
-
         delete attributes.style;
       } else if (['override:style'].includes(attr)) {
-        // Override style
         nodeAttrs.style = attributes['override:style'];
         delete attributes['override:style'];
       } else if (!attr.startsWith('$') && attr !== options.attribute) {
-        // Everything that doesn't start with '$' else set as attribute name/value
         nodeAttrs[attr] = attributes[attr];
         delete attributes[attr];
       }
@@ -517,6 +463,4 @@ function processAttributes(currentNode, attributes, locals, options) {
   });
 
   currentNode.content[index].attrs = nodeAttrs.compose();
-
-  log(currentNode.content[index].attrs, 'after processing attributes', 'processAttributes');
 }
