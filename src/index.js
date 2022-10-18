@@ -2,24 +2,23 @@
 
 const {readFileSync} = require('fs');
 const path = require('path');
-const {inspect} = require('util');
+// const {inspect} = require('util');
 const {parser} = require('posthtml-parser');
-const {render} = require('posthtml-render');
 const {match} = require('posthtml/lib/api');
 const expressions = require('posthtml-expressions');
-const scriptDataLocals = require('posthtml-expressions/lib/locals');
-const parseAttrs = require('posthtml-attrs-parser');
-const merge = require('deepmerge');
-const styleToObject = require('style-to-object');
 const findPathFromTagName = require('./find-path');
+const processLocals = require('./locals');
+const processAttributes = require('./attributes');
+const {processPushes, processStacks} = require('./stacks');
+const {setFilledSlots, processSlotContent, processFillContent} = require('./slots');
 
-const debug = false;
-
-const log = (object, what, method) => {
-  if (debug === true || method === debug) {
-    console.log(what, inspect(object, false, null, true));
-  }
-};
+// const debug = false;
+//
+// const log = (object, what, method) => {
+//   if (debug === true || method === debug) {
+//     console.log(what, inspect(object, false, null, true));
+//   }
+// };
 
 /* eslint-disable complexity */
 module.exports = (options = {}) => tree => {
@@ -65,10 +64,19 @@ module.exports = (options = {}) => tree => {
   options.locals = {...options.expressions.locals};
   options.aware = {};
 
-  tree = expressions(options.expressions)(tree);
-  tree = processTree(options)(tree);
+  const pushedContent = {};
 
-  return tree;
+  return processStacks(
+    processPushes(
+      processTree(options)(
+        expressions(options.expressions)(tree)
+      ),
+      pushedContent,
+      options.push
+    ),
+    pushedContent,
+    options.stack
+  );
 };
 /* eslint-enable complexity */
 
@@ -78,7 +86,6 @@ module.exports = (options = {}) => tree => {
  */
 function processTree(options) {
   // rename to pushes and slots
-  const pushedContent = {};
   const slotContent = {};
 
   let processCounter = 0;
@@ -103,10 +110,7 @@ function processTree(options) {
         return currentNode;
       }
 
-      // Process <push> tag
-      processPushes(currentNode, pushedContent, options);
-
-      log(`${++processCounter} ${componentPath}`, 'Processing component', 'processTree');
+      console.log(`${++processCounter}) Processing component ${componentPath}`);
 
       let nextNode = parser(readFileSync(componentPath, 'utf8'));
 
@@ -122,12 +126,6 @@ function processTree(options) {
       options.expressions.locals.$slots = slotContent;
       // const plugins = [...options.plugins, expressions(options.expressions)];
       nextNode = expressions(options.expressions)(nextNode);
-
-      // Process <push> tag
-      processPushes(nextNode, pushedContent, options);
-
-      // Process <stack> tag
-      processStacks(nextNode, pushedContent, options);
 
       // Process <yield> tag
       const content = match.call(nextNode, {tag: options.yield}, nextNode => {
@@ -147,6 +145,10 @@ function processTree(options) {
 
       processAttributes(currentNode, attributes, locals, options);
 
+      // log(currentNode, 'currentNode', 'currentNode')
+      // currentNode.attrs.counter = processCounter;
+      // currentNode.attrs.data = JSON.stringify({ attributes, locals });
+
       // messages.push({
       //   type: 'dependency',
       //   file: componentPath,
@@ -158,309 +160,4 @@ function processTree(options) {
 
     return tree;
   };
-}
-
-/**
- * Set filled slots
- *
- * @param  {Object} currentNode PostHTML tree
- * @param  {Object} slots
- * @param  {Object} options Plugin options
- * @return {void}
- */
-function setFilledSlots(currentNode, slots, {slot}) {
-  match.call(currentNode, {tag: slot}, fillNode => {
-    if (!fillNode.attrs) {
-      fillNode.attrs = {};
-    }
-
-    const name = fillNode.tag.split(':')[1];
-
-    /** @var {Object} locals */
-    const locals = Object.fromEntries(Object.entries(fillNode.attrs).filter(([attributeName]) => ![name, 'type'].includes(attributeName)));
-
-    if (locals) {
-      Object.keys(locals).forEach(local => {
-        try {
-          locals[local] = JSON.parse(locals[local]);
-        } catch {}
-      });
-    }
-
-    slots[name] = {
-      filled: true,
-      rendered: false,
-      tag: fillNode.tag,
-      attrs: fillNode.attrs,
-      content: fillNode.content,
-      source: render(fillNode.content),
-      locals
-    };
-
-    return fillNode;
-  });
-}
-
-/**
- * Process <push> tag
- *
- * @param  {Object} tree PostHTML tree
- * @param  {Object} content Content pushed by stack name
- * @param  {Object} options Plugin options
- * @return {void}
- */
-function processPushes(tree, content, {push}) {
-  match.call(tree, {tag: push}, pushNode => {
-    if (!pushNode.attrs || !pushNode.attrs.name) {
-      throw new Error(`[components] Push <${push}> tag must have an attribute "name".`);
-    }
-
-    if (!content[pushNode.attrs.name]) {
-      content[pushNode.attrs.name] = [];
-    }
-
-    const pushContent = render(pushNode.content);
-
-    if (typeof pushNode.attrs.once === 'undefined' || !content[pushNode.attrs.name].includes(pushContent)) {
-      if (typeof pushNode.attrs.prepend === 'undefined') {
-        content[pushNode.attrs.name].push(pushContent);
-      } else {
-        content[pushNode.attrs.name].unshift(pushContent);
-      }
-    }
-
-    pushNode.tag = false;
-    pushNode.content = null;
-
-    return pushNode;
-  });
-}
-
-/**
- * Process <stack> tag
- *
- * @param  {Object} tree PostHTML tree
- * @param  {Object} content Content pushed by stack name
- * @param  {Object} options Plugin options
- * @return {void}
- */
-function processStacks(tree, content, {stack}) {
-  match.call(tree, {tag: stack}, stackNode => {
-    stackNode.tag = false;
-    stackNode.content = content[stackNode.attrs.name];
-    return stackNode;
-  });
-}
-
-/**
- * Process <slot> tag
- *
- * @param  {Object} tree PostHTML tree
- * @param  {Object} content Content pushed by stack name
- * @param  {Object} options Plugin options
- * @return {void}
- */
-function processSlotContent(tree, content, {slot}) {
-  match.call(tree, {tag: slot}, slotNode => {
-    const name = slotNode.tag.split(':')[1];
-
-    if (!content[name]) {
-      content[name] = {};
-    }
-
-    content[name].tag = slotNode.tag;
-    content[name].attrs = slotNode.attrs;
-    content[name].content = slotNode.content;
-    content[name].source = render(slotNode.content);
-    content[name].rendered = false;
-
-    slotNode.tag = false;
-    slotNode.content = null;
-
-    return slotNode;
-  });
-}
-
-/**
- * Process <fill> tag
- *
- * @param  {Object} tree PostHTML tree
- * @param  {Object} content Content pushed by stack name
- * @param  {Object} options Plugin options
- * @return {void}
- */
-function processFillContent(tree, content, {fill}) {
-  match.call(tree, {tag: fill}, fillNode => {
-    const name = fillNode.tag.split(':')[1];
-
-    fillNode.tag = false;
-
-    if (content[name]?.rendered) {
-      fillNode.content = null;
-    } else if (fillNode.content && content[name]?.attrs && (typeof content[name]?.attrs.append !== 'undefined' || typeof content[name]?.attrs.prepend !== 'undefined')) {
-      fillNode.content = typeof content[name]?.attrs.append === 'undefined' ? content[name]?.content.concat(fillNode.content) : fillNode.content.concat(content[name]?.content);
-    } else {
-      fillNode.content = content[name]?.content;
-    }
-
-    // Set rendered to true so a slot can be output only once,
-    //  when not present "aware" attribute
-    if (content[name] && (!content[name]?.attrs || typeof content[name].attrs.aware === 'undefined')) {
-      content[name].rendered = true;
-    }
-
-    return fillNode;
-  });
-}
-
-/**
- * Parse locals from attributes, globals and via script
- *
- * @param {Object} currentNode - PostHTML tree
- * @param {Array} nextNode - PostHTML tree
- * @param {Object} slotContent - Slot locals
- * @param {Object} options - Plugin options
- * @return {Object} - Attribute locals and script locals
- */
-function processLocals(currentNode, nextNode, slotContent, options) {
-  let attributes = {...currentNode.attrs};
-
-  const merged = [];
-  const computed = [];
-  const aware = [];
-
-  Object.keys(attributes).forEach(attributeName => {
-    const newAttributeName = attributeName
-      .replace('merge:', '')
-      .replace('computed:', '')
-      .replace('aware:', '');
-
-    switch (true) {
-      case attributeName.startsWith('merge:'):
-        attributes[newAttributeName] = attributes[attributeName];
-        delete attributes[attributeName];
-        merged.push(newAttributeName);
-        break;
-
-      case attributeName.startsWith('computed:'):
-        attributes[newAttributeName] = attributes[attributeName];
-        delete attributes[attributeName];
-        computed.push(newAttributeName);
-        break;
-
-      case attributeName.startsWith('aware:'):
-        attributes[newAttributeName] = attributes[attributeName];
-        delete attributes[attributeName];
-        aware.push(newAttributeName);
-        break;
-
-      default: break;
-    }
-  });
-
-  // Parse JSON attributes
-  Object.keys(attributes).forEach(attributeName => {
-    try {
-      const parsed = JSON.parse(attributes[attributeName]);
-      if (attributeName === 'locals') {
-        if (merged.includes(attributeName)) {
-          attributes = merge(attributes, parsed);
-          merged.splice(merged.indexOf('locals'), 1);
-        } else {
-          // Override with merge see https://www.npmjs.com/package/deepmerge#arraymerge-example-overwrite-target-array
-          Object.assign(attributes, parsed);
-        }
-      } else {
-        attributes[attributeName] = parsed;
-      }
-    } catch {}
-  });
-
-  delete attributes.locals;
-
-  // Merge with global
-  attributes = merge(options.expressions.locals, attributes);
-
-  // Retrieve default locals from <script props> and merge with attributes
-  const {locals} = scriptDataLocals(nextNode, {localsAttr: options.localsAttr, removeScriptLocals: true, locals: {...attributes, $slots: slotContent}});
-
-  // Merge default locals and attributes or overrides props with attributes
-  if (locals) {
-    if (merged.length > 0) {
-      /** @var {Object} mergedAttributes */
-      const mergedAttributes = Object.fromEntries(Object.entries(attributes).filter(([attribute]) => merged.includes(attribute)));
-      /** @var {Object} mergedAttributes */
-      const mergedLocals = Object.fromEntries(Object.entries(locals).filter(([local]) => merged.includes(local)));
-
-      if (Object.keys(mergedLocals).length > 0) {
-        merged.forEach(attributeName => {
-          attributes[attributeName] = merge(mergedLocals[attributeName], mergedAttributes[attributeName]);
-        });
-      }
-    }
-
-    // Override attributes with props when is computed or attribute is not defined
-    Object.keys(locals).forEach(attributeName => {
-      if (computed.includes(attributeName) || typeof attributes[attributeName] === 'undefined') {
-        attributes[attributeName] = locals[attributeName];
-      }
-    });
-  }
-
-  if (aware.length > 0) {
-    options.aware = Object.fromEntries(Object.entries(attributes).filter(([attributeName]) => aware.includes(attributeName)));
-  }
-
-  return {attributes, locals};
-}
-
-/**
- * Map component attributes that it's not defined as locals to first element of node
- *
- * @param {Object} currentNode
- * @param {Object} attributes
- * @param {Object} locals
- * @param {Object} options
- * @return {void}
- */
-function processAttributes(currentNode, attributes, locals, options) {
-  // Find by attribute 'attributes' ??
-  const index = currentNode.content.findIndex(content => typeof content === 'object');
-
-  if (index === -1) {
-    return;
-  }
-
-  const nodeAttrs = parseAttrs(currentNode.content[index].attrs, options.attrsParserRules);
-
-  Object.keys(attributes).forEach(attr => {
-    if (typeof locals[attr] === 'undefined' && !Object.keys(options.aware).includes(attr)) {
-      if (['class'].includes(attr)) {
-        if (typeof nodeAttrs.class === 'undefined') {
-          nodeAttrs.class = [];
-        }
-
-        nodeAttrs.class.push(attributes.class);
-        delete attributes.class;
-      } else if (['override:class'].includes(attr)) {
-        nodeAttrs.class = attributes['override:class'];
-        delete attributes['override:class'];
-      } else if (['style'].includes(attr)) {
-        if (typeof nodeAttrs.style === 'undefined') {
-          nodeAttrs.style = {};
-        }
-
-        nodeAttrs.style = Object.assign(nodeAttrs.style, styleToObject(attributes.style));
-        delete attributes.style;
-      } else if (['override:style'].includes(attr)) {
-        nodeAttrs.style = attributes['override:style'];
-        delete attributes['override:style'];
-      } else if (!attr.startsWith('$') && attr !== options.attribute) {
-        nodeAttrs[attr] = attributes[attr];
-        delete attributes[attr];
-      }
-    }
-  });
-
-  currentNode.content[index].attrs = nodeAttrs.compose();
 }
