@@ -1,0 +1,65 @@
+<script props>
+  /**
+   * Bootstrap Modal
+   * @see https://getbootstrap.com/docs/5.0/components/modal/
+   *
+   * Props
+   *
+   * backdrop:      static|true|false
+   * keyboard:      true|false
+   * scrollable:    true|false
+   * centered:      true|false
+   * size:          sm|lg|xl
+   * fullscreen:    true|false|sm|md|lg|xl|xxl
+   * dialogClass:   any additional class for modal-dialog
+   * contentClass:  any additional class for modal-content
+   */
+  module.exports = {
+    dialogClass: '',
+    contentClass: '',
+    backdrop: true,
+    keyboard: locals.backdrop === "static" || locals.keyboard === true,
+    scrollable: locals.scrollable === true ? 'modal-dialog-scrollable' : '',
+    centered: locals.centered === true ? 'modal-dialog-centered' : '',
+    size: locals.size ? `modal-${locals.size}` : '',
+    fullscreen: [true, "sm", "md", "lg", "xl", "xxl"].includes(locals.fullscreen)
+      ? (locals.fullscreen === true ? "modal-fullscreen" : `modal-fullscreen-${locals.fullscreen}-down`)
+      : ''
+  };
+</script>
+
+<div
+    class="modal fade"
+    id="{{ id }}"
+    data-bs-backdrop="{{ backdrop }}"
+    data-bs-keyboard="{{ keyboard }}"
+    aria-labelledby="{{ id }}"
+    tabindex="-1"
+    aria-hidden="true"
+    aria-modal="true"
+    role="dialog"
+>
+    <div
+       class="modal-dialog {{ size }} {{ fullscreen }} {{ centered }} {{ scrollable }} {{ dialogClass }}"
+    >
+        <div class="modal-content {{ contentClass }}">
+            <yield></yield>
+            <if condition="$slots.header?.filled">
+                <x-modal.header>
+                    <!-- Alternative way to <fill:header></fill:header> -->
+                    {{{ $slots.header?.source }}}
+                </x-modal.header>
+            </if>
+            <if condition="$slots.body?.filled">
+                <x-modal.body>
+                    <fill:body></fill:body>
+                </x-modal.body>
+            </if>
+            <if condition="$slots.footer?.filled">
+                <x-modal.footer close="{{ $slots.footer?.locals.close }}">
+                    <fill:footer></fill:footer>
+                </x-modal.footer>
+            </if>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

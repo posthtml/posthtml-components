@@ -38,6 +38,7 @@
     "husky": "^5.1.3",
     "lint-staged": "^10.5.4",
     "posthtml": "^0.16.6",
+    "posthtml-beautify": "^0.7.0",
     "xo": "^0.37.1"
   }
 }

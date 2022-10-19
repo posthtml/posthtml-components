@@ -23,7 +23,7 @@ module.exports = (currentNode, attributes, locals, options) => {
   const nodeAttrs = parseAttrs(currentNode.content[index].attrs, options.attrsParserRules);
 
   Object.keys(attributes).forEach(attr => {
-    if (typeof locals[attr] === 'undefined' && !Object.keys(options.aware).includes(attr)) {
+    if (typeof locals[attr] === 'undefined' && !attr.startsWith('$') && attr !== options.attribute && !Object.keys(options.aware).includes(attr) && !Object.keys(options.locals).includes(attr)) {
       if (['class'].includes(attr)) {
         if (typeof nodeAttrs.class === 'undefined') {
           nodeAttrs.class = [];
@@ -44,7 +44,7 @@ module.exports = (currentNode, attributes, locals, options) => {
       } else if (['override:style'].includes(attr)) {
         nodeAttrs.style = attributes['override:style'];
         delete attributes['override:style'];
-      } else if (!attr.startsWith('$') && attr !== options.attribute) {
+      } else {
         nodeAttrs[attr] = attributes[attr];
         delete attributes[attr];
       }

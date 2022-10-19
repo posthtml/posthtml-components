@@ -1,0 +1,16 @@
+<script props>
+  module.exports = {
+    close: true
+  };
+</script>
+<div class="modal-header">
+    <yield></yield>
+
+    <if condition="close">
+        <x-button
+          override:class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></x-button>
+    </if>
+</div><!-- /.modal-header -->
