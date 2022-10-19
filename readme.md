@@ -92,6 +92,8 @@ This is where your content will be injected.
 
 In next section you can find all available options and then more examples.
 
+See also the `examples` folder. You can run `npm run build-examples` to compile them.
+
 ## Options
 
 |         Option         |           Default            | Description                                                                                                 |
@@ -555,6 +557,8 @@ You can add custom rules how attributes are parsed, as behind the scene it's use
 
 ## Migration
 
+TODO...
+
 ## Contributing
 
 See [PostHTML Guidelines](https://github.com/posthtml/posthtml/tree/master/docs) and [contribution guide](CONTRIBUTING.md).
@@ -571,4 +575,4 @@ See [PostHTML Guidelines](https://github.com/posthtml/posthtml/tree/master/docs)
 ## Credits
 
 Thanks to all PostHTML contributors and especially to `posthtml-extend` and `posthtml-modules` contributors, as part of code are ~~stolen~~ inspired from these plugins.
-Huge thanks also to Laravel Blade template engine!
+Huge thanks also to Laravel Blade template engine.
