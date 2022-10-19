@@ -12,7 +12,8 @@
   "scripts": {
     "version": "conventional-changelog -i changelog.md -s -r 0 && git add changelog.md",
     "test": "c8 ava",
-    "pretest": "clinton && xo"
+    "pretest": "clinton && xo",
+    "build-examples": "node ./examples"
   },
   "keywords": [
     "html",

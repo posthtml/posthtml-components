@@ -4,12 +4,12 @@ const posthtml = require('posthtml');
 const components = require('../src');
 const beautify = require('posthtml-beautify');
 
-const src = './src/pages/';
-const dist = './dist/';
+const src = './examples/src/pages/';
+const dist = './examples/dist/';
 
 const plugins = [
   components({
-    root: './src',
+    root: './examples/src',
     roots: ['components', 'layouts'],
     strict: true,
     expressions: {
