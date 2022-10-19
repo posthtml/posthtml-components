@@ -6,7 +6,7 @@ const posthtml = require('posthtml');
 const clean = html => html.replace(/(\n|\t)/g, '').trim();
 
 test('Must process with slots', async t => {
-  const actual = `<component src="layouts/base.html"><div>Main content</div><slot:header><h1>My header</h1></slot:header><slot:footer>My footer</slot:footer></component>`;
+  const actual = `<component src="layouts/base.html"><div>Main content</div><fill:header><h1>My header</h1></fill:header><fill:footer>My footer</fill:footer></component>`;
   const expected = `<html><head><title>Base Layout</title></head><body><header><h1>My header</h1></header><main><div>Main content</div></main><footer>My footer</footer></body></html>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
@@ -15,7 +15,7 @@ test('Must process with slots', async t => {
 });
 
 test('Must process the same component multiple times', async t => {
-  const actual = `<component src="components/component.html"><slot:title>Title</slot:title><slot:body>Body</slot:body></component><component src="components/component.html"><slot:title>Title 2</slot:title><slot:body>Body 2</slot:body></component>`;
+  const actual = `<component src="components/component.html"><fill:title>Title</fill:title><fill:body>Body</fill:body></component><component src="components/component.html"><fill:title>Title 2</fill:title><fill:body>Body 2</fill:body></component>`;
   const expected = `<div>Title</div><div>Body</div><div>Title 2</div><div>Body 2</div>`;
 
   const html = await posthtml([plugin({root: './test/templates/', tag: 'component'})]).process(actual).then(result => clean(result.html));
@@ -25,7 +25,7 @@ test('Must process the same component multiple times', async t => {
 
 test('Must process multiple time a slot with aware attribute', async t => {
   // With aware
-  let actual = `<component src="components/component-multiple-slot.html"><slot:title aware>Title</slot:title><slot:body>Body</slot:body></component>`;
+  let actual = `<component src="components/component-multiple-slot.html"><fill:title aware>Title</fill:title><fill:body>Body</fill:body></component>`;
   let expected = `<div>Title</div><div>Body</div><div>Title</div>`;
 
   let html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
@@ -33,7 +33,7 @@ test('Must process multiple time a slot with aware attribute', async t => {
   t.is(html, expected);
 
   // Without aware
-  actual = `<component src="components/component-multiple-slot.html"><slot:title>Title</slot:title><slot:body>Body</slot:body></component>`;
+  actual = `<component src="components/component-multiple-slot.html"><fill:title>Title</fill:title><fill:body>Body</fill:body></component>`;
   expected = `<div>Title</div><div>Body</div><div></div>`;
 
   html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
@@ -42,7 +42,7 @@ test('Must process multiple time a slot with aware attribute', async t => {
 });
 
 test('Must process append and prepend content to slot', async t => {
-  const actual = `<component src="components/component-append-prepend.html"><slot:title append><span>Append</span></slot:title><slot:body prepend><span>Prepend</span></slot:body></component>`;
+  const actual = `<component src="components/component-append-prepend.html"><fill:title append><span>Append</span></fill:title><fill:body prepend><span>Prepend</span></fill:body></component>`;
   const expected = `<div>Title<span>Append</span></div><div><span>Prepend</span>Body</div>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
@@ -58,7 +58,7 @@ test('Must process slots conditional rendering by using slot name', async t => {
 
   t.is(html, expected);
 
-  actual = `<component src="layouts/slot-condition.html"><h1>Content</h1><slot:footer>There is now footer defined</slot:footer></component>`;
+  actual = `<component src="layouts/slot-condition.html"><h1>Content</h1><fill:footer>There is now footer defined</fill:footer></component>`;
   expected = `<html><head><title>Slot Condition Layout</title></head><body><main><h1>Content</h1></main><footer>There is now footer defined</footer></body></html>`;
 
   html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
@@ -67,7 +67,7 @@ test('Must process slots conditional rendering by using slot name', async t => {
 });
 
 test('Must render slots using $slots locals', async t => {
-  const actual = `<component src="layouts/base-render-slots-locals.html"><div>Main content</div><slot:header><h1>My header</h1></slot:header><slot:footer>My footer</slot:footer></component>`;
+  const actual = `<component src="layouts/base-render-slots-locals.html"><div>Main content</div><fill:header><h1>My header</h1></fill:header><fill:footer>My footer</fill:footer></component>`;
   const expected = `<html><head><title>Base Render Slots Locals Layout</title></head><body><header><h1>My header</h1></header><main><div>Main content</div></main><footer>My footer</footer></body></html>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));

@@ -6,7 +6,7 @@ const posthtml = require('posthtml');
 const clean = html => html.replace(/(\n|\t)/g, '').trim();
 
 test('Must process layout with locals', async t => {
-  const actual = `<component src="layouts/base-locals.html" locals='{ "title": "My Page" }'><div>Content</div><slot:footer>Footer</slot:footer></component>`;
+  const actual = `<component src="layouts/base-locals.html" locals='{ "title": "My Page" }'><div>Content</div><fill:footer>Footer</fill:footer></component>`;
   const expected = `<html><head><title>My Page</title></head><body><main><div>Content</div></main><footer>Footer</footer></body></html>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
@@ -15,7 +15,7 @@ test('Must process layout with locals', async t => {
 });
 
 test('Must process attributes as locals', async t => {
-  const actual = `<component src="components/component-locals.html" title="My Component Title" body="Content"><slot:body prepend><span>Body</span></slot:body></component>`;
+  const actual = `<component src="components/component-locals.html" title="My Component Title" body="Content"><fill:body prepend><span>Body</span></fill:body></component>`;
   const expected = `<div><h1>My Component Title</h1></div><div><span>Body</span>Content</div>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
@@ -56,8 +56,8 @@ test('Must process parent and child locals via component', async t => {
 });
 
 test('Must has access to $slots in script locals', async t => {
-  const actual = `<x-script-locals><slot:filled>filled slot content...</slot:filled></x-script-locals>`;
-  const expected = `{"filled":{"filled":true,"rendered":false,"tag":"slot:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","locals":{}}}<div>{"filled":{"filled":true,"rendered":false,"tag":"slot:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","locals":{}}}</div><div><h1>Default title</h1></div><div>filled slot content...</div>`;
+  const actual = `<x-script-locals><fill:filled>filled slot content...</fill:filled></x-script-locals>`;
+  const expected = `{"filled":{"filled":true,"rendered":false,"tag":"fill:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","locals":{}}}<div>{"filled":{"filled":true,"rendered":false,"tag":"fill:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","locals":{}}}</div><div><h1>Default title</h1></div><div>filled slot content...</div>`;
 
   const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
 

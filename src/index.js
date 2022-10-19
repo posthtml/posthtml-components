@@ -97,8 +97,7 @@ module.exports = (options = {}) => tree => {
  * @return {Object} PostHTML tree
  */
 function processTree(options) {
-  // rename to pushes and slots
-  const slotContent = {};
+  const filledSlots = {};
 
   let processCounter = 0;
 
@@ -127,15 +126,15 @@ function processTree(options) {
       let nextNode = parser(readFileSync(componentPath, 'utf8'));
 
       // Set filled slots
-      setFilledSlots(currentNode, slotContent, options);
+      setFilledSlots(currentNode, filledSlots, options);
 
       // Reset previous locals with passed global and keep aware locals
       options.expressions.locals = {...options.locals, ...options.aware};
 
-      const {attributes, locals} = processLocals(currentNode, nextNode, slotContent, options);
+      const {attributes, locals} = processLocals(currentNode, nextNode, filledSlots, options);
 
       options.expressions.locals = attributes;
-      options.expressions.locals.$slots = slotContent;
+      options.expressions.locals.$slots = filledSlots;
       // const plugins = [...options.plugins, expressions(options.expressions)];
       nextNode = expressions(options.expressions)(nextNode);
 
@@ -145,11 +144,11 @@ function processTree(options) {
         return currentNode.content || nextNode.content || '';
       });
 
-      // Process <slot> tags
-      processSlotContent(nextNode, slotContent, options);
-
       // Process <fill> tags
-      processFillContent(nextNode, slotContent, options);
+      processFillContent(nextNode, filledSlots, options);
+
+      // Process <slot> tags
+      processSlotContent(nextNode, filledSlots, options);
 
       // Remove component tag and replace content with <yield>
       currentNode.tag = false;

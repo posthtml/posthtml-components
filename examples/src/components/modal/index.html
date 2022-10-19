@@ -46,18 +46,18 @@
             <yield></yield>
             <if condition="$slots.header?.filled">
                 <x-modal.header>
-                    <!-- Alternative way to <fill:header></fill:header> -->
+                    <!-- Alternative way to <slot:header></slot:header> -->
                     {{{ $slots.header?.source }}}
                 </x-modal.header>
             </if>
             <if condition="$slots.body?.filled">
                 <x-modal.body>
-                    <fill:body></fill:body>
+                    <slot:body></slot:body>
                 </x-modal.body>
             </if>
             <if condition="$slots.footer?.filled">
                 <x-modal.footer close="{{ $slots.footer?.locals.close }}">
-                    <fill:footer></fill:footer>
+                    <slot:footer></slot:footer>
                 </x-modal.footer>
             </if>
         </div><!-- /.modal-content -->
