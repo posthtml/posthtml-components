@@ -12,7 +12,7 @@ const {existsSync} = require('fs');
  * @return {String|boolean} [custom tag root where the module is found]
  */
 function findPathInRoots(tag, fileNameFromTag, options) {
-  let root = options.roots.find(root => existsSync(path.join(root, fileNameFromTag)));
+  let root = options.roots.find(root => existsSync(path.resolve(root, fileNameFromTag)));
 
   if (!root) {
     // Check if module exist in folder `tag-name/index.html`
@@ -20,7 +20,7 @@ function findPathInRoots(tag, fileNameFromTag, options) {
       .replace(`.${options.fileExtension}`, '')
       .concat(path.sep, 'index.', options.fileExtension);
 
-    root = options.roots.find(root => existsSync(path.join(root, fileNameFromTag)));
+    root = options.roots.find(root => existsSync(path.resolve(root, fileNameFromTag)));
   }
 
   if (!root) {
@@ -31,7 +31,7 @@ function findPathInRoots(tag, fileNameFromTag, options) {
     }
   }
 
-  return path.join(root, fileNameFromTag);
+  return path.resolve(root, fileNameFromTag);
 }
 
 module.exports = (tag, fileNameFromTag, options) => findPathInRoots(tag, fileNameFromTag, options);

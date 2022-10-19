@@ -1,12 +1,11 @@
 <x-html class="h-100">
-  <x-body class="d-flex flex-column h-100">
+  <x-body class="d-flex flex-column h-100 bg-light">
     <x-header>
       <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-        <li><x-nav-link href="home.html">Home</x-nav-link></li>
+        <li><x-nav-link href="index.html">Home</x-nav-link></li>
         <li><x-nav-link href="docs.html">Docs</x-nav-link></li>
-        <li><x-nav-link href="https://github.com/posthtml">PostHTML</x-nav-link></li>
-        <li><x-nav-link href="https://github.com/thewebartisan7/posthtml-components/blob/main/changelog.md">Changelog</x-nav-link></li>
-        <li><x-nav-link class="d-block d-md-none" href="about.html">GitHub</x-nav-link></li>
+        <li><x-nav-link href="https://github.com/posthtml" target="_blank">PostHTML</x-nav-link></li>
+        <li><x-nav-link class="d-block d-md-none" href="https://github.com/thewebartisan7/posthtml-components" target="_blank">GitHub</x-nav-link></li>
       </ul>
     </x-header>
 
@@ -16,7 +15,7 @@
       </div>
     </main>
 
-    <x-footer class="footer mt-auto py-3 bg-white">
+    <x-footer class="footer mt-auto py-3">
       <div class="text-muted text-center">
         Built with
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill d-inline mx-1 text-danger" viewBox="0 0 16 16">
@@ -33,11 +32,22 @@
   </x-body>
 </x-html>
 
-<push name="head">
-  <meta name="pushed" content="Pushed from page.html">
+<push name="styles">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .doc-shadow {
+      box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+      rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+      rgba(0, 0, 0, 0.1) 0px 1px 2px -1px !important;
+    }
+  </style>
 </push>
 
-<push name="body-bottom">
+<push name="scripts">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+</push>
+
+<push name="modals">
   <x-modal
     id="modalWithComponents"
     backdrop="true"

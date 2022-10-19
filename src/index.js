@@ -12,7 +12,7 @@ const processAttributes = require('./attributes');
 const {processPushes, processStacks} = require('./stacks');
 const {setFilledSlots, processSlotContent, processFillContent} = require('./slots');
 
-// const debug = false;
+// const debug = true;
 //
 // const log = (object, what, method) => {
 //   if (debug === true || method === debug) {
@@ -42,9 +42,17 @@ module.exports = (options = {}) => tree => {
   options.attrsParserRules = options.attrsParserRules || {};
   options.strict = typeof options.strict === 'undefined' ? true : options.strict;
 
-  options.slot = new RegExp(`^${options.slot}:`, 'i');
-  options.fill = new RegExp(`^${options.fill}:`, 'i');
-  options.tagPrefix = new RegExp(`^${options.tagPrefix}`, 'i');
+  if (!(options.slot instanceof RegExp)) {
+    options.slot = new RegExp(`^${options.slot}:`, 'i');
+  }
+
+  if (!(options.fill instanceof RegExp)) {
+    options.fill = new RegExp(`^${options.fill}:`, 'i');
+  }
+
+  if (!(options.tagPrefix instanceof RegExp)) {
+    options.tagPrefix = new RegExp(`^${options.tagPrefix}`, 'i');
+  }
 
   if (!Array.isArray(options.matcher)) {
     options.matcher = [];
@@ -59,7 +67,7 @@ module.exports = (options = {}) => tree => {
 
   options.roots = Array.isArray(options.roots) ? options.roots : [options.roots];
   options.roots.forEach((root, index) => {
-    options.roots[index] = path.join(options.root, root);
+    options.roots[index] = path.resolve(options.root, root);
   });
   options.namespaces = Array.isArray(options.namespaces) ? options.namespaces : [options.namespaces];
   options.namespaces.forEach((namespace, index) => {
