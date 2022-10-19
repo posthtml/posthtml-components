@@ -555,9 +555,186 @@ Result:
 
 You can add custom rules how attributes are parsed, as behind the scene it's used [posthtml-attrs-parser](https://github.com/posthtml/posthtml-attrs-parser) plugin.
 
+## Tips and tricks
+
+You can work with `<slot>` and `<fill>` or you can create component for each "block" of your component, and you can also support both of them.
+You can find an example of this inside `examples/components/modal`. Below is a short explanation about the both approach.
+
+### Using slots
+
+Let's suppose we want to create a component for [bootstrap modal](https://getbootstrap.com/docs/5.2/components/modal/). The code required is:
+
+```html
+<!-- Modal HTML -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+There is almost three block of code: the header, the body and the footer.
+So we could create our component with three slot like below:
+
+```html
+<!-- Modal component -->
+<div class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <slot:header></slot:header>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <slot:body></slot:body>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <slot:footer></slot:footer>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+In this case we can use it like:
+
+```html
+ <x-modal
+  id="exampleModal"
+  aria-labelledby="exampleModalLabel"
+>
+  <slot:header>
+      <h5 class="modal-title" id="exampleModalLabel">My modal</h5>
+  </slot:header>
+
+  <slot:body>
+      Modal body content goes here...
+  </slot:body>
+
+  <slot:footer close="false">
+      <button type="button" class="btn btn-primary">Confirm</button>
+  </slot:footer>
+</x-modal>
+```
+
+### Splitting component in small component
+
+Another way is to split the component in small component, my preferred way, because you can pass attributes to each of them.
+So we create the component with a main component and then three different small component:
+
+```html
+<!-- Main modal component -->
+<div class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <yield></yield>
+    </div>
+  </div>
+</div>
+```
+
+```html
+<!-- Header modal component -->
+<div class="modal-header">
+  <yield></yield>
+</div>
+```
+
+```html
+<!-- Body modal component -->
+<div class="modal-body">
+  <yield></yield>
+</div>
+```
+
+```html
+<!-- Footer modal component -->
+<div class="modal-footer">
+  <yield></yield>
+</div>
+```
+
+And then you can use it like below example:
+
+```html
+<x-modal
+  id="exampleModal"
+  aria-labelledby="exampleModalLabel"
+>
+  <x-modal.header>
+    <h5 class="modal-title" id="exampleModalLabel">My modal</h5>
+  </x-modal.header>
+
+  <x-modal.body>
+    Modal body content goes here...
+  </x-modal.body>
+
+  <x-modal.footer>
+    <button type="button" class="btn btn-primary">Confirm</button>
+  </x-modal.footer>
+</x-modal>
+```
+
+As said in this way you can pass attributes to each of them, without defining props.
+
+### Combine slots and small component
+
+You can also combine both way, and then use them with slots or with small component:
+
+```html
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  tabindex="-1"
+  aria-hidden="true"
+  aria-modal="true"
+  role="dialog"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <if condition="$slots.header?.filled">
+          <x-modal.header>
+            <slot:header></slot:header>
+          </x-modal.header>
+      </if>
+      <if condition="$slots.body?.filled">
+          <x-modal.body>
+              <slot:body></slot:body>
+          </x-modal.body>
+      </if>
+      <if condition="$slots.footer?.filled">
+          <x-modal.footer close="{{ $slots.footer?.locals.close }}">
+              <slot:footer></slot:footer>
+          </x-modal.footer>
+      </if>
+      <yield></yield>
+    </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+```
+
+Now you can use your component with slots or with small components.
+As you may notice, by using slots, you already can use also your small components, and so you can also pass props
+via `$slots` which has all the `props` passed via slot, and as well check if slot is filled.
+
 ## Migration
 
-TODO...
+If you are migrating from `posthtml-extend` and/or `posthtml-modules` then you can continue to keep them until you migrate all of your components.
+For continue to use current code without changing it, at the moment it's not yet fully supported, but it maybe come in near future.
 
 ## Contributing
 
