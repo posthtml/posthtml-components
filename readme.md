@@ -241,11 +241,269 @@ With namespaces you can define a top level root path to your components like sho
 
 ### Slots
 
+Your components can inject code in specific slots you define, and then you can fill this content when you use the component.
+Find below a simple example.
+
+Create the component:
+
+```html
+<!-- src/modal.html -->
+<div class="modal">
+  <div class="modal-header">
+    <slot:header></slot:header>
+  </div>
+  <div class="modal-body">
+    <slot:body></slot:body>
+  </div>
+  <div class="modal-footer">
+    <slot:footer></slot:footer>
+  </div>
+</div>
+```
+
+Use the component:
+
+```html
+<!-- src/index.html -->
+<x-modal>
+  <fill:header>Header content</fill:header>
+  <fill:body>Body content</fill:body>
+  <fill:footer>Footer content</fill:footer>
+</x-modal>
+```
+
+Result:
+
+```html
+<!-- dist/index.html -->
+<div class="modal">
+  <div class="modal-header">
+    Header content
+  </div>
+  <div class="modal-body">
+    Body content
+  </div>
+  <div class="modal-footer">
+    Footer content
+  </div>
+</div>
+```
+
+By default the content is replaced, but you can also prepend or append the content, or keep the default content by not filling the slot.
+
+Add some default content in the component:
+
+```html
+<!-- src/modal.html -->
+<div class="modal">
+  <div class="modal-header">
+    <slot:header>Default header</slot:header>
+  </div>
+  <div class="modal-body">
+    <slot:body>content</slot:body>
+  </div>
+  <div class="modal-footer">
+    <slot:footer>Footer</slot:footer>
+  </div>
+</div>
+```
+
+```html
+<!-- src/index.html -->
+<x-modal>
+  <fill:body prepend>Prepend body</fill:body>
+  <fill:footer append>content</fill:footer>
+</x-modal>
+```
+
+Result:
+
+```html
+<!-- dist/index.html -->
+<div class="modal">
+  <div class="modal-header">
+    Default header
+  </div>
+  <div class="modal-body">
+    Prepend body content
+  </div>
+  <div class="modal-footer">
+    Footer content
+  </div>
+</div>
+```
+
 ### Stacks
+
+You can push content to named stacks which can be rendered somewhere else in another place. This can be particularly useful for specifying any JavaScript or CSS required by your components.
+
+First of all define a `<stack>` anywhere in your code, for example:
+
+```html
+<!-- src/index.html -->
+<html>
+<head>
+<stack name="styles"></stack>
+</head>
+<body>
+
+<x-modal>
+  <fill:header>Header content</fill:header>
+  <fill:body>Body content</fill:body>
+  <fill:footer>Footer content</fill:footer>
+</x-modal>
+  
+<stack name="scripts"></stack>
+</body>
+</html>
+```
+
+Then in modal components, or any other child components, you can push content to this stack.
+
+```html
+<!-- src/modal.html -->
+<div class="modal">
+  <div class="modal-header">
+    <slot:header></slot:header>
+  </div>
+  <div class="modal-body">
+    <slot:body></slot:body>
+  </div>
+  <div class="modal-footer">
+    <slot:footer></slot:footer>
+  </div>
+</div>
+
+<push name="styles">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</push>
+
+<push name="scripts">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+</push>
+```
+
+The output will be:
+
+```html
+<!-- dist/index.html -->
+<html>
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="modal">
+  <div class="modal-header">
+    Header content
+  </div>
+  <div class="modal-body">
+    Body content
+  </div>
+  <div class="modal-footer">
+    Footer content
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+```
+
+The `once` attribute allows you to push content only once per rendering cycle. For example, if you are rendering a given component within a loop, you may wish to only push the JavaScript and CSS the first time the component is rendered.
+
+Example.
+
+```html
+<!-- src/modal.html -->
+<div class="modal">
+  <!-- ... -->
+</div>
+
+<!-- The push content will be pushed only once in the stack -->
+
+<push name="styles" once>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</push>
+
+<push name="scripts" once>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+</push>
+```
+
+By default the content is pushed in the stack in the given order.
+If you would like to prepend content onto the beginning of a stack, you should use the `prepend` attribute:
+
+```html
+<push name="scripts">
+  <!-- This will be second -->
+  <script src="/example.js"></script>
+</push>
+
+<!-- Later... -->
+
+<push name="scripts" prepend>
+  <!-- This will be first -->
+  <script src="/example-2.js"></script>
+</push>
+```
 
 ### Props
 
+TODO...
+
 ### Attributes
+
+Your can pass any attributes to your components and this will be added to the first element of your component.
+By default `class` and `style` are merged with existing `class` and `style` attribute of the first element of your component.
+All others attributes are override by default.
+Only attribute not defined as `props` will be processed.
+
+As already seen in basic example:
+
+``` html
+<!-- src/button.html -->
+<script props>
+  module.exports = {
+    label: 'A button'
+  }
+</script>
+<button type="button" class="btn">
+  {{ label }}
+</button>
+```
+
+Use the component:
+
+``` html
+<!-- src/index.html -->
+<x-button type="submit" class="btn-primary" label="My button"></x-button>
+```
+
+Result:
+
+``` html
+<!-- dist/index.html -->
+<button type="submit" class="btn btn-primary">My button</button>
+```
+
+As you may notice the `label` attribute is not added as attribute, since it's defined as a `props`.
+
+If you are familiar with Laravel Blade, this is also how Blade handle this.
+
+As said early, class and style are merged by default, if you want to override them, just prepend `override:` to the attributes:
+
+``` html
+<!-- src/index.html -->
+<x-button type="submit" override:class="btn-custom" label="My button"></x-button>
+```
+
+Result:
+
+``` html
+<!-- dist/index.html -->
+<button type="submit" class="btn-custom">My button</button>
+```
+
+You can add custom rules how attributes are parsed, as behind the scene it's used [posthtml-attrs-parser](https://github.com/posthtml/posthtml-attrs-parser) plugin.
 
 ## Migration
 
