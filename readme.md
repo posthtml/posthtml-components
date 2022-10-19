@@ -26,8 +26,8 @@ Create the component:
 
 ``` html
 <!-- src/button.html -->
-<button class="btn btn-primary">
-  <slot></slot>
+<button type="button" class="btn">
+  <yield></yield>
 </button>
 ```
 
@@ -37,7 +37,7 @@ Use the component:
 <!-- src/index.html -->
 <html>
 <body>
-  <x-button>Submit</x-button>
+  <x-button type="submit" class="btn-primary">Submit</x-button>
 </body>
 </html>
 ```
@@ -62,42 +62,65 @@ Result:
 <!-- dist/index.html -->
 <html>
 <body>
-  <button class="btn btn-primary">Submit</button>
+  <button type="submit" class="btn btn-primary">Submit</button>
 </body>
 </html>
 ```
 
+You may ask yourself many questions about this basic examples, and you will find most if not all answers in this readme. In case is missing something, feel free to ask via discussions.
+
+But I want to explain a few things now.
+
+First you may notice that our `src/button.html` component has a `type` and `class` attribute, and when we use the component in `src/index.html` we add type and class attribute. The result is that `type` is override, and `class` is merged. 
+
+By default `class` and `style` attributes are merged, while all others attribute are override. You can also override class and style attribute by prepending `override:` to the class attribute. Example:
+
+```html
+<x-button override:class="btn-custom">Submit</x-button>
+
+<!-- Output -->
+<button type="button" class="btn-custom">Submit</button>
+```
+
+All attributes you pass to the component will be added to the first root element of your component, and only if they are not defined as `props` via `<script props>`. More details on this later.
+
+Second you may notice a `<yield>` tag.
+
+This is where your content will be injected.
+
+In next section you can find all available options and then more examples.
+
 ## Options
 
-|          Option          |          Default          | Description                                                                                                    |
-|:------------------------:|:-------------------------:|:---------------------------------------------------------------------------------------------------------------|
-|         **root**         |          `'./'`           | String value as root path for components lookup.                                                               |
-|        **roots**         |           `''`            | Array of additional multi roots path from `options.root`.                                                      |
-|      **namespaces**      |           `[]`            | Array of namespace's root path, fallback path and custom path for override.                                    |
-|  **namespaceSeparator**  |           `::`            | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                 |
-|  **namespaceFallback**   |          `false`          | Boolean value for use fallback path to defined roots in `options.roots`.                                       |
-|    **fileExtension**     |          `html`           | String value for file extension of the components used for retrieve x-tag file.                                |
-|      **tagPrefix**       |           `x-`            | String for tag prefix.                                                                                         |
-|      **tagRegExp**       | `new RegExp('^x-'), 'i')` | Object for regex used to match x-tag. Set only `options.tagPrefix` to keep default.                            |
-|     **slotTagName**      |          `slot`           | String value for slot tag name.                                                                                |
-| **fallbackSlotTagName**  |          `false`          | Boolean or string value used to support posthtml-modules slot. Set to true to use `<content>` or set a string. |
-|       **tagName**        |        `component`        | String value for component tag.                                                                                |
-|       **tagNames**       |           `[]`            | Array of additional component tag. Useful if you are migrating from extend and modules.                        |
-|      **attribute**       |           `src`           | String value for component attribute for set path.                                                             |
-|      **attributes**      |           `[]`            | Array of additional component path to be used for migrating from extend and modules.                           |
-|     **expressions**      |           `{}`            | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.    |
-|       **plugins**        |           `[]`            | PostHTML plugins to apply for every parsed components.                                                         |
-|       **encoding**       |          `utf8`           | String value for the encoding of the component.                                                                |
-| **scriptLocalAttribute** |          `props`          | String value for set custom attribute parsed by the plugin to retrieve locals in the components.               |
-|       **matcher**        |           `[]`            | Array of object used to match the tags. Useful if you are migrating from extend and modules.                   |
-|        **strict**        |          `true`           | Boolean value for enable or disable throw an exception.                                                        |
+|         Option         |           Default            | Description                                                                                                 |
+|:----------------------:|:----------------------------:|:------------------------------------------------------------------------------------------------------------|
+|        **root**        |            `'./'`            | String value as root path for components lookup.                                                            |
+|       **roots**        |            `['']`            | Array of additional multi roots path from `options.root`.                                                   |
+|     **tagPrefix**      |             `x-`             | String for tag prefix.                                                                                      |
+|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.           |
+|     **attribute**      |            `src`             | String value for component attribute for set path.                                                          |
+|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                 |
+| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`              |
+| **namespaceFallback**  |           `false`            | Boolean value for use fallback path to defined roots in `options.roots`.                                    |
+|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                             |
+|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                           |
+|        **slot**        |            `slot`            | String value for `<slot>` tag name.                                                                         |
+|        **fill**        |            `fill`            | String value for `<fill>` tag name.                                                                         |
+|        **push**        |            `push`            | String value for `<push>` tag name.                                                                         |
+|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                        |
+|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.            |
+|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example. |
+|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                      |
+|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                     |
+|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                              |
+|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                     |
 
 ## Features
 
 ### Tag names and x-tags
 
 You can use the components in multiple ways, or also a combination of them.
-Like with `posthtml-extend` and `posthtml-modules` you can define a tag name or multiples tag name in combination with an attribute name or multiple attributes name for set the path to the components.
+Like with `posthtml-extend` and `posthtml-modules` you can define a tag name in combination with an attribute name for set the path of the components.
 
 For example for the same button component `src/button.html` in the basic example we can define the tag name and attribute name and then use it in this way:
 
@@ -116,34 +139,6 @@ Init PostHTML:
 // index.js
 
 require('posthtml')(require('posthtml-components')({ root: './src', tagName: 'component', attribute: 'src' }))
-  .process(/* ... */)
-  .then(/* ... */)
-```
-
-We can also set multiple tag names by passing an array of component name and an array of attribute name, this is useful if you need to migrate from `posthtml-extend` and `posthtml-modules` where you are using different tag name.
-
-Init PostHTML with multiple tag names and attributes:
-
-``` html
-<!-- src/index.html -->
-<html>
-<body>
-  <extends src="button.html">Submit</extends>
-  <module href="button.html">Submit</module>
-</body>
-</html>
-```
-
-```js
-// index.js
-
-const options = { 
-  root: './src', 
-  tagNames: ['extends', 'module'], 
-  attributes: ['src', 'href']
-};
-
-require('posthtml')(require('posthtml-components')(options))
   .process(/* ... */)
   .then(/* ... */)
 ```
@@ -198,7 +193,7 @@ If your components are in a subfolder then you can use `dot` to access it, examp
 <x-forms.button>Submit</x-forms.button>
 ```
 
-If your components are in a sub-folder with multiple files, then for avoid to type the main file you can use `index.html` without specify it.
+If your components are in a sub-folder with multiple files, then for avoid typing the main file you can use `index.html` without specify it.
 Please see below example to understand better.
 
 ``` html
@@ -244,11 +239,13 @@ With namespaces you can define a top level root path to your components like sho
 
 ### Slots
 
+### Stacks
+
 ### Props
 
-### Matcher
+### Attributes
 
-## Migration from posthtml-extend and posthtml-modules
+## Migration
 
 ## Contributing
 
@@ -265,4 +262,5 @@ See [PostHTML Guidelines](https://github.com/posthtml/posthtml/tree/master/docs)
 
 ## Credits
 
-Thanks to all PostHTML contributors and especially to `posthtml-extend` and `posthtml-modules` contributors, as part of code are ~~stolen~~ borrowed from these plugins.
+Thanks to all PostHTML contributors and especially to `posthtml-extend` and `posthtml-modules` contributors, as part of code are ~~stolen~~ inspired from these plugins.
+Huge thanks also to Laravel Blade template engine!

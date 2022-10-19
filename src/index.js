@@ -25,12 +25,12 @@ module.exports = (options = {}) => tree => {
   options.root = path.resolve(options.root || './');
   options.roots = options.roots || [''];
   options.tagPrefix = options.tagPrefix || 'x-';
+  options.tag = options.tag || false;
+  options.attribute = options.attribute || 'src';
   options.namespaces = options.namespaces || [];
   options.namespaceSeparator = options.namespaceSeparator || '::';
   options.namespaceFallback = options.namespaceFallback || false;
   options.fileExtension = options.fileExtension || 'html';
-  options.tag = options.tag || 'component';
-  options.attribute = options.attribute || 'src';
   options.yield = options.yield || 'yield';
   options.slot = options.slot || 'slot';
   options.fill = options.fill || 'fill';
@@ -39,12 +39,24 @@ module.exports = (options = {}) => tree => {
   options.localsAttr = options.localsAttr || 'props';
   options.expressions = options.expressions || {};
   options.plugins = options.plugins || [];
-  options.strict = typeof options.strict === 'undefined' ? true : options.strict;
   options.attrsParserRules = options.attrsParserRules || {};
+  options.strict = typeof options.strict === 'undefined' ? true : options.strict;
+
   options.slot = new RegExp(`^${options.slot}:`, 'i');
   options.fill = new RegExp(`^${options.fill}:`, 'i');
   options.tagPrefix = new RegExp(`^${options.tagPrefix}`, 'i');
-  options.matcher = options.matcher || [{tag: options.tag}, {tag: options.tagPrefix}];
+
+  if (!Array.isArray(options.matcher)) {
+    options.matcher = [];
+    if (options.tagPrefix) {
+      options.matcher.push({tag: options.tagPrefix});
+    }
+
+    if (options.tag) {
+      options.matcher.push({tag: options.tag});
+    }
+  }
+
   options.roots = Array.isArray(options.roots) ? options.roots : [options.roots];
   options.roots.forEach((root, index) => {
     options.roots[index] = path.join(options.root, root);
