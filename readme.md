@@ -448,7 +448,55 @@ If you would like to prepend content onto the beginning of a stack, you should u
 
 ### Props
 
-TODO...
+Behind the `props` there is powerful [posthtml-expressions](https://github.com/posthtml/posthtml-expressions) plugin, with feature to pass `props` via attributes, define default via `<script props>`, merge with default and use `<script props>` as computed.
+
+Let's see how it works with an example.
+
+Create the component:
+
+```html
+<!-- src/modal.html -->
+<script props>
+  module.exports = {
+    title: 'Default title',
+    size: locals.size ? `modal-${locals.size}` : '',
+    items: ['first', 'second']
+  }
+</script>
+<div class="modal {{ size }}">
+  <div class="modal-header">
+    {{ title }}
+  </div>
+  <div class="modal-body">
+    <each loop="item in items"><span>{{ item }}</span></each>
+  </div>
+</div>
+```
+
+Use:
+
+```html
+<x-modal computed:size="xl" title="My modal title" merge:items='["third", "fourth"]' class="modal-custom"></x-modal>
+```
+
+The output will be:
+
+```html
+<div class="modal modal-custom modal-xl">
+  <div class="modal-header">
+    My modal title
+  </div>
+  <div class="modal-body">
+    <span>first</span>
+    <span>second</span>
+    <span>third</span>
+    <span>fourth</span>
+  </div>
+</div>
+```
+
+So the prop `size` is not override since we prepend `computed:` to the attribute, while the prop `title` is override.
+And the prop `items` is merged and not override. 
 
 ### Attributes
 
@@ -459,7 +507,7 @@ Only attribute not defined as `props` will be processed.
 
 As already seen in basic example:
 
-``` html
+```html
 <!-- src/button.html -->
 <script props>
   module.exports = {
@@ -473,14 +521,14 @@ As already seen in basic example:
 
 Use the component:
 
-``` html
+```html
 <!-- src/index.html -->
 <x-button type="submit" class="btn-primary" label="My button"></x-button>
 ```
 
 Result:
 
-``` html
+```html
 <!-- dist/index.html -->
 <button type="submit" class="btn btn-primary">My button</button>
 ```
@@ -491,14 +539,14 @@ If you are familiar with Laravel Blade, this is also how Blade handle this.
 
 As said early, class and style are merged by default, if you want to override them, just prepend `override:` to the attributes:
 
-``` html
+```html
 <!-- src/index.html -->
 <x-button type="submit" override:class="btn-custom" label="My button"></x-button>
 ```
 
 Result:
 
-``` html
+```html
 <!-- dist/index.html -->
 <button type="submit" class="btn-custom">My button</button>
 ```
