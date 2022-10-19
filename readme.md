@@ -20,6 +20,8 @@ This PostHTML plugin provides an HTML-friendly syntax for write components in yo
 If you are familiar with Blade, you will find similar syntax as this plugin was inspired by it.
 See below a basic example, as code is worth a thousand words.
 
+> This plugin is still in early stage of development and the current API may change.
+
 ## Basic example
 
 Create the component:
