@@ -6,7 +6,7 @@ const path = require('path');
 const {parser} = require('posthtml-parser');
 const {match} = require('posthtml/lib/api');
 const expressions = require('posthtml-expressions');
-const findPathFromTagName = require('./find-path');
+const findPathFromTag = require('./find-path');
 const processLocals = require('./locals');
 const processAttributes = require('./attributes');
 const {processPushes, processStacks} = require('./stacks');
@@ -23,13 +23,12 @@ const {setFilledSlots, processSlotContent, processFillContent} = require('./slot
 /* eslint-disable complexity */
 module.exports = (options = {}) => tree => {
   options.root = path.resolve(options.root || './');
-  options.roots = options.roots || [''];
+  options.folders = options.folders || [''];
   options.tagPrefix = options.tagPrefix || 'x-';
   options.tag = options.tag || false;
   options.attribute = options.attribute || 'src';
   options.namespaces = options.namespaces || [];
   options.namespaceSeparator = options.namespaceSeparator || '::';
-  options.namespaceFallback = options.namespaceFallback || false;
   options.fileExtension = options.fileExtension || 'html';
   options.yield = options.yield || 'yield';
   options.slot = options.slot || 'slot';
@@ -65,10 +64,10 @@ module.exports = (options = {}) => tree => {
     }
   }
 
-  options.roots = Array.isArray(options.roots) ? options.roots : [options.roots];
-  options.roots.forEach((root, index) => {
-    options.roots[index] = path.resolve(options.root, root);
-  });
+  options.roots = Array.isArray(options.folders) ? options.folders : [options.folders];
+  // options.roots.forEach((root, index) => {
+  //   options.roots[index] = path.resolve(options.root, root);
+  // });
   options.namespaces = Array.isArray(options.namespaces) ? options.namespaces : [options.namespaces];
   options.namespaces.forEach((namespace, index) => {
     options.namespaces[index].root = path.resolve(namespace.root);
@@ -115,7 +114,11 @@ function processTree(options) {
         currentNode.attrs = {};
       }
 
-      const componentFile = currentNode.attrs[options.attribute] || findPathFromTagName(currentNode, options);
+      if (!currentNode.attrs[options.attribute]) {
+        console.log(currentNode.tag);
+      }
+
+      const componentFile = currentNode.attrs[options.attribute] || findPathFromTag(currentNode.tag, options);
 
       if (!componentFile) {
         return currentNode;

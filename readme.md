@@ -8,7 +8,7 @@
   <p>HTML-friendly syntax component with slots, attributes as locals and more!</p>
 </div>
 
-## Install
+## Installation
 
 ```bash
 npm i -D posthtml-components
@@ -96,28 +96,27 @@ See also the `examples` folder. You can run `npm run build-examples` to compile 
 
 ## Options
 
-|         Option         |           Default            | Description                                                                                                 |
-|:----------------------:|:----------------------------:|:------------------------------------------------------------------------------------------------------------|
-|        **root**        |            `'./'`            | String value as root path for components lookup.                                                            |
-|       **roots**        |            `['']`            | Array of additional multi roots path from `options.root`.                                                   |
-|     **tagPrefix**      |             `x-`             | String for tag prefix.                                                                                      |
-|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.           |
-|     **attribute**      |            `src`             | String value for component attribute for set path.                                                          |
-|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                 |
-| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`              |
-| **namespaceFallback**  |           `false`            | Boolean value for use fallback path to defined roots in `options.roots`.                                    |
-|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                             |
-|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                           |
-|        **slot**        |            `slot`            | String value for `<slot>` tag name.                                                                         |
-|        **fill**        |            `fill`            | String value for `<fill>` tag name.                                                                         |
-|        **push**        |            `push`            | String value for `<push>` tag name.                                                                         |
-|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                        |
-|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.            |
-|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example. |
-|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                      |
-|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                     |
-|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                              |
-|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                     |
+|         Option         |           Default            | Description                                                                                                    |
+|:----------------------:|:----------------------------:|:---------------------------------------------------------------------------------------------------------------|
+|        **root**        |            `'./'`            | String value as root path for components lookup.                                                               |
+|      **folders**       |            `['']`            | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom. |
+|     **tagPrefix**      |             `x-`             | String for tag prefix. The plugin will use RegExp with this string.                                            |
+|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.              |
+|     **attribute**      |            `src`             | String value for component attribute for set path.                                                             |
+|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                    |
+| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                 |
+|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                                |
+|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                              |
+|        **slot**        |            `slot`            | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).            |
+|        **fill**        |            `fill`            | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).            |
+|        **push**        |            `push`            | String value for `<push>` tag name.                                                                            |
+|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                           |
+|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.               |
+|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.    |
+|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                         |
+|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                        |
+|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                                 |
+|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                        |
 
 ## Features
 
@@ -208,18 +207,17 @@ Please see below example to understand better.
 <x-modal>Submit</x-modal>
 ```
 
-### Multiple roots
+### Multiple folders
 
-You have full control where to place your components. Once you set the main root path of your components, you can then set multiple roots.
+You have full control where to place your components. Once you set the base root path of your components, you can then set multiple folders.
 For example let's suppose your main root is `./src` and then you have several folders where you have your components, for example `./src/components` and `./src/layouts`.
 You can setup the plugin like below:
 
 ```js
 // index.js
-
 const options = { 
   root: './src', 
-  roots: ['components', 'layouts'] 
+  folders: ['components', 'layouts'] 
 };
 
 require('posthtml')(require('posthtml-components')(options))
@@ -229,7 +227,60 @@ require('posthtml')(require('posthtml-components')(options))
 
 ### Namespaces
 
-With namespaces you can define a top level root path to your components like shown in below example:
+With namespaces you can define a top level root path to your components like shown in below example.
+It can be useful for handle custom theme, where you define a specific top level root, with fallback root when component it's not found,
+and a custom root for override, something like a child theme.
+
+Thanks to namespace, you can create folders structure like below:
+
+- `src` (base root folder)
+  - `components` (folder for components like modal, button, etc.)
+  - `layouts` (folder for layout components like base layout, header, footer, etc.)
+  - `theme-dark` (namespace folder for theme-dark)
+    - `components` (folder for components for theme dark)
+    - `layouts` (folder for layout components for dark theme)
+  - `theme-light` (namespace folder for theme-light)
+    - `components` (folder for components for light theme)
+    - `layouts` (folder for layout components for dark theme)
+  - `custom` (custom folder for override your namespace themes)
+    - `theme-dark` (custom folder for override dark theme)
+      - `components` (folder for override components of theme dark)
+      - `layouts` (folder for override layout components of dark theme)
+    - `theme-light` (custom folder for override light theme)
+      - `components` (folder for override components of theme dark)
+      - `layouts` (folder for override layout components of dark theme)
+
+And the options would be like:
+
+```js
+// index.js
+const options = {
+  // Main root for component without namespace
+  root: './src',
+  // Folders is always appended in 'root' or any defined namespace's folders (base, fallback or custom)
+  folders: ['components', 'layouts'],
+  namespaces: [{
+    // Namespace name will be prepend to tag name (example <x-theme-dark::button>)
+    name: 'theme-dark',
+    // Base root of the namespace
+    root: './src/theme-dark',
+    // Fallback root when a component it's not found in namespace
+    fallback: './src',
+    // Custom root for override, the lookup happen first here
+    custom: './src/custom/theme-dark'
+  }, {
+    // Light theme
+    name: 'theme-light',
+    root: './src/theme-light',
+    fallback: './src',
+    custom: './src/custom/theme-light'
+  }, {
+    /* ... */
+  }]
+};
+```
+
+Use the component namespace:
 
 ``` html
 <!-- src/index.html -->
@@ -240,6 +291,8 @@ With namespaces you can define a top level root path to your components like sho
 </body>
 </html>
 ```
+
+Of course, you can change this folder structure as you prefer according to your project requirements.
 
 ### Slots
 
@@ -734,7 +787,8 @@ via `$slots` which has all the `props` passed via slot, and as well check if slo
 ## Migration
 
 If you are migrating from `posthtml-extend` and/or `posthtml-modules` then you can continue to keep them until you migrate all of your components.
-For continue to use current code without changing it, at the moment it's not yet fully supported, but it maybe come in near future.
+For continue to use current code with this plugin without changing it, at the moment it's not yet fully supported, but it maybe comes in near future.
+This because the new version has different logic to handle slots and locals, as well the yield content.
 
 ## Contributing
 

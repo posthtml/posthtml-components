@@ -16,7 +16,7 @@ const md = './examples/src/md';
 const plugins = [
   components({
     root: './examples/src',
-    roots: ['components', 'layouts'],
+    folders: ['components', 'layouts'],
     strict: true,
     expressions: {
       locals: {
@@ -76,23 +76,30 @@ readdirSync(src).forEach(file => {
     });
 });
 
-function processCodeTags () {
-  return function(tree) {
-    tree.match.call(tree, {tag: 'pre'}, function(node) {
-      node.content = Array.from(node.content).map(content => {
-        if (typeof content === 'string') {
-          content = '';
-        } else if (content.tag === 'code' && content.attrs?.class?.startsWith('language-')) {
-          Array.from(content.content).forEach((c, i) => {
-            content.content[i] = c.trim()
+function processCodeTags() {
+  return function (tree) {
+    tree.match({tag: 'pre'}, node => {
+      if (!Array.isArray(node.content)) {
+        return node;
+      }
+
+      // Clear whitespaces before and after <pre> and <code>
+      node.content = node.content.map(contentNode => {
+        if (typeof contentNode === 'string') {
+          contentNode = '';
+        } else if (contentNode.tag === 'code' && contentNode.attrs?.class?.startsWith('language-') && Array.isArray(contentNode.content)) {
+          contentNode.content.forEach((c, i) => {
+            contentNode.content[i] = c.trim();
           });
         }
-        return content;
+
+        return contentNode;
       });
+
       return node;
     });
 
-    // tree.match.call(tree, {tag: 'code'}, function(node) {
+    // tree.match({tag: 'code'}, function(node) {
     //   if (Array.isArray(node.content)) {
     //     node.content = hljs.highlight(render(node.content), {language: 'html'}).value
     //   } else {
@@ -100,5 +107,5 @@ function processCodeTags () {
     //   }
     //   return node;
     // });
-  }
+  };
 }

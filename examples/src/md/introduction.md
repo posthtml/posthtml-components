@@ -1,6 +1,6 @@
 $<toc{"containerId":"header-toc"}>
 
-## Install
+## Installation
 
 ```bash
 npm i -D posthtml-components
@@ -88,28 +88,27 @@ See also the `examples` folder. You can run `npm run build-examples` to compile 
 
 ## Options
 
-|         Option         |           Default            | Description                                                                                                 |
-|:----------------------:|:----------------------------:|:------------------------------------------------------------------------------------------------------------|
-|        **root**        |            `'./'`            | String value as root path for components lookup.                                                            |
-|       **roots**        |            `['']`            | Array of additional multi roots path from `options.root`.                                                   |
-|     **tagPrefix**      |             `x-`             | String for tag prefix.                                                                                      |
-|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.           |
-|     **attribute**      |            `src`             | String value for component attribute for set path.                                                          |
-|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                 |
-| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`              |
-| **namespaceFallback**  |           `false`            | Boolean value for use fallback path to defined roots in `options.roots`.                                    |
-|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                             |
-|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                           |
-|        **slot**        |            `slot`            | String value for `<slot>` tag name.                                                                         |
-|        **fill**        |            `fill`            | String value for `<fill>` tag name.                                                                         |
-|        **push**        |            `push`            | String value for `<push>` tag name.                                                                         |
-|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                        |
-|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.            |
-|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example. |
-|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                      |
-|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                     |
-|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                              |
-|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                     |
+|         Option         |           Default            | Description                                                                                                    |
+|:----------------------:|:----------------------------:|:---------------------------------------------------------------------------------------------------------------|
+|        **root**        |            `'./'`            | String value as root path for components lookup.                                                               |
+|      **folders**       |            `['']`            | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom. |
+|     **tagPrefix**      |             `x-`             | String for tag prefix. The plugin will use RegExp with this string.                                            |
+|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.              |
+|     **attribute**      |            `src`             | String value for component attribute for set path.                                                             |
+|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                    |
+| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                 |
+|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                                |
+|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                              |
+|        **slot**        |            `slot`            | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).            |
+|        **fill**        |            `fill`            | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).            |
+|        **push**        |            `push`            | String value for `<push>` tag name.                                                                            |
+|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                           |
+|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.               |
+|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.    |
+|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                         |
+|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                        |
+|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                                 |
+|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                        |
 
 ## Features
 
@@ -200,18 +199,17 @@ Please see below example to understand better.
 <x-modal>Submit</x-modal>
 ```
 
-### Multiple roots
+### Multiple folders
 
-You have full control where to place your components. Once you set the main root path of your components, you can then set multiple roots.
+You have full control where to place your components. Once you set the base root path of your components, you can then set multiple folders.
 For example let's suppose your main root is `./src` and then you have several folders where you have your components, for example `./src/components` and `./src/layouts`.
 You can setup the plugin like below:
 
 ```js
 // index.js
-
 const options = { 
   root: './src', 
-  roots: ['components', 'layouts'] 
+  folders: ['components', 'layouts'] 
 };
 
 require('posthtml')(require('posthtml-components')(options))
@@ -221,7 +219,60 @@ require('posthtml')(require('posthtml-components')(options))
 
 ### Namespaces
 
-With namespaces you can define a top level root path to your components like shown in below example:
+With namespaces you can define a top level root path to your components like shown in below example.
+It can be useful for handle custom theme, where you define a specific top level root, with fallback root when component it's not found,
+and a custom root for override, something like a child theme.
+
+Thanks to namespace, you can create folders structure like below:
+
+- `src` (base root folder)
+  - `components` (folder for components like modal, button, etc.)
+  - `layouts` (folder for layout components like base layout, header, footer, etc.)
+  - `theme-dark` (namespace folder for theme-dark)
+    - `components` (folder for components for theme dark)
+    - `layouts` (folder for layout components for dark theme)
+  - `theme-light` (namespace folder for theme-light)
+    - `components` (folder for components for light theme)
+    - `layouts` (folder for layout components for dark theme)
+  - `custom` (custom folder for override your namespace themes)
+    - `theme-dark` (custom folder for override dark theme)
+      - `components` (folder for override components of theme dark)
+      - `layouts` (folder for override layout components of dark theme)
+    - `theme-light` (custom folder for override light theme)
+      - `components` (folder for override components of theme dark)
+      - `layouts` (folder for override layout components of dark theme)
+
+And the options would be like:
+
+```js
+// index.js
+const options = {
+  // Main root for component without namespace
+  root: './src',
+  // Folders is always appended in 'root' or any defined namespace's folders (base, fallback or custom)
+  folders: ['components', 'layouts'],
+  namespaces: [{
+    // Namespace name will be prepend to tag name (example <x-theme-dark::button>)
+    name: 'theme-dark',
+    // Base root of the namespace
+    root: './src/theme-dark',
+    // Fallback root when a component it's not found in namespace
+    fallback: './src',
+    // Custom root for override, the lookup happen first here
+    custom: './src/custom/theme-dark'
+  }, {
+    // Light theme
+    name: 'theme-light',
+    root: './src/theme-light',
+    fallback: './src',
+    custom: './src/custom/theme-light'
+  }, {
+    /* ... */
+  }]
+};
+```
+
+Use the component namespace:
 
 ``` html
 <!-- src/index.html -->
@@ -232,6 +283,8 @@ With namespaces you can define a top level root path to your components like sho
 </body>
 </html>
 ```
+
+Of course, you can change this folder structure as you prefer according to your project requirements.
 
 ### Slots
 
@@ -547,6 +600,184 @@ Result:
 
 You can add custom rules how attributes are parsed, as behind the scene it's used [posthtml-attrs-parser](https://github.com/posthtml/posthtml-attrs-parser) plugin.
 
+## Tips and tricks
+
+You can work with `<slot>` and `<fill>` or you can create component for each "block" of your component, and you can also support both of them.
+You can find an example of this inside `examples/components/modal`. Below is a short explanation about the both approach.
+
+### Using slots
+
+Let's suppose we want to create a component for [bootstrap modal](https://getbootstrap.com/docs/5.2/components/modal/). The code required is:
+
+```html
+<!-- Modal HTML -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+There is almost three block of code: the header, the body and the footer.
+So we could create our component with three slot like below:
+
+```html
+<!-- Modal component -->
+<div class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <slot:header></slot:header>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <slot:body></slot:body>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <slot:footer></slot:footer>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+In this case we can use it like:
+
+```html
+ <x-modal
+  id="exampleModal"
+  aria-labelledby="exampleModalLabel"
+>
+  <slot:header>
+      <h5 class="modal-title" id="exampleModalLabel">My modal</h5>
+  </slot:header>
+
+  <slot:body>
+      Modal body content goes here...
+  </slot:body>
+
+  <slot:footer close="false">
+      <button type="button" class="btn btn-primary">Confirm</button>
+  </slot:footer>
+</x-modal>
+```
+
+### Splitting component in small component
+
+Another way is to split the component in small component, my preferred way, because you can pass attributes to each of them.
+So we create the component with a main component and then three different small component:
+
+```html
+<!-- Main modal component -->
+<div class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <yield></yield>
+    </div>
+  </div>
+</div>
+```
+
+```html
+<!-- Header modal component -->
+<div class="modal-header">
+  <yield></yield>
+</div>
+```
+
+```html
+<!-- Body modal component -->
+<div class="modal-body">
+  <yield></yield>
+</div>
+```
+
+```html
+<!-- Footer modal component -->
+<div class="modal-footer">
+  <yield></yield>
+</div>
+```
+
+And then you can use it like below example:
+
+```html
+<x-modal
+  id="exampleModal"
+  aria-labelledby="exampleModalLabel"
+>
+  <x-modal.header>
+    <h5 class="modal-title" id="exampleModalLabel">My modal</h5>
+  </x-modal.header>
+
+  <x-modal.body>
+    Modal body content goes here...
+  </x-modal.body>
+
+  <x-modal.footer>
+    <button type="button" class="btn btn-primary">Confirm</button>
+  </x-modal.footer>
+</x-modal>
+```
+
+As said in this way you can pass attributes to each of them, without defining props.
+
+### Combine slots and small component
+
+You can also combine both way, and then use them with slots or with small component:
+
+```html
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  tabindex="-1"
+  aria-hidden="true"
+  aria-modal="true"
+  role="dialog"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <if condition="$slots.header?.filled">
+          <x-modal.header>
+            <slot:header></slot:header>
+          </x-modal.header>
+      </if>
+      <if condition="$slots.body?.filled">
+          <x-modal.body>
+              <slot:body></slot:body>
+          </x-modal.body>
+      </if>
+      <if condition="$slots.footer?.filled">
+          <x-modal.footer close="{{ $slots.footer?.locals.close }}">
+              <slot:footer></slot:footer>
+          </x-modal.footer>
+      </if>
+      <yield></yield>
+    </div>
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+```
+
+Now you can use your component with slots or with small components.
+As you may notice, by using slots, you already can use also your small components, and so you can also pass props
+via `$slots` which has all the `props` passed via slot, and as well check if slot is filled.
+
 ## Migration
 
-TODO...
+If you are migrating from `posthtml-extend` and/or `posthtml-modules` then you can continue to keep them until you migrate all of your components.
+For continue to use current code with this plugin without changing it, at the moment it's not yet fully supported, but it maybe comes in near future.
+This because the new version has different logic to handle slots and locals, as well the yield content.

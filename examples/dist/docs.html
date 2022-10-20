@@ -119,7 +119,7 @@
             <nav id="header-toc" class="h-100 flex-column align-items-stretch ps-4 p-3 bg-white rounded-3 doc-shadow">
               <ul class="nav flex-column">
                 <li class="nav-item">
-                  <a class="nav-link" href="#install">Install</a>
+                  <a class="nav-link" href="#installation">Installation</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#introduction">Introduction</a>
@@ -137,7 +137,7 @@
                       <a class="nav-link" href="#tag-names-and-x-tags">Tag names and x-tags</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="#multiple-roots">Multiple roots</a>
+                      <a class="nav-link" href="#multiple-folders">Multiple folders</a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" href="#namespaces">Namespaces</a>
@@ -157,13 +157,27 @@
                   </ul>
                 </li>
                 <li class="nav-item">
+                  <a class="nav-link" href="#tips-and-tricks">Tips and tricks</a>
+                  <ul class="nav flex-column">
+                    <li class="nav-item">
+                      <a class="nav-link" href="#using-slots">Using slots</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#splitting-component-in-small-component">Splitting component in small component</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#combine-slots-and-small-component">Combine slots and small component</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="nav-item">
                   <a class="nav-link" href="#migration">Migration</a>
                 </li>
               </ul>
             </nav>
-            <h2 id="install" tabindex="-1">
-              <a class="header-anchor" href="#install">#</a>
-              Install
+            <h2 id="installation" tabindex="-1">
+              <a class="header-anchor" href="#installation">#</a>
+              Installation
             </h2>
             <pre><code class="language-bash">npm i -D posthtml-components</code></pre>
             <h2 id="introduction" tabindex="-1">
@@ -290,15 +304,15 @@ posthtml(components({ root: './src' }))
                 </tr>
                 <tr>
                   <td style="text-align:center">
-                    <strong>roots</strong>
+                    <strong>folders</strong>
                   </td>
                   <td style="text-align:center">
                     <code>['']</code>
                   </td>
                   <td style="text-align:left">
-                    Array of additional multi roots path from
+                    Array of additional multi folders path from
                     <code>options.root</code>
-                    .
+                    or any defined namespaces root, fallback or custom.
                   </td>
                 </tr>
                 <tr>
@@ -308,7 +322,7 @@ posthtml(components({ root: './src' }))
                   <td style="text-align:center">
                     <code>x-</code>
                   </td>
-                  <td style="text-align:left">String for tag prefix.</td>
+                  <td style="text-align:left">String for tag prefix. The plugin will use RegExp with this string.</td>
                 </tr>
                 <tr>
                   <td style="text-align:center">
@@ -355,19 +369,6 @@ posthtml(components({ root: './src' }))
                 </tr>
                 <tr>
                   <td style="text-align:center">
-                    <strong>namespaceFallback</strong>
-                  </td>
-                  <td style="text-align:center">
-                    <code>false</code>
-                  </td>
-                  <td style="text-align:left">
-                    Boolean value for use fallback path to defined roots in
-                    <code>options.roots</code>
-                    .
-                  </td>
-                </tr>
-                <tr>
-                  <td style="text-align:center">
                     <strong>fileExtension</strong>
                   </td>
                   <td style="text-align:center">
@@ -398,7 +399,11 @@ posthtml(components({ root: './src' }))
                   <td style="text-align:left">
                     String value for
                     <code>&lt;slot&gt;</code>
-                    tag name.
+                    tag name. Used with RegExp by appending
+                    <code>:</code>
+                    (example
+                    <code>&lt;slot:slot-name&gt;</code>
+                    ).
                   </td>
                 </tr>
                 <tr>
@@ -411,7 +416,11 @@ posthtml(components({ root: './src' }))
                   <td style="text-align:left">
                     String value for
                     <code>&lt;fill&gt;</code>
-                    tag name.
+                    tag name. Used with RegExp by appending
+                    <code>:</code>
+                    (example
+                    <code>&lt;fill:slot-name&gt;</code>
+                    ).
                   </td>
                 </tr>
                 <tr>
@@ -595,12 +604,12 @@ Please see below example to understand better.
 
 &lt;!-- You can omit &quot;index&quot; part since the file is named &quot;index.html&quot; --&gt;
 &lt;x-modal&gt;Submit&lt;/x-modal&gt;</code></pre>
-            <h3 id="multiple-roots" tabindex="-1">
-              <a class="header-anchor" href="#multiple-roots">#</a>
-              Multiple roots
+            <h3 id="multiple-folders" tabindex="-1">
+              <a class="header-anchor" href="#multiple-folders">#</a>
+              Multiple folders
             </h3>
             <p>
-              You have full control where to place your components. Once you set the main root path of your components, you can then set multiple roots.
+              You have full control where to place your components. Once you set the base root path of your components, you can then set multiple folders.
 For example let's suppose your main root is
               <code>./src</code>
               and then you have several folders where you have your components, for example
@@ -611,10 +620,9 @@ For example let's suppose your main root is
 You can setup the plugin like below:
             </p>
             <pre><code class="language-js">// index.js
-
 const options = { 
   root: './src', 
-  roots: ['components', 'layouts'] 
+  folders: ['components', 'layouts'] 
 };
 
 require('posthtml')(require('posthtml-components')(options))
@@ -625,8 +633,116 @@ require('posthtml')(require('posthtml-components')(options))
               Namespaces
             </h3>
             <p>
-              With namespaces you can define a top level root path to your components like shown in below example:
+              With namespaces you can define a top level root path to your components like shown in below example.
+It can be useful for handle custom theme, where you define a specific top level root, with fallback root when component it's not found,
+and a custom root for override, something like a child theme.
             </p>
+            <p>Thanks to namespace, you can create folders structure like below:</p>
+            <ul>
+              <li>
+                <code>src</code>
+                (base root folder)
+                <ul>
+                  <li>
+                    <code>components</code>
+                    (folder for components like modal, button, etc.)
+                  </li>
+                  <li>
+                    <code>layouts</code>
+                    (folder for layout components like base layout, header, footer, etc.)
+                  </li>
+                  <li>
+                    <code>theme-dark</code>
+                    (namespace folder for theme-dark)
+                    <ul>
+                      <li>
+                        <code>components</code>
+                        (folder for components for theme dark)
+                      </li>
+                      <li>
+                        <code>layouts</code>
+                        (folder for layout components for dark theme)
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <code>theme-light</code>
+                    (namespace folder for theme-light)
+                    <ul>
+                      <li>
+                        <code>components</code>
+                        (folder for components for light theme)
+                      </li>
+                      <li>
+                        <code>layouts</code>
+                        (folder for layout components for dark theme)
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <code>custom</code>
+                    (custom folder for override your namespace themes)
+                    <ul>
+                      <li>
+                        <code>theme-dark</code>
+                        (custom folder for override dark theme)
+                        <ul>
+                          <li>
+                            <code>components</code>
+                            (folder for override components of theme dark)
+                          </li>
+                          <li>
+                            <code>layouts</code>
+                            (folder for override layout components of dark theme)
+                          </li>
+                        </ul>
+                      </li>
+                      <li>
+                        <code>theme-light</code>
+                        (custom folder for override light theme)
+                        <ul>
+                          <li>
+                            <code>components</code>
+                            (folder for override components of theme dark)
+                          </li>
+                          <li>
+                            <code>layouts</code>
+                            (folder for override layout components of dark theme)
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <p>And the options would be like:</p>
+            <pre><code class="language-js">// index.js
+const options = {
+  // Main root for component without namespace
+  root: './src',
+  // Folders is always appended in 'root' or any defined namespace's folders (base, fallback or custom)
+  folders: ['components', 'layouts'],
+  namespaces: [{
+    // Namespace name will be prepend to tag name (example &lt;x-theme-dark::button&gt;)
+    name: 'theme-dark',
+    // Base root of the namespace
+    root: './src/theme-dark',
+    // Fallback root when a component it's not found in namespace
+    fallback: './src',
+    // Custom root for override, the lookup happen first here
+    custom: './src/custom/theme-dark'
+  }, {
+    // Light theme
+    name: 'theme-light',
+    root: './src/theme-light',
+    fallback: './src',
+    custom: './src/custom/theme-light'
+  }, {
+    /* ... */
+  }]
+};</code></pre>
+            <p>Use the component namespace:</p>
             <pre><code class="language-html">&lt;!-- src/index.html --&gt;
 &lt;html&gt;
 &lt;body&gt;
@@ -634,6 +750,9 @@ require('posthtml')(require('posthtml-components')(options))
   &lt;x-theme-light::button&gt;Submit&lt;/theme-light::button&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
+            <p>
+              Of course, you can change this folder structure as you prefer according to your project requirements.
+            </p>
             <h3 id="slots" tabindex="-1">
               <a class="header-anchor" href="#slots">#</a>
               Slots
@@ -938,11 +1057,192 @@ Only attribute not defined as
               <a href="https://github.com/posthtml/posthtml-attrs-parser">posthtml-attrs-parser</a>
               plugin.
             </p>
+            <h2 id="tips-and-tricks" tabindex="-1">
+              <a class="header-anchor" href="#tips-and-tricks">#</a>
+              Tips and tricks
+            </h2>
+            <p>
+              You can work with
+              <code>&lt;slot&gt;</code>
+              and
+              <code>&lt;fill&gt;</code>
+              or you can create component for each &quot;block&quot; of your component, and you can also support both of them.
+You can find an example of this inside
+              <code>examples/components/modal</code>
+              . Below is a short explanation about the both approach.
+            </p>
+            <h3 id="using-slots" tabindex="-1">
+              <a class="header-anchor" href="#using-slots">#</a>
+              Using slots
+            </h3>
+            <p>
+              Let's suppose we want to create a component for
+              <a href="https://getbootstrap.com/docs/5.2/components/modal/">bootstrap modal</a>
+              . The code required is:
+            </p>
+            <pre><code class="language-html">&lt;!-- Modal HTML --&gt;
+&lt;div class=&quot;modal fade&quot; id=&quot;exampleModal&quot; tabindex=&quot;-1&quot; aria-labelledby=&quot;exampleModalLabel&quot; aria-hidden=&quot;true&quot;&gt;
+  &lt;div class=&quot;modal-dialog&quot;&gt;
+    &lt;div class=&quot;modal-content&quot;&gt;
+      &lt;div class=&quot;modal-header&quot;&gt;
+        &lt;h1 class=&quot;modal-title fs-5&quot; id=&quot;exampleModalLabel&quot;&gt;Modal title&lt;/h1&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn-close&quot; data-bs-dismiss=&quot;modal&quot; aria-label=&quot;Close&quot;&gt;&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;modal-body&quot;&gt;
+        ...
+      &lt;/div&gt;
+      &lt;div class=&quot;modal-footer&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-secondary&quot; data-bs-dismiss=&quot;modal&quot;&gt;Close&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt;Save changes&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            <p>
+              There is almost three block of code: the header, the body and the footer.
+So we could create our component with three slot like below:
+            </p>
+            <pre><code class="language-html">&lt;!-- Modal component --&gt;
+&lt;div class=&quot;modal fade&quot; tabindex=&quot;-1&quot; aria-hidden=&quot;true&quot;&gt;
+  &lt;div class=&quot;modal-dialog&quot;&gt;
+    &lt;div class=&quot;modal-content&quot;&gt;
+      &lt;div class=&quot;modal-header&quot;&gt;
+        &lt;slot:header&gt;&lt;/slot:header&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn-close&quot; data-bs-dismiss=&quot;modal&quot; aria-label=&quot;Close&quot;&gt;&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;modal-body&quot;&gt;
+        &lt;slot:body&gt;&lt;/slot:body&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;modal-footer&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-secondary&quot; data-bs-dismiss=&quot;modal&quot;&gt;Close&lt;/button&gt;
+        &lt;slot:footer&gt;&lt;/slot:footer&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            <p>In this case we can use it like:</p>
+            <pre><code class="language-html">&lt;x-modal
+  id=&quot;exampleModal&quot;
+  aria-labelledby=&quot;exampleModalLabel&quot;
+&gt;
+  &lt;slot:header&gt;
+      &lt;h5 class=&quot;modal-title&quot; id=&quot;exampleModalLabel&quot;&gt;My modal&lt;/h5&gt;
+  &lt;/slot:header&gt;
+
+  &lt;slot:body&gt;
+      Modal body content goes here...
+  &lt;/slot:body&gt;
+
+  &lt;slot:footer close=&quot;false&quot;&gt;
+      &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt;Confirm&lt;/button&gt;
+  &lt;/slot:footer&gt;
+&lt;/x-modal&gt;</code></pre>
+            <h3 id="splitting-component-in-small-component" tabindex="-1">
+              <a class="header-anchor" href="#splitting-component-in-small-component">#</a>
+              Splitting component in small component
+            </h3>
+            <p>
+              Another way is to split the component in small component, my preferred way, because you can pass attributes to each of them.
+So we create the component with a main component and then three different small component:
+            </p>
+            <pre><code class="language-html">&lt;!-- Main modal component --&gt;
+&lt;div class=&quot;modal fade&quot; tabindex=&quot;-1&quot; aria-hidden=&quot;true&quot;&gt;
+  &lt;div class=&quot;modal-dialog&quot;&gt;
+    &lt;div class=&quot;modal-content&quot;&gt;
+      &lt;yield&gt;&lt;/yield&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            <pre><code class="language-html">&lt;!-- Header modal component --&gt;
+&lt;div class=&quot;modal-header&quot;&gt;
+  &lt;yield&gt;&lt;/yield&gt;
+&lt;/div&gt;</code></pre>
+            <pre><code class="language-html">&lt;!-- Body modal component --&gt;
+&lt;div class=&quot;modal-body&quot;&gt;
+  &lt;yield&gt;&lt;/yield&gt;
+&lt;/div&gt;</code></pre>
+            <pre><code class="language-html">&lt;!-- Footer modal component --&gt;
+&lt;div class=&quot;modal-footer&quot;&gt;
+  &lt;yield&gt;&lt;/yield&gt;
+&lt;/div&gt;</code></pre>
+            <p>And then you can use it like below example:</p>
+            <pre><code class="language-html">&lt;x-modal
+  id=&quot;exampleModal&quot;
+  aria-labelledby=&quot;exampleModalLabel&quot;
+&gt;
+  &lt;x-modal.header&gt;
+    &lt;h5 class=&quot;modal-title&quot; id=&quot;exampleModalLabel&quot;&gt;My modal&lt;/h5&gt;
+  &lt;/x-modal.header&gt;
+
+  &lt;x-modal.body&gt;
+    Modal body content goes here...
+  &lt;/x-modal.body&gt;
+
+  &lt;x-modal.footer&gt;
+    &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt;Confirm&lt;/button&gt;
+  &lt;/x-modal.footer&gt;
+&lt;/x-modal&gt;</code></pre>
+            <p>
+              As said in this way you can pass attributes to each of them, without defining props.
+            </p>
+            <h3 id="combine-slots-and-small-component" tabindex="-1">
+              <a class="header-anchor" href="#combine-slots-and-small-component">#</a>
+              Combine slots and small component
+            </h3>
+            <p>
+              You can also combine both way, and then use them with slots or with small component:
+            </p>
+            <pre><code class="language-html">&lt;!-- Modal --&gt;
+&lt;div
+  class=&quot;modal fade&quot;
+  tabindex=&quot;-1&quot;
+  aria-hidden=&quot;true&quot;
+  aria-modal=&quot;true&quot;
+  role=&quot;dialog&quot;
+&gt;
+  &lt;div class=&quot;modal-dialog&quot;&gt;
+    &lt;div class=&quot;modal-content&quot;&gt;
+      &lt;if condition=&quot;$slots.header?.filled&quot;&gt;
+          &lt;x-modal.header&gt;
+            &lt;slot:header&gt;&lt;/slot:header&gt;
+          &lt;/x-modal.header&gt;
+      &lt;/if&gt;
+      &lt;if condition=&quot;$slots.body?.filled&quot;&gt;
+          &lt;x-modal.body&gt;
+              &lt;slot:body&gt;&lt;/slot:body&gt;
+          &lt;/x-modal.body&gt;
+      &lt;/if&gt;
+      &lt;if condition=&quot;$slots.footer?.filled&quot;&gt;
+          &lt;x-modal.footer close=&quot;{{ $slots.footer?.locals.close }}&quot;&gt;
+              &lt;slot:footer&gt;&lt;/slot:footer&gt;
+          &lt;/x-modal.footer&gt;
+      &lt;/if&gt;
+      &lt;yield&gt;&lt;/yield&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
+&lt;/div&gt;&lt;!-- /.modal --&gt;</code></pre>
+            <p>
+              Now you can use your component with slots or with small components.
+As you may notice, by using slots, you already can use also your small components, and so you can also pass props
+via
+              <code>$slots</code>
+              which has all the
+              <code>props</code>
+              passed via slot, and as well check if slot is filled.
+            </p>
             <h2 id="migration" tabindex="-1">
               <a class="header-anchor" href="#migration">#</a>
               Migration
             </h2>
-            <p>TODO...</p>
+            <p>
+              If you are migrating from
+              <code>posthtml-extend</code>
+              and/or
+              <code>posthtml-modules</code>
+              then you can continue to keep them until you migrate all of your components.
+For continue to use current code with this plugin without changing it, at the moment it's not yet fully supported, but it maybe comes in near future.
+This because the new version has different logic to handle slots and locals, as well the yield content.
+            </p>
           </div>
         </div>
       </div>
