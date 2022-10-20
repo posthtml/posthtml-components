@@ -11,7 +11,7 @@
 ## Installation
 
 ```bash
-npm i -D posthtml-components
+npm i -D posthtml-component
 ```
 
 ## Introduction
