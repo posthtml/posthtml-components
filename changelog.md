@@ -1,4 +1,4 @@
-## 1.0.0-beta.0 (2022-10-20)
+## 1.0.0-beta.1 (2022-10-20)
 
 * Added examples ([60a86fd](https://github.com/thewebartisan7/posthtml-components/commit/60a86fd))
 * Added support for works with the same extends and modules syntax together with x-tag for easy migrat ([d5f665e](https://github.com/thewebartisan7/posthtml-components/commit/d5f665e))

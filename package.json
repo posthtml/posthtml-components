@@ -1,6 +1,6 @@
 {
   "name": "posthtml-component",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "description": "PostHTML Components Blade-like with slots, attributes as props and custom tag",
   "license": "MIT",
   "repository": "thewebartisan7/posthtml-components",
