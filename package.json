@@ -1,5 +1,5 @@
 {
-  "name": "posthtml-components",
+  "name": "posthtml-component",
   "version": "1.0.0-beta.0",
   "description": "PostHTML Components Blade-like with slots, attributes as props and custom tag",
   "license": "MIT",
@@ -16,9 +16,11 @@
     "build-examples": "node ./examples"
   },
   "keywords": [
-    "html",
     "posthtml",
-    "posthtml-components"
+    "posthtml-component",
+    "posthtml-components",
+    "components",
+    "html"
   ],
   "dependencies": {
     "deepmerge": "^4.2.2",
