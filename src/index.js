@@ -65,9 +65,6 @@ module.exports = (options = {}) => tree => {
   }
 
   options.roots = Array.isArray(options.folders) ? options.folders : [options.folders];
-  // options.roots.forEach((root, index) => {
-  //   options.roots[index] = path.resolve(options.root, root);
-  // });
   options.namespaces = Array.isArray(options.namespaces) ? options.namespaces : [options.namespaces];
   options.namespaces.forEach((namespace, index) => {
     options.namespaces[index].root = path.resolve(namespace.root);
@@ -109,6 +106,10 @@ function processTree(options) {
   let processCounter = 0;
 
   return function (tree) {
+    if (options.plugins.length > 0) {
+      tree = applyPluginsToTree(tree, options.plugins);
+    }
+
     match.call(tree, options.matcher, currentNode => {
       if (!currentNode.attrs) {
         currentNode.attrs = {};
@@ -149,6 +150,10 @@ function processTree(options) {
       // const plugins = [...options.plugins, expressions(options.expressions)];
       nextNode = expressions(options.expressions)(nextNode);
 
+      if (options.plugins.length > 0) {
+        nextNode = applyPluginsToTree(nextNode, options.plugins);
+      }
+
       // Process <yield> tag
       const content = match.call(nextNode, {tag: options.yield}, nextNode => {
         // Fill <yield> with current node content or default <yield> content or empty
@@ -182,4 +187,11 @@ function processTree(options) {
 
     return tree;
   };
+}
+
+function applyPluginsToTree(tree, plugins) {
+  return plugins.reduce((tree, plugin) => {
+    tree = plugin(tree);
+    return tree;
+  }, tree);
 }

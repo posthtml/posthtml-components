@@ -45,6 +45,7 @@
     "markdown-it-toc-done-right": "^4.2.0",
     "posthtml": "^0.16.6",
     "posthtml-beautify": "^0.7.0",
+    "posthtml-include": "^1.7.4",
     "posthtml-markdownit": "^1.3.0",
     "xo": "^0.37.1"
   }
