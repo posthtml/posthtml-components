@@ -1,0 +1,19 @@
+<x-page>
+  <div class="row">
+    <div class="col-lg-8">
+      <h1 class="display-1 fw-bold mb-4">Demo</h1>
+
+      <x-demo
+        aStringOverride="My override string changed"
+        anObjectOverride='{ "third": "Third override item", "fourth": "Fourth override item" }'
+        merge:anObjectMerged='{ "third": "Third merged item", "fourth": "Fourth merged item", "anObjectMerged1": { "third": "Third merged item (UPDATED?)", "fourth1": "Fourth merged item" } }'
+
+        merge:post='{ "title": "My post title", "body": "My post body", "comments": [ { "id": 1, "body": "My comment 1 new" }, { "id": 3, "body": "My comment 3" } ] }'
+
+        merge:anArrayOfObjects='[ { "id": 1, "title": "My new title 1" }, { "id": 2, "title": "My new title 2", "somethingnew": "New" } ]'
+
+        merge:anArray='[ "first", "third", "fourth" ]'
+      ></x-demo>
+    </div>
+  </div>
+</x-page>

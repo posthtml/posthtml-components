@@ -1,0 +1,36 @@
+<script props>
+  module.exports = {
+    aStringDefault: 'My default string',
+    aStringOverride: 'My default override string',
+    anObjectDefault: {
+      first: 'First default item',
+      second: 'Second default item'
+    },
+    anObjectOverride: {
+      first: 'First overriden item',
+      second: 'Second overriden item'
+    },
+    anObjectMerged: {
+      first: 'First merged item',
+      second: 'Second merged item'
+    }
+  };
+</script>
+<div>
+  <h1>anObjectDefault</h1>
+  <each loop="o,i in anObjectDefault">
+    <p><strong>{{ i }}</strong>: {{ o }}</p>
+  </each>
+  <h1>anObjectOverride</h1>
+  <each loop="o,i in anObjectOverride">
+    <p><strong>{{ i }}</strong>: {{ o }}</p>
+  </each>
+  <h1>anObjectMerged</h1>
+  <each loop="o,i in anObjectMerged">
+    <p><strong>{{ i }}</strong>: {{ o }}</p>
+  </each>
+  <h1>aStringDefault</h1>
+  <p>{{ aStringDefault }}</p>
+  <h1>aStringOverride</h1>
+  <p>{{ aStringOverride }}</p>
+</div>

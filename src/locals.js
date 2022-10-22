@@ -2,6 +2,16 @@
 
 const merge = require('deepmerge');
 const scriptDataLocals = require('posthtml-expressions/lib/locals');
+const {pick, extend} = require('underscore');
+// const {inspect} = require('util');
+//
+// const debug = true;
+//
+// const log = (object, what, method) => {
+//   if (debug === true || method === debug) {
+//     console.log(what, inspect(object, false, null, true));
+//   }
+// };
 
 /**
  * Parse locals from attributes, globals and via script
@@ -74,19 +84,10 @@ module.exports = (currentNode, nextNode, slotContent, options) => {
   // Retrieve default locals from <script props> and merge with attributes
   const {locals} = scriptDataLocals(nextNode, {localsAttr: options.localsAttr, removeScriptLocals: true, locals: {...attributes, $slots: slotContent}});
 
-  // Merge default locals and attributes or overrides props with attributes
+  // Merge or overrides props and attributes
   if (locals) {
     if (merged.length > 0) {
-      /** @var {Object} mergedAttributes */
-      const mergedAttributes = Object.fromEntries(Object.entries(attributes).filter(([attribute]) => merged.includes(attribute)));
-      /** @var {Object} mergedAttributes */
-      const mergedLocals = Object.fromEntries(Object.entries(locals).filter(([local]) => merged.includes(local)));
-
-      if (Object.keys(mergedLocals).length > 0) {
-        merged.forEach(attributeName => {
-          attributes[attributeName] = merge(mergedLocals[attributeName], mergedAttributes[attributeName]);
-        });
-      }
+      extend(attributes, merge(pick(locals, merged), pick(attributes, merged)));
     }
 
     // Override attributes with props when is computed or attribute is not defined

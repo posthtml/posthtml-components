@@ -72,3 +72,12 @@ test('Must has access to $slots in script locals', async t => {
 //
 //   t.is(html, expected);
 // });
+
+test('Must process default, merged and override props', async t => {
+  const actual = `<component src="components/component-locals-type.html" aStringOverride="My override string changed" anObjectOverride='{ "third": "Third override item", "fourth": "Fourth override item" }' merge:anObjectMerged='{ "third": "Third merged item", "fourth": "Fourth merged item" }'></component>`;
+  const expected = `<div>  <h1>anObjectDefault</h1>      <p><strong>first</strong>: First default item</p>      <p><strong>second</strong>: Second default item</p>    <h1>anObjectOverride</h1>      <p><strong>third</strong>: Third override item</p>      <p><strong>fourth</strong>: Fourth override item</p>    <h1>anObjectMerged</h1>      <p><strong>first</strong>: First merged item</p>      <p><strong>second</strong>: Second merged item</p>      <p><strong>third</strong>: Third merged item</p>      <p><strong>fourth</strong>: Fourth merged item</p>    <h1>aStringDefault</h1>  <p>My default string</p>  <h1>aStringOverride</h1>  <p>My override string changed</p></div>`;
+
+  const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
