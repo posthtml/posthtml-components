@@ -5,7 +5,7 @@
 <div align="center">
   <img width="300" title="PostHTML" src="http://posthtml.github.io/posthtml/logo.svg">
   <h1>PostHTML Components </h1>
-  <p>HTML-friendly syntax component with slots, attributes as locals and more!</p>
+  <p>A PostHTML plugin for create components with HTML-friendly syntax inspired by Laravel Blade. Slots, stack/push, props, custom tag and much more.</p>
 </div>
 
 ## Installation
