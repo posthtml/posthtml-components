@@ -47,11 +47,11 @@
       }
     ],
     anArray: ['first', 'second'],
-    aComputed: locals.aComputed === true ? 'Yes' : 'No',
+    aComputed: locals.aComputed === true ? 'Yes' : 'No'
   };
 </script>
 <div class="wrapper">
-  <div class="demo" attributes>
+  <div class="demo">
     <h1>anObjectDefault</h1>
     <each loop="o,i in anObjectDefault">
       <p><strong>{{ i }}</strong>: {{ o }}</p>
@@ -95,5 +95,9 @@
 
     <h1>aComputed</h1>
     <p>{{ aComputed }}</p>
+
+    <slot:name>
+      {{ $slots.name.locals.aslotlocal }}
+    </slot:name>
   </div>
 </div>

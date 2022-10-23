@@ -19,7 +19,9 @@
         merge:locals='{ "something": "alocal", "anArray": [ "ten" ] }'
 
         class="my-demo"
-      ></x-demo>
+      >
+        <fill:name aslotlocal="Hello" prepend>My filled slot</fill:name>
+      </x-demo>
     </div>
   </div>
 </x-page>

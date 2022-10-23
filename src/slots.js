@@ -2,6 +2,9 @@
 
 const {match} = require('posthtml/lib/api');
 const {render} = require('posthtml-render');
+const {each, omit} = require('underscore');
+
+const separator = ':';
 
 /**
  * Set filled slots
@@ -17,15 +20,14 @@ function setFilledSlots(currentNode, filledSlots, {fill}) {
       fillNode.attrs = {};
     }
 
-    const name = fillNode.tag.split(':')[1];
+    const name = fillNode.tag.split(separator)[1];
 
-    /** @var {Object} locals - NOT YET TESTED */
-    const locals = Object.fromEntries(Object.entries(fillNode.attrs).filter(([attributeName]) => ![name, 'type'].includes(attributeName)));
+    const locals = omit(fillNode.attrs, [name, 'type', 'append', 'prepend', 'aware']);
 
     if (locals) {
-      Object.keys(locals).forEach(local => {
+      each(locals, (value, key, attrs) => {
         try {
-          locals[local] = JSON.parse(locals[local]);
+          attrs[key] = JSON.parse(value);
         } catch {}
       });
     }
@@ -54,7 +56,7 @@ function setFilledSlots(currentNode, filledSlots, {fill}) {
  */
 function processFillContent(tree, filledSlots, {fill}) {
   match.call(tree, {tag: fill}, fillNode => {
-    const name = fillNode.tag.split(':')[1];
+    const name = fillNode.tag.split(separator)[1];
 
     if (!filledSlots[name]) {
       filledSlots[name] = {};
@@ -83,7 +85,7 @@ function processFillContent(tree, filledSlots, {fill}) {
  */
 function processSlotContent(tree, filledSlots, {slot}) {
   match.call(tree, {tag: slot}, slotNode => {
-    const name = slotNode.tag.split(':')[1];
+    const name = slotNode.tag.split(separator)[1];
 
     slotNode.tag = false;
 
