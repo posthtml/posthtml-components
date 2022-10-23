@@ -23,6 +23,7 @@ function processPushes(tree, content, push) {
 
     const pushContent = render(pushNode.content);
 
+    // Review as rendered content is not anymore processable by others plugin
     if (typeof pushNode.attrs.once === 'undefined' || !content[pushNode.attrs.name].includes(pushContent)) {
       if (typeof pushNode.attrs.prepend === 'undefined') {
         content[pushNode.attrs.name].push(pushContent);

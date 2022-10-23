@@ -5,6 +5,7 @@
     "src/**",
     "lib/**",
     "examples/**",
+    "docs/**",
     ".idea/**",
     "*.{html,jpg}",
     "cache.json"
