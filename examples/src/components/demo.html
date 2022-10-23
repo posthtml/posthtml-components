@@ -46,7 +46,8 @@
         title: "My default title 2"
       }
     ],
-    anArray: ['first', 'second']
+    anArray: ['first', 'second'],
+    aComputed: locals.aComputed === true ? 'Yes' : 'No',
   };
 </script>
 <div>
@@ -88,4 +89,9 @@
   <each loop="o,i in anArray">
     <p><strong>{{ i }}</strong>: {{ o }}</p>
   </each>
+
+  <hr>
+
+  <h1>aComputed</h1>
+  <p>{{ aComputed }}</p>
 </div>

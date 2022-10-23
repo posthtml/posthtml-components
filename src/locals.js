@@ -2,16 +2,8 @@
 
 const merge = require('deepmerge');
 const scriptDataLocals = require('posthtml-expressions/lib/locals');
-const {pick, extend} = require('underscore');
-// const {inspect} = require('util');
-//
-// const debug = true;
-//
-// const log = (object, what, method) => {
-//   if (debug === true || method === debug) {
-//     console.log(what, inspect(object, false, null, true));
-//   }
-// };
+const {pick, extend, keys, defaults, each} = require('underscore');
+const attributeTypes = ['merge', 'computed', 'aware'];
 
 /**
  * Parse locals from attributes, globals and via script
@@ -25,58 +17,44 @@ const {pick, extend} = require('underscore');
 module.exports = (currentNode, nextNode, slotContent, options) => {
   let attributes = {...currentNode.attrs};
 
-  const merged = [];
-  const computed = [];
-  const aware = [];
+  const attributesByTypeName = {};
+  each(attributeTypes, type => {
+    attributesByTypeName[type] = [];
+  });
 
-  Object.keys(attributes).forEach(attributeName => {
-    const newAttributeName = attributeName
-      .replace('merge:', '')
-      .replace('computed:', '')
-      .replace('aware:', '');
+  each(attributes, (value, key, attrs) => {
+    let newKey = key;
+    each(attributeTypes, type => {
+      if (key.startsWith(`${type}:`)) {
+        newKey = newKey.replace(`${type}:`, '');
+        attributesByTypeName[type].push(newKey);
+      }
+    });
 
-    switch (true) {
-      case attributeName.startsWith('merge:'):
-        attributes[newAttributeName] = attributes[attributeName];
-        delete attributes[attributeName];
-        merged.push(newAttributeName);
-        break;
-
-      case attributeName.startsWith('computed:'):
-        attributes[newAttributeName] = attributes[attributeName];
-        delete attributes[attributeName];
-        computed.push(newAttributeName);
-        break;
-
-      case attributeName.startsWith('aware:'):
-        attributes[newAttributeName] = attributes[attributeName];
-        delete attributes[attributeName];
-        aware.push(newAttributeName);
-        break;
-
-      default: break;
+    if (newKey !== key) {
+      attrs[newKey] = value;
+      delete attrs[key];
     }
   });
 
   // Parse JSON attributes
-  Object.keys(attributes).forEach(attributeName => {
+  each(attributes, (value, key, attrs) => {
     try {
-      const parsed = JSON.parse(attributes[attributeName]);
-      if (attributeName === 'locals') {
-        if (merged.includes(attributeName)) {
-          attributes = merge(attributes, parsed);
-          merged.splice(merged.indexOf('locals'), 1);
-        } else {
-          // Override with merge see https://www.npmjs.com/package/deepmerge#arraymerge-example-overwrite-target-array
-          Object.assign(attributes, parsed);
-        }
-      } else {
-        attributes[attributeName] = parsed;
-      }
+      attrs[key] = JSON.parse(value);
     } catch {}
   });
 
-  delete attributes.locals;
+  // Merge or extend attribute locals
+  if (attributes.locals) {
+    if (attributesByTypeName.merge.includes('locals')) {
+      attributesByTypeName.merge.splice(attributesByTypeName.merge.indexOf('locals'), 1);
+      attributes = merge(attributes, attributes.locals);
+    } else {
+      extend(attributes, attributes.locals);
+    }
+
+    delete attributes.locals;
+  }
 
   // Merge with global
   attributes = merge(options.expressions.locals, attributes);
@@ -84,22 +62,24 @@ module.exports = (currentNode, nextNode, slotContent, options) => {
   // Retrieve default locals from <script props> and merge with attributes
   const {locals} = scriptDataLocals(nextNode, {localsAttr: options.localsAttr, removeScriptLocals: true, locals: {...attributes, $slots: slotContent}});
 
-  // Merge or overrides props and attributes
   if (locals) {
-    if (merged.length > 0) {
-      extend(attributes, merge(pick(locals, merged), pick(attributes, merged)));
+    // Merge attributes
+    if (attributesByTypeName.merge.length > 0) {
+      extend(attributes, merge(pick(locals, attributesByTypeName.merge), pick(attributes, attributesByTypeName.merge)));
     }
 
-    // Override attributes with props when is computed or attribute is not defined
-    Object.keys(locals).forEach(attributeName => {
-      if (computed.includes(attributeName) || typeof attributes[attributeName] === 'undefined') {
-        attributes[attributeName] = locals[attributeName];
-      }
-    });
+    // Override attributes with computed locals
+    if (attributesByTypeName.computed.length > 0) {
+      extend(attributes, pick(locals, keys(pick(attributes, attributesByTypeName.computed))));
+    }
+
+    // Set attributes not defined
+    defaults(attributes, locals);
   }
 
-  if (aware.length > 0) {
-    options.aware = Object.fromEntries(Object.entries(attributes).filter(([attributeName]) => aware.includes(attributeName)));
+  // Set aware attributes
+  if (attributesByTypeName.aware.length > 0) {
+    options.aware = pick(attributes, attributesByTypeName.aware);
   }
 
   return {attributes, locals};
