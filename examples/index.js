@@ -12,6 +12,7 @@ const markdownItToc = require('markdown-it-toc-done-right');
 const src = './examples/src/pages/';
 const dist = './examples/dist/';
 const md = './examples/src/md';
+const docs = './docs/';
 
 const plugins = [
   components({
@@ -73,6 +74,7 @@ readdirSync(src).forEach(file => {
     .process(html, options)
     .then(result => {
       writeFileSync(path.resolve(`${dist}${file}`), result.html, 'utf-8');
+      writeFileSync(path.resolve(`${docs}${file}`), result.html, 'utf-8');
     });
 });
 
