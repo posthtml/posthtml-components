@@ -3,7 +3,7 @@
     <div class="col-lg-8">
       <h1 class="display-1 fw-bold mb-4">Demo</h1>
 
-      <x-demo
+      <x-test
         aStringOverride="My override string changed"
         anObjectOverride='{ "third": "Third override item", "fourth": "Fourth override item" }'
         merge:anObjectMerged='{ "third": "Third merged item", "fourth": "Fourth merged item", "anObjectMerged1": { "third": "Third merged item (UPDATED?)", "fourth1": "Fourth merged item" } }'
@@ -21,7 +21,7 @@
         class="my-demo"
       >
         <fill:name aslotlocal="Hello" prepend>My filled slot</fill:name>
-      </x-demo>
+      </x-test>
     </div>
   </div>
 </x-page>

@@ -88,27 +88,28 @@ See also the `examples` folder. You can run `npm run build-examples` to compile 
 
 ## Options
 
-|         Option         |           Default            | Description                                                                                                    |
-|:----------------------:|:----------------------------:|:---------------------------------------------------------------------------------------------------------------|
-|        **root**        |            `'./'`            | String value as root path for components lookup.                                                               |
-|      **folders**       |            `['']`            | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom. |
-|     **tagPrefix**      |             `x-`             | String for tag prefix. The plugin will use RegExp with this string.                                            |
-|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.              |
-|     **attribute**      |            `src`             | String value for component attribute for set path.                                                             |
-|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                    |
-| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                 |
-|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                                |
-|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                              |
-|        **slot**        |            `slot`            | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).            |
-|        **fill**        |            `fill`            | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).            |
-|        **push**        |            `push`            | String value for `<push>` tag name.                                                                            |
-|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                           |
-|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.               |
-|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.    |
-|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                         |
-|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                        |
-|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                                 |
-|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                        |
+|         Option         |           Default            | Description                                                                                                           |
+|:----------------------:|:----------------------------:|:----------------------------------------------------------------------------------------------------------------------|
+|        **root**        |            `'./'`            | String value as root path for components lookup.                                                                      |
+|      **folders**       |            `['']`            | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom.        |
+|     **tagPrefix**      |             `x-`             | String for tag prefix. The plugin will use RegExp with this string.                                                   |
+|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.                     |
+|     **attribute**      |            `src`             | String value for component attribute for set path.                                                                    |
+|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                           |
+| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                        |
+|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                                       |
+|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                                     |
+|        **slot**        |            `slot`            | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).                   |
+|        **fill**        |            `fill`            | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).                   |
+|   **slotSeparator**    |             `:`              | String value used for separate `<slot>` and `<fill>` tag from their names.                                            |
+|        **push**        |            `push`            | String value for `<push>` tag name.                                                                                   |
+|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                                  |
+|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.                      |
+|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.           |
+|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                                |
+|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                               |
+|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                                        |
+|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                               |
 
 ## Features
 
@@ -495,9 +496,59 @@ If you would like to prepend content onto the beginning of a stack, you should u
 
 ### Props
 
-Behind the `props` there is powerful [posthtml-expressions](https://github.com/posthtml/posthtml-expressions) plugin, with feature to pass `props` via attributes, define default via `<script props>`, merge with default and use `<script props>` as computed.
+Behind the `props` there is powerful [posthtml-expressions](https://github.com/posthtml/posthtml-expressions) plugin, with feature to pass `props` (locals) via attributes, define default via `<script props>`, merge with default and use `<script props>` as computed.
 
-Let's see how it works with an example.
+Let's see how it works with a few examples starting with a basic one.
+
+Create the component:
+
+```html
+<!-- src/my-component.html -->
+<script props>
+  module.exports = {
+    prop: 'Default prop value'
+  }
+</script>
+<div>
+  {{ prop }}
+</div>
+```
+
+Use:
+
+```html
+<x-my-component prop="Hello world!"></x-my-component>
+```
+
+The output will be:
+
+```html
+<div>
+  Hello world!
+</div>
+```
+
+Without passing `prop` via attribute then the output would be `Default prop value`, as shown below.
+
+Use component without passing prop:
+
+```html
+<x-my-component></x-my-component>
+```
+
+The output will be:
+
+```html
+<div>
+  Default prop value
+</div>
+```
+
+If you don't add the props in `<script props>` inside your component, all props will be added as attributes to the first node of your component or to the node with attribute `attributes`.
+More details on this in the next section.
+
+So by default `<script props>` act as default value, like the `@props` you define with Laravel Blade.
+You can change this behaviour by prepending `computed` or `merge` to the attribute name like shown below.
 
 Create the component:
 
@@ -505,9 +556,9 @@ Create the component:
 <!-- src/modal.html -->
 <script props>
   module.exports = {
-    title: 'Default title',
-    size: locals.size ? `modal-${locals.size}` : '',
-    items: ['first', 'second']
+    title: 'Default title', // This will be the default value
+    size: locals.size ? `modal-${locals.size}` : '', // This will be a computed value, so it's always used
+    items: ['first', 'second'] // This will be merged
   }
 </script>
 <div class="modal {{ size }}">
@@ -544,13 +595,14 @@ The output will be:
 
 So the prop `size` is not override since we prepend `computed:` to the attribute, while the prop `title` is override.
 And the prop `items` is merged and not override.
+You can also notice how the `class` attribute is merged with `class` attribute of the first node. Let's see in next section more about this.
 
 ### Attributes
 
-Your can pass any attributes to your components and this will be added to the first element of your component.
-By default `class` and `style` are merged with existing `class` and `style` attribute of the first element of your component.
+Your can pass any attributes to your components and this will be added to the first node of your component, or to the node with an attribute named `attributes`.
+By default `class` and `style` are merged with existing `class` and `style` attribute.
 All others attributes are override by default.
-Only attribute not defined as `props` will be processed.
+Only attribute not defined as `props` will be used.
 
 As already seen in basic example:
 
@@ -584,7 +636,7 @@ As you may notice the `label` attribute is not added as attribute, since it's de
 
 If you are familiar with Laravel Blade, this is also how Blade handle this.
 
-As said early, class and style are merged by default, if you want to override them, just prepend `override:` to the attributes:
+As said early, `class` and `style` are merged by default, if you want to override them, just prepend `override:` to the attribute name:
 
 ```html
 <!-- src/index.html -->
@@ -598,9 +650,38 @@ Result:
 <button type="submit" class="btn-custom">My button</button>
 ```
 
+If you want to use another node for add such attributes, then you can add the attribute `attributes` like shown below.
+
+```html
+<!-- src/my-component.html -->
+<div class="first-node">
+  <div class="second-node" attributes>
+    Hello world!
+  </div>
+</div>
+```
+
+Use the component:
+
+```html
+<!-- src/index.html -->
+<x-my-component class="my-class"></x-my-component>
+```
+
+Result:
+
+```html
+<!-- dist/index.html -->
+<div class="first-node">
+  <div class="second-node my-class">
+    Hello world!
+  </div>
+</div>
+```
+
 You can add custom rules how attributes are parsed, as behind the scene it's used [posthtml-attrs-parser](https://github.com/posthtml/posthtml-attrs-parser) plugin.
 
-## Tips and tricks
+## Examples
 
 You can work with `<slot>` and `<fill>` or you can create component for each "block" of your component, and you can also support both of them.
 You can find an example of this inside `examples/components/modal`. Below is a short explanation about the both approach.
@@ -779,5 +860,48 @@ via `$slots` which has all the `props` passed via slot, and as well check if slo
 ## Migration
 
 If you are migrating from `posthtml-extend` and/or `posthtml-modules` then you can continue to keep them until you migrate all of your components.
-For continue to use current code with this plugin without changing it, at the moment it's not yet fully supported, but it maybe comes in near future.
-This because the new version has different logic to handle slots and locals, as well the yield content.
+For continue to use current code with this plugin without changing it, see below examples. Any more updates on this will be added in this issue:
+[posthtml-components/issues/16](https://github.com/thewebartisan7/posthtml-components/issues/16).
+
+### PostHTML Include
+
+PostHTML Include plugin can work when passed via `options.plugins` like below example:
+
+```js
+require("posthtml-component")({
+  root: "./src",
+  folders: ["components", "layouts"],
+  plugins: [
+    require("posthtml-include")({
+      encoding: "utf8",
+      root: "./src"
+    }),
+  ]
+})
+```
+
+### PostHTML Modules
+
+At the moment doesn't work when nested inside PostHTML Components plugin since it use `tree.match` and even trying with something like PostHTML Include is doing here https://github.com/posthtml/posthtml-include/blob/master/lib/index.js#L16 doesn't work. But a workaround is to use PostHTML Components custom tag and attributes like below:
+
+```js
+require("posthtml-component")({
+  root: "./src",
+  folders: ["components", "layouts"],
+  tag: 'module',
+  attribute: 'href',
+  yield: 'content'
+  plugins: [
+    require("posthtml-include")({
+      encoding: "utf8",
+      root: "./src/www/posthtml-templates/"
+    }),
+  ]
+})
+```
+
+NOTE: If you change `<yield>` tag to `<content>` to support your existing code, then you need to use it always. Maybe you can just replace all `<content>` with `<yield>` and it should works fine.
+
+### PostHTML Extends
+
+Not yet tested.

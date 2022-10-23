@@ -158,7 +158,7 @@
                   </ul>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#tips-and-tricks">Tips and tricks</a>
+                  <a class="nav-link" href="#examples">Examples</a>
                   <ul class="nav flex-column">
                     <li class="nav-item">
                       <a class="nav-link" href="#using-slots">Using slots</a>
@@ -173,6 +173,17 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#migration">Migration</a>
+                  <ul class="nav flex-column">
+                    <li class="nav-item">
+                      <a class="nav-link" href="#posthtml-include">PostHTML Include</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#posthtml-modules">PostHTML Modules</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#posthtml-extends">PostHTML Extends</a>
+                    </li>
+                  </ul>
                 </li>
               </ul>
             </nav>
@@ -422,6 +433,21 @@ posthtml(components({ root: './src' }))
                     (example
                     <code>&lt;fill:slot-name&gt;</code>
                     ).
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align:center">
+                    <strong>slotSeparator</strong>
+                  </td>
+                  <td style="text-align:center">
+                    <code>:</code>
+                  </td>
+                  <td style="text-align:left">
+                    String value used for separate
+                    <code>&lt;slot&gt;</code>
+                    and
+                    <code>&lt;fill&gt;</code>
+                    tag from their names.
                   </td>
                 </tr>
                 <tr>
@@ -949,20 +975,69 @@ If you would like to prepend content onto the beginning of a stack, you should u
               <a href="https://github.com/posthtml/posthtml-expressions">posthtml-expressions</a>
               plugin, with feature to pass
               <code>props</code>
-              via attributes, define default via
+              (locals) via attributes, define default via
               <code>&lt;script props&gt;</code>
               , merge with default and use
               <code>&lt;script props&gt;</code>
               as computed.
             </p>
-            <p>Let's see how it works with an example.</p>
+            <p>Let's see how it works with a few examples starting with a basic one.</p>
+            <p>Create the component:</p>
+            <pre><code class="language-html">&lt;!-- src/my-component.html --&gt;
+&lt;script props&gt;
+  module.exports = {
+    prop: 'Default prop value'
+  }
+&lt;/script&gt;
+&lt;div&gt;
+  {{ prop }}
+&lt;/div&gt;</code></pre>
+            <p>Use:</p>
+            <pre><code class="language-html">&lt;x-my-component prop=&quot;Hello world!&quot;&gt;&lt;/x-my-component&gt;</code></pre>
+            <p>The output will be:</p>
+            <pre><code class="language-html">&lt;div&gt;
+  Hello world!
+&lt;/div&gt;</code></pre>
+            <p>
+              Without passing
+              <code>prop</code>
+              via attribute then the output would be
+              <code>Default prop value</code>
+              , as shown below.
+            </p>
+            <p>Use component without passing prop:</p>
+            <pre><code class="language-html">&lt;x-my-component&gt;&lt;/x-my-component&gt;</code></pre>
+            <p>The output will be:</p>
+            <pre><code class="language-html">&lt;div&gt;
+  Default prop value
+&lt;/div&gt;</code></pre>
+            <p>
+              If you don't add the props in
+              <code>&lt;script props&gt;</code>
+              inside your component, all props will be added as attributes to the first node of your component or to the node with attribute
+              <code>attributes</code>
+              .
+More details on this in the next section.
+            </p>
+            <p>
+              So by default
+              <code>&lt;script props&gt;</code>
+              act as default value, like the
+              <code>@props</code>
+              you define with Laravel Blade.
+You can change this behaviour by prepending
+              <code>computed</code>
+              or
+              <code>merge</code>
+              to the attribute name like shown below.
+            </p>
             <p>Create the component:</p>
             <pre><code class="language-html">&lt;!-- src/modal.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    title: 'Default title',
-    size: locals.size ? `modal-${locals.size}` : '',
-    items: ['first', 'second']
+    title: 'Default title', // This will be the default value
+    size: locals.size ? `modal-${locals.size}` : '', // This will be a computed value, so it's always used
+    items: ['first', 'second'] // This will be merged
   }
 &lt;/script&gt;
 &lt;div class=&quot;modal {{ size }}&quot;&gt;
@@ -998,13 +1073,20 @@ If you would like to prepend content onto the beginning of a stack, you should u
 And the prop
               <code>items</code>
               is merged and not override.
+You can also notice how the
+              <code>class</code>
+              attribute is merged with
+              <code>class</code>
+              attribute of the first node. Let's see in next section more about this.
             </p>
             <h3 id="attributes" tabindex="-1">
               <a class="header-anchor" href="#attributes">#</a>
               Attributes
             </h3>
             <p>
-              Your can pass any attributes to your components and this will be added to the first element of your component.
+              Your can pass any attributes to your components and this will be added to the first node of your component, or to the node with an attribute named
+              <code>attributes</code>
+              .
 By default
               <code>class</code>
               and
@@ -1013,11 +1095,11 @@ By default
               <code>class</code>
               and
               <code>style</code>
-              attribute of the first element of your component.
+              attribute.
 All others attributes are override by default.
 Only attribute not defined as
               <code>props</code>
-              will be processed.
+              will be used.
             </p>
             <p>As already seen in basic example:</p>
             <pre><code class="language-html">&lt;!-- src/button.html --&gt;
@@ -1044,9 +1126,13 @@ Only attribute not defined as
             </p>
             <p>If you are familiar with Laravel Blade, this is also how Blade handle this.</p>
             <p>
-              As said early, class and style are merged by default, if you want to override them, just prepend
+              As said early,
+              <code>class</code>
+              and
+              <code>style</code>
+              are merged by default, if you want to override them, just prepend
               <code>override:</code>
-              to the attributes:
+              to the attribute name:
             </p>
             <pre><code class="language-html">&lt;!-- src/index.html --&gt;
 &lt;x-button type=&quot;submit&quot; override:class=&quot;btn-custom&quot; label=&quot;My button&quot;&gt;&lt;/x-button&gt;</code></pre>
@@ -1054,13 +1140,34 @@ Only attribute not defined as
             <pre><code class="language-html">&lt;!-- dist/index.html --&gt;
 &lt;button type=&quot;submit&quot; class=&quot;btn-custom&quot;&gt;My button&lt;/button&gt;</code></pre>
             <p>
+              If you want to use another node for add such attributes, then you can add the attribute
+              <code>attributes</code>
+              like shown below.
+            </p>
+            <pre><code class="language-html">&lt;!-- src/my-component.html --&gt;
+&lt;div class=&quot;first-node&quot;&gt;
+  &lt;div class=&quot;second-node&quot; attributes&gt;
+    Hello world!
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            <p>Use the component:</p>
+            <pre><code class="language-html">&lt;!-- src/index.html --&gt;
+&lt;x-my-component class=&quot;my-class&quot;&gt;&lt;/x-my-component&gt;</code></pre>
+            <p>Result:</p>
+            <pre><code class="language-html">&lt;!-- dist/index.html --&gt;
+&lt;div class=&quot;first-node&quot;&gt;
+  &lt;div class=&quot;second-node my-class&quot;&gt;
+    Hello world!
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            <p>
               You can add custom rules how attributes are parsed, as behind the scene it's used
               <a href="https://github.com/posthtml/posthtml-attrs-parser">posthtml-attrs-parser</a>
               plugin.
             </p>
-            <h2 id="tips-and-tricks" tabindex="-1">
-              <a class="header-anchor" href="#tips-and-tricks">#</a>
-              Tips and tricks
+            <h2 id="examples" tabindex="-1">
+              <a class="header-anchor" href="#examples">#</a>
+              Examples
             </h2>
             <p>
               You can work with
@@ -1241,9 +1348,67 @@ via
               and/or
               <code>posthtml-modules</code>
               then you can continue to keep them until you migrate all of your components.
-For continue to use current code with this plugin without changing it, at the moment it's not yet fully supported, but it maybe comes in near future.
-This because the new version has different logic to handle slots and locals, as well the yield content.
+For continue to use current code with this plugin without changing it, see below examples. Any more updates on this will be added in this issue:
+              <a href="https://github.com/thewebartisan7/posthtml-components/issues/16">posthtml-components/issues/16</a>
+              .
             </p>
+            <h3 id="posthtml-include" tabindex="-1">
+              <a class="header-anchor" href="#posthtml-include">#</a>
+              PostHTML Include
+            </h3>
+            <p>
+              PostHTML Include plugin can work when passed via
+              <code>options.plugins</code>
+              like below example:
+            </p>
+            <pre><code class="language-js">require(&quot;posthtml-component&quot;)({
+  root: &quot;./src&quot;,
+  folders: [&quot;components&quot;, &quot;layouts&quot;],
+  plugins: [
+    require(&quot;posthtml-include&quot;)({
+      encoding: &quot;utf8&quot;,
+      root: &quot;./src&quot;
+    }),
+  ]
+})</code></pre>
+            <h3 id="posthtml-modules" tabindex="-1">
+              <a class="header-anchor" href="#posthtml-modules">#</a>
+              PostHTML Modules
+            </h3>
+            <p>
+              At the moment doesn't work when nested inside PostHTML Components plugin since it use
+              <code>tree.match</code>
+              and even trying with something like PostHTML Include is doing here https://github.com/posthtml/posthtml-include/blob/master/lib/index.js#L16 doesn't work. But a workaround is to use PostHTML Components custom tag and attributes like below:
+            </p>
+            <pre><code class="language-js">require(&quot;posthtml-component&quot;)({
+  root: &quot;./src&quot;,
+  folders: [&quot;components&quot;, &quot;layouts&quot;],
+  tag: 'module',
+  attribute: 'href',
+  yield: 'content'
+  plugins: [
+    require(&quot;posthtml-include&quot;)({
+      encoding: &quot;utf8&quot;,
+      root: &quot;./src/www/posthtml-templates/&quot;
+    }),
+  ]
+})</code></pre>
+            <p>
+              NOTE: If you change
+              <code>&lt;yield&gt;</code>
+              tag to
+              <code>&lt;content&gt;</code>
+              to support your existing code, then you need to use it always. Maybe you can just replace all
+              <code>&lt;content&gt;</code>
+              with
+              <code>&lt;yield&gt;</code>
+              and it should works fine.
+            </p>
+            <h3 id="posthtml-extends" tabindex="-1">
+              <a class="header-anchor" href="#posthtml-extends">#</a>
+              PostHTML Extends
+            </h3>
+            <p>Not yet tested.</p>
           </div>
         </div>
       </div>

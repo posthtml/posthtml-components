@@ -2,7 +2,6 @@
 
 const {readFileSync} = require('fs');
 const path = require('path');
-// const {inspect} = require('util');
 const {parser} = require('posthtml-parser');
 const {match} = require('posthtml/lib/api');
 const expressions = require('posthtml-expressions');
@@ -12,8 +11,8 @@ const processAttributes = require('./attributes');
 const {processPushes, processStacks} = require('./stacks');
 const {setFilledSlots, processSlotContent, processFillContent} = require('./slots');
 
+// const {inspect} = require('util');
 // const debug = true;
-//
 // const log = (object, what, method) => {
 //   if (debug === true || method === debug) {
 //     console.log(what, inspect(object, false, null, true));
