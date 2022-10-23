@@ -115,23 +115,10 @@ function processTree(options) {
         currentNode.attrs = {};
       }
 
-      const componentFile = currentNode.attrs[options.attribute] || findPathFromTag(currentNode.tag, options);
+      const componentPath = getComponentPath(currentNode, options);
 
-      if (!componentFile) {
+      if (!componentPath) {
         return currentNode;
-      }
-
-      const componentPath = path.isAbsolute(componentFile) && !currentNode.attrs[options.attribute] ?
-        componentFile :
-        path.join(options.root, componentFile);
-
-      // Check if file exist only when not using x-tag
-      if (currentNode.attrs[options.attribute] && !existsSync(componentPath)) {
-        if (options.strict) {
-          throw new Error(`[components] The component was not found in ${componentPath}.`);
-        } else {
-          return currentNode;
-        }
       }
 
       // console.log(`${++processCounter}) Processing component ${componentPath}`);
@@ -140,6 +127,7 @@ function processTree(options) {
 
       // Set filled slots
       setFilledSlots(currentNode, filledSlots, options);
+      setFilledSlots(nextNode, filledSlots, options);
 
       // Reset previous locals with passed global and keep aware locals
       options.expressions.locals = {...options.locals, ...options.aware};
@@ -158,6 +146,7 @@ function processTree(options) {
       // Process <yield> tag
       const content = match.call(nextNode, {tag: options.yield}, nextNode => {
         // Fill <yield> with current node content or default <yield>
+        console.log(currentNode.content);
         return currentNode.content || nextNode.content;
       });
 
@@ -188,6 +177,26 @@ function processTree(options) {
 
     return tree;
   };
+}
+
+function getComponentPath(currentNode, options) {
+  const componentFile = currentNode.attrs[options.attribute];
+
+  if (componentFile) {
+    const componentPath = path.join(options.root, componentFile);
+
+    if (!existsSync(componentPath)) {
+      if (options.strict) {
+        throw new Error(`[components] The component was not found in ${componentPath}.`);
+      } else {
+        return false;
+      }
+    }
+
+    return componentPath;
+  }
+
+  return findPathFromTag(currentNode.tag, options);
 }
 
 function applyPluginsToTree(tree, plugins) {

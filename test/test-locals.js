@@ -72,3 +72,12 @@ test('Must process default, merged and override props', async t => {
 
   t.is(html, expected);
 });
+
+test('Must process slot with locals', async t => {
+  const actual = `<component src="components/slot-with-locals.html"><fill:name mySlotLocal=" Via Slot" prepend>My Local</fill:name></component>`;
+  const expected = `<div>My Local Via Slot</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});

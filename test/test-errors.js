@@ -58,3 +58,9 @@ test('Must fail when component is not found in defined namespace with strict mod
 
   await t.throwsAsync(async () => posthtml([plugin({root: './test/templates', strict: true, namespaces: [{name: 'empty-namespace', root: './test/templates/empty-namespace'}]})]).process(actual).then(result => clean(result.html)));
 });
+
+test('Must fail when push tag missing name', async t => {
+  const actual = `<div><push></push></div>`;
+
+  await t.throwsAsync(async () => posthtml([plugin({root: './test/templates', strict: true})]).process(actual).then(result => clean(result.html)));
+});

@@ -21,7 +21,7 @@ function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator}) {
 
     const name = fillNode.tag.split(slotSeparator)[1];
 
-    const locals = omit(fillNode.attrs, [name, 'type', 'append', 'prepend', 'aware']);
+    const locals = omit(fillNode.attrs, ['append', 'prepend', 'aware']);
 
     if (locals) {
       each(locals, (value, key, attrs) => {
@@ -58,10 +58,6 @@ function processFillContent(tree, filledSlots, {fill, slotSeparator}) {
   match.call(tree, {tag: fill}, fillNode => {
     const name = fillNode.tag.split(slotSeparator)[1];
 
-    if (!filledSlots[name]) {
-      filledSlots[name] = {};
-    }
-
     filledSlots[name].tag = fillNode.tag;
     filledSlots[name].attrs = fillNode.attrs;
     filledSlots[name].content = fillNode.content;
@@ -90,17 +86,21 @@ function processSlotContent(tree, filledSlots, {slot, slotSeparator}) {
 
     slotNode.tag = false;
 
-    if (filledSlots[name]?.rendered) {
+    if (!filledSlots[name]) {
+      return slotNode;
+    }
+
+    if (filledSlots[name].rendered) {
       slotNode.content = null;
-    } else if (slotNode.content && filledSlots[name]?.attrs && (typeof filledSlots[name]?.attrs.append !== 'undefined' || typeof filledSlots[name]?.attrs.prepend !== 'undefined')) {
-      slotNode.content = typeof filledSlots[name]?.attrs.append === 'undefined' ? filledSlots[name]?.content.concat(slotNode.content) : slotNode.content.concat(filledSlots[name]?.content);
+    } else if (slotNode.content && filledSlots[name].attrs && (typeof filledSlots[name].attrs.append !== 'undefined' || typeof filledSlots[name].attrs.prepend !== 'undefined')) {
+      slotNode.content = typeof filledSlots[name].attrs.append === 'undefined' ? filledSlots[name].content.concat(slotNode.content) : slotNode.content.concat(filledSlots[name].content);
     } else {
-      slotNode.content = filledSlots[name]?.content;
+      slotNode.content = filledSlots[name].content;
     }
 
     // Set rendered to true so a slot can be output only once,
     //  when not present "aware" attribute
-    if (filledSlots[name] && (!filledSlots[name]?.attrs || typeof filledSlots[name].attrs.aware === 'undefined')) {
+    if (filledSlots[name] && (!filledSlots[name].attrs || typeof filledSlots[name].attrs.aware === 'undefined')) {
       filledSlots[name].rendered = true;
     }
 
