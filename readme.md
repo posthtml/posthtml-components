@@ -898,7 +898,7 @@ require("posthtml-component")({
   folders: ["components", "layouts"],
   tag: 'module',
   attribute: 'href',
-  yield: 'content'
+  yield: 'content',
   plugins: [
     require("posthtml-include")({
       encoding: "utf8",
@@ -918,14 +918,14 @@ Not yet tested.
 
 See [PostHTML Guidelines](https://github.com/posthtml/posthtml/tree/master/docs) and [contribution guide](CONTRIBUTING.md).
 
-[npm]: https://img.shields.io/npm/v/PLUGIN_NAME.svg
-[npm-url]: https://npmjs.com/package/PLUGIN_NAME
+[npm]: https://img.shields.io/npm/v/posthtml-component.svg
+[npm-url]: https://www.npmjs.com/package/posthtml-component
 
 [style]: https://img.shields.io/badge/code_style-XO-5ed9c7.svg
 [style-url]: https://github.com/sindresorhus/xo
 
-[cover]: https://coveralls.io/repos/USER_NAME/PLUGIN_NAME/badge.svg?branch=master
-[cover-badge]: https://coveralls.io/r/USER_NAME/PLUGIN_NAME?branch=master
+[cover]: https://coveralls.io/repos/thewebartisan7/posthtml-components/badge.svg?branch=main
+[cover-badge]: https://coveralls.io/r/thewebartisan7/posthtml-components?branch=main
 
 ## Credits
 

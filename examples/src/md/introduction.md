@@ -890,7 +890,7 @@ require("posthtml-component")({
   folders: ["components", "layouts"],
   tag: 'module',
   attribute: 'href',
-  yield: 'content'
+  yield: 'content',
   plugins: [
     require("posthtml-include")({
       encoding: "utf8",
