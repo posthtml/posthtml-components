@@ -10,11 +10,11 @@ const attributeTypes = ['merge', 'computed', 'aware'];
  *
  * @param {Object} currentNode - PostHTML tree
  * @param {Array} nextNode - PostHTML tree
- * @param {Object} slotContent - Slot locals
+ * @param {Object} filledSlots - Slot locals
  * @param {Object} options - Plugin options
  * @return {Object} - Attribute locals and script locals
  */
-module.exports = (currentNode, nextNode, slotContent, options) => {
+module.exports = (currentNode, nextNode, filledSlots, options) => {
   let attributes = {...currentNode.attrs};
 
   const attributesByTypeName = {};
@@ -60,7 +60,7 @@ module.exports = (currentNode, nextNode, slotContent, options) => {
   attributes = merge(options.expressions.locals, attributes);
 
   // Retrieve default locals from <script props> and merge with attributes
-  const {locals} = scriptDataLocals(nextNode, {localsAttr: options.localsAttr, removeScriptLocals: true, locals: {...attributes, $slots: slotContent}});
+  const {locals} = scriptDataLocals(nextNode, {localsAttr: options.localsAttr, removeScriptLocals: true, locals: {...attributes, $slots: filledSlots}});
 
   if (locals) {
     // Merge attributes

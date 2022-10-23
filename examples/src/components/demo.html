@@ -50,48 +50,50 @@
     aComputed: locals.aComputed === true ? 'Yes' : 'No',
   };
 </script>
-<div>
-  <h1>anObjectDefault</h1>
-  <each loop="o,i in anObjectDefault">
-    <p><strong>{{ i }}</strong>: {{ o }}</p>
-  </each>
+<div class="wrapper">
+  <div class="demo" attributes>
+    <h1>anObjectDefault</h1>
+    <each loop="o,i in anObjectDefault">
+      <p><strong>{{ i }}</strong>: {{ o }}</p>
+    </each>
 
-  <h1>anObjectOverride</h1>
-  <each loop="o,i in anObjectOverride">
-    <p><strong>{{ i }}</strong>: {{ o }}</p>
-  </each>
+    <h1>anObjectOverride</h1>
+    <each loop="o,i in anObjectOverride">
+      <p><strong>{{ i }}</strong>: {{ o }}</p>
+    </each>
 
-  <h1>anObjectMerged</h1>
-  <each loop="o,i in anObjectMerged">
-    <p><strong>{{ i }}</strong>: {{ o }}</p>
-  </each>
+    <h1>anObjectMerged</h1>
+    <each loop="o,i in anObjectMerged">
+      <p><strong>{{ i }}</strong>: {{ o }}</p>
+    </each>
 
-  <h1>aStringDefault</h1>
-  <p>{{ aStringDefault }}</p>
+    <h1>aStringDefault</h1>
+    <p>{{ aStringDefault }}</p>
 
-  <h1>aStringOverride</h1>
-  <p>{{ aStringOverride }}</p>
+    <h1>aStringOverride</h1>
+    <p>{{ aStringOverride }}</p>
 
-  <hr>
+    <hr>
 
-  <h1>post</h1>
-  {{ post.title }} {{ post.body }}
-  <each loop="comment in post.comments">
-    <p><strong>{{ comment.id }}</strong>: {{ comment.body }}</p>
-  </each>
+    <h1>post</h1>
+    {{ post.title }} {{ post.body }}
+    <each loop="comment in post.comments">
+      <p><strong>{{ comment.id }}</strong>: {{ comment.body }}</p>
+    </each>
 
-  <h1>anArrayOfObjects</h1>
-  <each loop="o,i in anArrayOfObjects">
-    <p><strong>{{ i }}</strong>: {{ o }}</p>
-  </each>
+    <h1>anArrayOfObjects</h1>
+    <each loop="o,i in anArrayOfObjects">
+      <p><strong>{{ i }}</strong>: {{ o }}</p>
+    </each>
 
-  <h1>anArray</h1>
-  <each loop="o,i in anArray">
-    <p><strong>{{ i }}</strong>: {{ o }}</p>
-  </each>
+    <h1>anArray</h1>
+    <each loop="o,i in anArray">
+      <p><strong>{{ i }}</strong>: {{ o }}</p>
+    </each>
 
-  <hr>
+    <hr>
 
-  <h1>aComputed</h1>
-  <p>{{ aComputed }}</p>
+    <h1>aComputed</h1>
+    <p>{{ aComputed }}</p>
+  </div>
 </div>
