@@ -4,23 +4,22 @@ const {match} = require('posthtml/lib/api');
 const {render} = require('posthtml-render');
 const {each, omit} = require('underscore');
 
-const separator = ':';
-
 /**
  * Set filled slots
  *
  * @param  {Object} currentNode PostHTML tree
  * @param  {Object} filledSlots
- * @param  {Object} options Plugin options
+ * @param  {String} fill Fill tag name
+ * @param  {String} slotSeparator Slot separator
  * @return {void}
  */
-function setFilledSlots(currentNode, filledSlots, {fill}) {
+function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator}) {
   match.call(currentNode, {tag: fill}, fillNode => {
     if (!fillNode.attrs) {
       fillNode.attrs = {};
     }
 
-    const name = fillNode.tag.split(separator)[1];
+    const name = fillNode.tag.split(slotSeparator)[1];
 
     const locals = omit(fillNode.attrs, [name, 'type', 'append', 'prepend', 'aware']);
 
@@ -51,12 +50,13 @@ function setFilledSlots(currentNode, filledSlots, {fill}) {
  *
  * @param  {Object} tree PostHTML tree
  * @param  {Object} filledSlots Filled slots content
- * @param  {Object} options Plugin options
+ * @param  {String} fill Fill tag name
+ * @param  {String} slotSeparator Slot separator
  * @return {void}
  */
-function processFillContent(tree, filledSlots, {fill}) {
+function processFillContent(tree, filledSlots, {fill, slotSeparator}) {
   match.call(tree, {tag: fill}, fillNode => {
-    const name = fillNode.tag.split(separator)[1];
+    const name = fillNode.tag.split(slotSeparator)[1];
 
     if (!filledSlots[name]) {
       filledSlots[name] = {};
@@ -80,12 +80,13 @@ function processFillContent(tree, filledSlots, {fill}) {
  *
  * @param  {Object} tree PostHTML tree
  * @param  {Object} filledSlots Filled slots content
- * @param  {Object} options Plugin options
+ * @param  {String} slot Slot tag name
+ * @param  {String} slotSeparator Slot separator
  * @return {void}
  */
-function processSlotContent(tree, filledSlots, {slot}) {
+function processSlotContent(tree, filledSlots, {slot, slotSeparator}) {
   match.call(tree, {tag: slot}, slotNode => {
-    const name = slotNode.tag.split(separator)[1];
+    const name = slotNode.tag.split(slotSeparator)[1];
 
     slotNode.tag = false;
 

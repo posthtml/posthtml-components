@@ -33,6 +33,7 @@ module.exports = (options = {}) => tree => {
   options.yield = options.yield || 'yield';
   options.slot = options.slot || 'slot';
   options.fill = options.fill || 'fill';
+  options.slotSeparator = options.slotSeparator || ':';
   options.push = options.push || 'push';
   options.stack = options.stack || 'stack';
   options.localsAttr = options.localsAttr || 'props';
@@ -42,11 +43,11 @@ module.exports = (options = {}) => tree => {
   options.strict = typeof options.strict === 'undefined' ? true : options.strict;
 
   if (!(options.slot instanceof RegExp)) {
-    options.slot = new RegExp(`^${options.slot}:`, 'i');
+    options.slot = new RegExp(`^${options.slot}${options.slotSeparator}`, 'i');
   }
 
   if (!(options.fill instanceof RegExp)) {
-    options.fill = new RegExp(`^${options.fill}:`, 'i');
+    options.fill = new RegExp(`^${options.fill}${options.slotSeparator}`, 'i');
   }
 
   if (!(options.tagPrefix instanceof RegExp)) {
