@@ -1,6 +1,6 @@
 'use strict';
 
-const {readFileSync} = require('fs');
+const {readFileSync, existsSync} = require('fs');
 const path = require('path');
 const {parser} = require('posthtml-parser');
 const {match} = require('posthtml/lib/api');
@@ -64,7 +64,7 @@ module.exports = (options = {}) => tree => {
     }
   }
 
-  options.roots = Array.isArray(options.folders) ? options.folders : [options.folders];
+  options.folders = Array.isArray(options.folders) ? options.folders : [options.folders];
   options.namespaces = Array.isArray(options.namespaces) ? options.namespaces : [options.namespaces];
   options.namespaces.forEach((namespace, index) => {
     options.namespaces[index].root = path.resolve(namespace.root);
@@ -121,12 +121,17 @@ function processTree(options) {
         return currentNode;
       }
 
-      const componentPath = path.isAbsolute(componentFile) && componentFile !== currentNode.attrs[options.attribute] ?
+      const componentPath = path.isAbsolute(componentFile) && !currentNode.attrs[options.attribute] ?
         componentFile :
         path.join(options.root, componentFile);
 
-      if (!componentPath) {
-        return currentNode;
+      // Check if file exist only when not using x-tag
+      if (currentNode.attrs[options.attribute] && !existsSync(componentPath)) {
+        if (options.strict) {
+          throw new Error(`[components] The component was not found in ${componentPath}.`);
+        } else {
+          return currentNode;
+        }
       }
 
       // console.log(`${++processCounter}) Processing component ${componentPath}`);
@@ -152,8 +157,8 @@ function processTree(options) {
 
       // Process <yield> tag
       const content = match.call(nextNode, {tag: options.yield}, nextNode => {
-        // Fill <yield> with current node content or default <yield> content or empty
-        return currentNode.content || nextNode.content || '';
+        // Fill <yield> with current node content or default <yield>
+        return currentNode.content || nextNode.content;
       });
 
       // Process <fill> tags

@@ -14,6 +14,15 @@ test('Must process with slots', async t => {
   t.is(html, expected);
 });
 
+test('Must output default yield content when not provided', async t => {
+  const actual = `<component src="components/component-default-yield.html"></component>`;
+  const expected = `<div>Default yield</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
 test('Must process the same component multiple times', async t => {
   const actual = `<component src="components/component.html"><fill:title>Title</fill:title><fill:body>Body</fill:body></component><component src="components/component.html"><fill:title>Title 2</fill:title><fill:body>Body 2</fill:body></component>`;
   const expected = `<div>Title</div><div>Body</div><div>Title 2</div><div>Body 2</div>`;

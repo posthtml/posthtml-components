@@ -9,7 +9,7 @@ test('Must process component with x-tag', async t => {
   const actual = `<x-modal></x-modal>`;
   const expected = `<div>Modal</div>`;
 
-  const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
+  const html = await posthtml([plugin({root: './test/templates', folders: 'components'})]).process(actual).then(result => clean(result.html));
 
   t.is(html, expected);
 });

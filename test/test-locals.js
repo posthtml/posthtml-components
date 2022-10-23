@@ -23,15 +23,6 @@ test('Must process attributes as locals', async t => {
   t.is(html, expected);
 });
 
-test('Must process default attributes and map attributes not locals to first node', async t => {
-  const actual = `<component src="components/component-mapped-attributes.html" title="My Title" class="bg-light p-2" style="display: flex; font-size: 20px"></component>`;
-  const expected = `<div class="text-dark m-3 bg-light p-2" style="display: flex; font-size: 20px">My Title Default body</div>`;
-
-  const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
-
-  t.is(html, expected);
-});
-
 test('Must process component with locals as JSON and string', async t => {
   const actual = `<component src="components/component-locals-json-and-string.html"
                     merge:titles='{ "suptitle": "This is custom suptitle" }'
@@ -64,14 +55,14 @@ test('Must has access to $slots in script locals', async t => {
   t.is(html, expected);
 });
 
-// test('Must pass locals from parent to child via aware', async t => {
-//   const actual = `<x-parent aware:aString="I am custom aString for PARENT via component (1)"><x-child></x-child></x-parent>`;
-//   const expected = `PARENT:<div>  aBoolean  value: true  type: boolean  aString  value: I am custom aString for PARENT via component (1)  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>  CHILD:<div>  aBoolean  value: true  type: boolean  aString  value: I am custom aString for PARENT via component (1)  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>`;
-//
-//   const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
-//
-//   t.is(html, expected);
-// });
+test('Must pass locals from parent to child via aware', async t => {
+  const actual = `<x-parent aware:aString="I am custom aString for PARENT via component (1)"><x-child></x-child></x-parent>`;
+  const expected = `PARENT:<div>  aBoolean  value: true  type: boolean  aString  value: I am custom aString for PARENT via component (1)  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>CHILD:<div>  aBoolean  value: true  type: boolean  aString  value: I am custom aString for PARENT via component (1)  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
 
 test('Must process default, merged and override props', async t => {
   const actual = `<component src="components/component-locals-type.html" aStringOverride="My override string changed" anObjectOverride='{ "third": "Third override item", "fourth": "Fourth override item" }' merge:anObjectMerged='{ "third": "Third merged item", "fourth": "Fourth merged item" }'></component>`;
