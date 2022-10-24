@@ -1,16 +1,46 @@
-<x-child-parent alocal="Test"></x-child-parent>
+<x-page>
+  <div class="row">
+    <div class="col-lg-8">
+      <h1 class="display-1 fw-bold mb-4">Demo</h1>
 
-<x-parent>
-  <h5>YIELD PARENT IN TEST.html</h5>
-  {{ alocal }}
-  <fill:myslot>
-    SLOT PARENT INSIDE TEST.html
-  </fill:myslot>
-</x-parent>
+      <x-test
+        aStringOverride="My override string changed"
+        anObjectOverride='{ "third": "Third override item", "fourth": "Fourth override item" }'
+        merge:anObjectMerged='{ "third": "Third merged item", "fourth": "Fourth merged item", "anObjectMerged1": { "third": "Third merged item (UPDATED?)", "fourth1": "Fourth merged item" } }'
 
-<x-child>
-  <h5>YIELD CHILD INSIDE TEST.html</h5>
-  <fill:myslot>
-    SLOT CHILD INSIDE TEST.html
-  </fill:myslot>
-</x-child>
+        merge:post='{ "title": "My post title", "body": "My post body", "comments": [ { "id": 1, "body": "My comment 1 new" }, { "id": 3, "body": "My comment 3" } ] }'
+
+        merge:anArrayOfObjects='[ { "id": 1, "title": "My new title 1" }, { "id": 2, "title": "My new title 2", "somethingnew": "New" } ]'
+
+        merge:anArray='[ "first", "third", "fourth" ]'
+
+        computed:aComputed="true"
+
+        merge:locals='{ "something": "alocal", "anArray": [ "ten" ] }'
+
+        class="my-demo"
+      >
+        <fill:name aslotlocal="Hello" prepend>My filled slot</fill:name>
+      </x-test>
+
+      <hr>
+
+      <x-child-parent alocal="Test"></x-child-parent>
+
+      <x-parent>
+        <h5>YIELD PARENT IN TEST.html</h5>
+        {{ alocal }}
+        <fill:myslot>
+          SLOT PARENT INSIDE TEST.html
+        </fill:myslot>
+      </x-parent>
+
+      <x-child>
+        <h5>YIELD CHILD INSIDE TEST.html</h5>
+        <fill:myslot>
+          SLOT CHILD INSIDE TEST.html
+        </fill:myslot>
+      </x-child>
+    </div>
+  </div>
+</x-page>

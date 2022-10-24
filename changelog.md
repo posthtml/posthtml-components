@@ -1,3 +1,8 @@
+## 1.0.0-beta.5 (2022-10-24)
+
+* 100% coverage test
+* Fix components with same slot name in the same node 
+
 ## 1.0.0-beta.4 (2022-10-23)
 
 * Refactor with underscore.js
