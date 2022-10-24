@@ -71,28 +71,37 @@
       margin-bottom: 1.5rem;
     }
 
-    .header-anchor {
-      margin-left: -28px;
-      line-height: 1;
+    .header-anchor,
+    h1 .header-anchor,
+    h2 .header-anchor,
+    h3 .header-anchor {
       color: inherit;
       text-decoration: none;
-      visibility: hidden;
     }
 
-    h1 .header-anchor {
-      margin-left: -34px;
-    }
+    @media only screen and (min-width: 1200px) {
+      .header-anchor {
+        margin-left: -28px;
+        line-height: 1;
+        color: inherit;
+        text-decoration: none;
+        visibility: hidden;
+      }
 
-    h3 .header-anchor {
-      margin-left: -24px;
-    }
+      h1 .header-anchor {
+        margin-left: -34px;
+      }
 
-    .header-anchor:hover,
-    h1:hover .header-anchor,
-    h2:hover .header-anchor,
-    h3:hover .header-anchor{
-      visibility: visible;
-      color: inherit;
+      h3 .header-anchor {
+        margin-left: -24px;
+      }
+
+      .header-anchor:hover,
+      h1:hover .header-anchor,
+      h2:hover .header-anchor,
+      h3:hover .header-anchor {
+        visibility: visible;
+      }
     }
 
     #header-toc .nav-link {

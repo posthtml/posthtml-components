@@ -146,9 +146,10 @@ function processTree(options) {
       // Process <yield> tag
       const content = match.call(nextNode, {tag: options.yield}, nextNode => {
         // Fill <yield> with current node content or default <yield>
-        console.log(currentNode.content);
         return currentNode.content || nextNode.content;
       });
+
+      nextNode = processTree(options)(nextNode);
 
       // Process <fill> tags
       processFillContent(nextNode, filledSlots, options);
