@@ -1,0 +1,15 @@
+<div class="parent">
+  {{ $slots }}
+
+  <div class="parent-content">
+    I'm parent
+  </div>
+
+  <div class="parent-yield">
+    <yield></yield>
+  </div>
+
+  <div class="parent-slot">
+    <slot:name></slot:name>
+  </div>
+</div>

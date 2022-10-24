@@ -103,7 +103,7 @@ module.exports = (options = {}) => tree => {
 function processTree(options) {
   const filledSlots = {};
 
-  // let processCounter = 0;
+  let processCounter = 0;
 
   return function (tree) {
     if (options.plugins.length > 0) {
@@ -121,13 +121,15 @@ function processTree(options) {
         return currentNode;
       }
 
-      // console.log(`${++processCounter}) Processing component ${componentPath}`);
+      console.log(`${++processCounter}) Processing component ${componentPath}`);
+
+      // log(currentNode, 'currentNode');
 
       let nextNode = parser(readFileSync(componentPath, 'utf8'));
 
       // Set filled slots
       setFilledSlots(currentNode, filledSlots, options);
-      setFilledSlots(nextNode, filledSlots, options);
+      // setFilledSlots(nextNode, filledSlots, options);
 
       // Reset previous locals with passed global and keep aware locals
       options.expressions.locals = {...options.locals, ...options.aware};
