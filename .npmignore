@@ -12,7 +12,7 @@ test
 .editorconfig
 .c8rc
 .clintonrc.json
-ava.config.json
+ava.config.js
 changelog.md
 xo.config.js
 .lintstagedrc
