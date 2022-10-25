@@ -96,28 +96,29 @@ See also the `examples` folder. You can run `npm run build-examples` to compile 
 
 ## Options
 
-|         Option         |           Default            | Description                                                                                                           |
-|:----------------------:|:----------------------------:|:----------------------------------------------------------------------------------------------------------------------|
-|        **root**        |            `'./'`            | String value as root path for components lookup.                                                                      |
-|      **folders**       |            `['']`            | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom.        |
-|     **tagPrefix**      |             `x-`             | String for tag prefix. The plugin will use RegExp with this string.                                                   |
-|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.                     |
-|     **attribute**      |            `src`             | String value for component attribute for set path.                                                                    |
-|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                           |
-| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                        |
-|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                                       |
-|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                                     |
-|        **slot**        |            `slot`            | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).                   |
-|        **fill**        |            `fill`            | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).                   |
-|   **slotSeparator**    |             `:`              | String value used for separate `<slot>` and `<fill>` tag from their names.                                            |
-|        **push**        |            `push`            | String value for `<push>` tag name.                                                                                   |
-|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                                  |
-|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.                      |
-|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.           |
-|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                                |
-|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                               |
-|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                                        |
-|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                               |
+|         Option         |           Default            | Description                                                                                                                        |
+|:----------------------:|:----------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------|
+|        **root**        |            `'./'`            | String value as root path for components lookup.                                                                                   |
+|      **folders**       |            `['']`            | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom.                     |
+|     **tagPrefix**      |             `x-`             | String for tag prefix. The plugin will use RegExp with this string.                                                                |
+|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.                                  |
+|     **attribute**      |            `src`             | String value for component attribute for set path.                                                                                 |
+|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                                        |
+| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                                     |
+|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                                                    |
+|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                                                  |
+|        **slot**        |            `slot`            | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).                                |
+|        **fill**        |            `fill`            | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).                                |
+|   **slotSeparator**    |             `:`              | String value used for separate `<slot>` and `<fill>` tag from their names.                                                         |
+|        **push**        |            `push`            | String value for `<push>` tag name.                                                                                                |
+|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                                               |
+|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.                                   |
+|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.                        |
+|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                                             |
+|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                                            |
+|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                                                     |
+|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                                            |
+|  **mergeCustomizer**   |          `function`          | Function callback passed to lodash `mergeWith` for attribute `locals` and `merge:attribute`. By default it's used to concat array. |
 
 ## Features
 
@@ -604,6 +605,9 @@ The output will be:
 So the prop `size` is not override since we prepend `computed:` to the attribute, while the prop `title` is override.
 And the prop `items` is merged and not override. 
 You can also notice how the `class` attribute is merged with `class` attribute of the first node. Let's see in next section more about this.
+
+You can change how attributes are merged by passing via options a callback function used by lodash method [mergeWith](https://lodash.com/docs/4.17.15#mergeWith).
+By default, it's used to concat array.
 
 ### Attributes
 

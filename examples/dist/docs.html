@@ -546,6 +546,23 @@ posthtml(components({ root: './src' }))
                   </td>
                   <td style="text-align:left">Boolean value for enable or disable throw an exception.</td>
                 </tr>
+                <tr>
+                  <td style="text-align:center">
+                    <strong>mergeCustomizer</strong>
+                  </td>
+                  <td style="text-align:center">
+                    <code>function</code>
+                  </td>
+                  <td style="text-align:left">
+                    Function callback passed to lodash
+                    <code>mergeWith</code>
+                    for attribute
+                    <code>locals</code>
+                    and
+                    <code>merge:attribute</code>
+                    . By default it's used to concat array.
+                  </td>
+                </tr>
               </tbody>
             </table>
             <h2 id="features" tabindex="-1">
@@ -1086,6 +1103,12 @@ You can also notice how the
               attribute is merged with
               <code>class</code>
               attribute of the first node. Let's see in next section more about this.
+            </p>
+            <p>
+              You can change how attributes are merged by passing via options a callback function used by lodash method
+              <a href="https://lodash.com/docs/4.17.15#mergeWith">mergeWith</a>
+              .
+By default, it's used to concat array.
             </p>
             <h3 id="attributes" tabindex="-1">
               <a class="header-anchor" href="#attributes">#</a>

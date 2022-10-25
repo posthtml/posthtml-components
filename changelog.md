@@ -1,6 +1,12 @@
+## 1.0.0-beta.7 (2022-10-24)
+
+* Replace underscore with lodash
+* Replace deepmerge with lodash method `mergeWith`
+* Added merge customizer via options for lodash method `mergeWith`
+
 ## 1.0.0-beta.6 (2022-10-24)
 
-* Fix $slots context
+* Fix `$slots` context
 
 ## 1.0.0-beta.5 (2022-10-24)
 

@@ -41,6 +41,17 @@ module.exports = (options = {}) => tree => {
   options.attrsParserRules = options.attrsParserRules || {};
   options.strict = typeof options.strict === 'undefined' ? true : options.strict;
 
+  // Merge customizer callback passed to lodash mergeWith
+  //  for merge attribute `locals` and all attributes starting with `merge:`
+  //  @see https://lodash.com/docs/4.17.15#mergeWith
+  options.mergeCustomizer = options.mergeCustomizer || ((objectValue, sourceValue) => {
+    if (Array.isArray(objectValue)) {
+      return objectValue.concat(sourceValue);
+    }
+  });
+
+  options.mergeCustomizer();
+
   if (!(options.slot instanceof RegExp)) {
     options.slot = new RegExp(`^${options.slot}${options.slotSeparator}`, 'i');
   }

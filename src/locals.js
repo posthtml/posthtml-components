@@ -1,12 +1,12 @@
 'use strict';
 
 const scriptDataLocals = require('posthtml-expressions/lib/locals');
-const merge = require('deepmerge');
 const pick = require('lodash/pick');
 const keys = require('lodash/keys');
 const defaults = require('lodash/defaults');
 const each = require('lodash/each');
 const extend = require('lodash/extend');
+const mergeWith = require('lodash/mergeWith');
 
 const attributeTypes = ['merge', 'computed', 'aware'];
 
@@ -53,7 +53,7 @@ module.exports = (currentNode, nextNode, filledSlots, options) => {
   if (attributes.locals) {
     if (attributesByTypeName.merge.includes('locals')) {
       attributesByTypeName.merge.splice(attributesByTypeName.merge.indexOf('locals'), 1);
-      attributes = merge(attributes, attributes.locals);
+      mergeWith(attributes, attributes.locals, options.mergeCustomizer);
     } else {
       extend(attributes, attributes.locals);
     }
@@ -62,7 +62,7 @@ module.exports = (currentNode, nextNode, filledSlots, options) => {
   }
 
   // Merge with global
-  attributes = merge(options.expressions.locals, attributes);
+  attributes = mergeWith(options.expressions.locals, attributes, options.mergeCustomizer);
 
   // There is no way to know here what are locals
   //  and what attributes passed to component
@@ -78,7 +78,7 @@ module.exports = (currentNode, nextNode, filledSlots, options) => {
   if (locals) {
     // Merge attributes
     if (attributesByTypeName.merge.length > 0) {
-      extend(attributes, merge(pick(locals, attributesByTypeName.merge), pick(attributes, attributesByTypeName.merge)));
+      extend(attributes, mergeWith(pick(locals, attributesByTypeName.merge), pick(attributes, attributesByTypeName.merge), options.mergeCustomizer));
     }
 
     // Override attributes with computed locals

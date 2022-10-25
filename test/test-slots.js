@@ -83,3 +83,12 @@ test('Must render slots using $slots locals', async t => {
 
   t.is(html, expected);
 });
+
+test('Must merge global locals passed via expressions.locals', async t => {
+  const actual = `<component src="layouts/global-locals.html" anArray='["third", "fourth"]'><div>Main content</div></component>`;
+  const expected = `<html><head><title>My page title</title></head><body><main><div>Main content</div></main><span>first</span><span>second</span><span>third</span><span>fourth</span></body></html>`;
+
+  const html = await posthtml([plugin({root: './test/templates', tag: 'component', expressions: {locals: {title: 'My page title', anArray: ['first', 'second']}}})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
