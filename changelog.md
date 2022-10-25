@@ -1,8 +1,8 @@
-## 1.0.0-beta.8 (2022-10-24)
+## 1.0.0-beta.8 (2022-10-25)
 
 * Fix merge locals with global
 
-## 1.0.0-beta.7 (2022-10-24)
+## 1.0.0-beta.7 (2022-10-25)
 
 * Replace underscore with lodash
 * Replace deepmerge with lodash method `mergeWith`
