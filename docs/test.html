@@ -46,7 +46,7 @@
       <div class="container-lg">
         <div class="row">
           <div class="col-lg-8">
-            <h1 class="display-1 fw-bold mb-4">Demo</h1>
+            <h1 class="display-1 fw-bold mb-4">Playground</h1>
             <div class="wrapper">
               <div class="demo my-demo" something="alocal">
                 <h1>anObjectDefault</h1>
@@ -190,6 +190,32 @@
               <h4>Child</h4>
               <h5>YIELD CHILD INSIDE TEST.html</h5>
               SLOT CHILD INSIDE TEST.html
+            </div>
+            <div class="wrapper">
+              <div class="parent">
+                {"name":{"filled":true,"rendered":false,"tag":"fill:name","attrs":{},"content":["Slot parent"],"source":"Slot parent","locals":{}}}
+                <div class="parent-content">I'm parent</div>
+                <div class="parent-yield">
+                  <h1>Parent yield</h1>
+                  <div class="child">
+                    {"name":{"filled":true,"rendered":false,"tag":"fill:name","attrs":{},"content":["Slot child"],"source":"Slot child","locals":{}}}
+                    <div class="child-content">I'm child</div>
+                    <div class="child-yield">
+                      <h1>Child yield</h1>
+                    </div>
+                    <div class="child-slot">Slot child</div>
+                  </div>
+                </div>
+                <div class="parent-slot">Slot parent</div>
+              </div>
+              {"name":{"filled":true,"rendered":false,"tag":"fill:name","attrs":{},"content":["\n          ",{"tag":"div","attrs":{"class":"parent2-child2-slot"},"content":["\n            parent2-child2 slot\n          "]},"\n        "],"source":"\n
+              <div class="\&quot;parent2-child2-slot\&quot;">\n            parent2-child2 slot\n</div>
+              \n        ","locals":{}},"myslot":{"filled":true,"rendered":true,"tag":"fill:myslot","attrs":{},"content":["\n          SLOT CHILD INSIDE TEST.html\n        "],"source":"\n          SLOT CHILD INSIDE TEST.html\n        ","locals":{}}}
+
+  
+    yes is filled
+              <div class="parent2-child2-slot">parent2-child2 slot</div>
+              <div class="parent2-child2-yield">parent2-child2 yield</div>
             </div>
           </div>
         </div>

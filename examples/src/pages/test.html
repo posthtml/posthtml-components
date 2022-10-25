@@ -1,7 +1,7 @@
 <x-page>
   <div class="row">
     <div class="col-lg-8">
-      <h1 class="display-1 fw-bold mb-4">Demo</h1>
+      <h1 class="display-1 fw-bold mb-4">Playground</h1>
 
       <x-test
         aStringOverride="My override string changed"
@@ -25,22 +25,34 @@
 
       <hr>
 
-      <x-child-parent alocal="Test"></x-child-parent>
+      <x-test.child-parent alocal="Test"></x-test.child-parent>
 
-      <x-parent>
+      <x-test.parent>
         <h5>YIELD PARENT IN TEST.html</h5>
         {{ alocal }}
         <fill:myslot>
           SLOT PARENT INSIDE TEST.html
         </fill:myslot>
-      </x-parent>
+      </x-test.parent>
 
-      <x-child>
+      <x-test.child>
         <h5>YIELD CHILD INSIDE TEST.html</h5>
         <fill:myslot>
           SLOT CHILD INSIDE TEST.html
         </fill:myslot>
-      </x-child>
+      </x-test.child>
+
+      <x-test.parent2-child2>
+        <div class="parent2-child2-yield">
+          parent2-child2 yield
+        </div>
+
+        <fill:name>
+          <div class="parent2-child2-slot">
+            parent2-child2 slot
+          </div>
+        </fill:name>
+      </x-test.parent2-child2>
     </div>
   </div>
 </x-page>

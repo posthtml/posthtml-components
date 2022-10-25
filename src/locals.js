@@ -59,6 +59,14 @@ module.exports = (currentNode, nextNode, filledSlots, options) => {
   // Merge with global
   attributes = merge(options.expressions.locals, attributes);
 
+  // There is no way to know here what are locals
+  //  and what attributes passed to component
+
+  // Convert attribute names to camelCase
+  // each(attributes, (value, key, attrs) => {
+  //   attrs[camelCase(key)] = value;
+  // });
+
   // Retrieve default locals from <script props> and merge with attributes
   const {locals} = scriptDataLocals(nextNode, {localsAttr: options.localsAttr, removeScriptLocals: true, locals: {...attributes, $slots: filledSlots}});
 
