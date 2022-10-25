@@ -62,7 +62,7 @@ module.exports = (currentNode, nextNode, filledSlots, options) => {
   }
 
   // Merge with global
-  attributes = mergeWith(options.expressions.locals, attributes, options.mergeCustomizer);
+  attributes = mergeWith({}, options.expressions.locals, attributes, options.mergeCustomizer);
 
   // There is no way to know here what are locals
   //  and what attributes passed to component
