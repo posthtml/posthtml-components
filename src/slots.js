@@ -2,7 +2,8 @@
 
 const {match} = require('posthtml/lib/api');
 const {render} = require('posthtml-render');
-const {each, omit} = require('lodash');
+const each = require('lodash/each');
+const omit = require('lodash/omit');
 
 /**
  * Set filled slots

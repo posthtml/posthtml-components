@@ -1,8 +1,13 @@
 'use strict';
 
-const merge = require('deepmerge');
 const scriptDataLocals = require('posthtml-expressions/lib/locals');
-const {pick, keys, defaults, each, extend} = require('lodash');
+const merge = require('deepmerge');
+const pick = require('lodash/pick');
+const keys = require('lodash/keys');
+const defaults = require('lodash/defaults');
+const each = require('lodash/each');
+const extend = require('lodash/extend');
+
 const attributeTypes = ['merge', 'computed', 'aware'];
 
 /**

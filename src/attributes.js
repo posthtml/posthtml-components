@@ -3,7 +3,12 @@
 const {match} = require('posthtml/lib/api');
 const parseAttrs = require('posthtml-attrs-parser');
 const styleToObject = require('style-to-object');
-const {omit, keys, union, each, has, extend} = require('lodash');
+const omit = require('lodash/omit');
+const keys = require('lodash/keys');
+const union = require('lodash/union');
+const each = require('lodash/each');
+const has = require('lodash/has');
+const extend = require('lodash/extend');
 
 /**
  * Map component attributes that it's not defined as locals to first element of node
