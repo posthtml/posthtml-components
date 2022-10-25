@@ -3,7 +3,7 @@
 const {match} = require('posthtml/lib/api');
 const parseAttrs = require('posthtml-attrs-parser');
 const styleToObject = require('style-to-object');
-const {omit, keys, union, each, has, extend} = require('underscore');
+const {omit, keys, union, each, has, extend} = require('lodash');
 
 /**
  * Map component attributes that it's not defined as locals to first element of node

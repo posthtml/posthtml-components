@@ -2,7 +2,7 @@
 
 const merge = require('deepmerge');
 const scriptDataLocals = require('posthtml-expressions/lib/locals');
-const {pick, extend, keys, defaults, each} = require('underscore');
+const {pick, keys, defaults, each, extend} = require('lodash');
 const attributeTypes = ['merge', 'computed', 'aware'];
 
 /**

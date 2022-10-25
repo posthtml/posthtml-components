@@ -2,7 +2,7 @@
 
 const {match} = require('posthtml/lib/api');
 const {render} = require('posthtml-render');
-const {each, omit} = require('underscore');
+const {each, omit} = require('lodash');
 
 /**
  * Set filled slots

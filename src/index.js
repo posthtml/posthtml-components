@@ -103,7 +103,7 @@ module.exports = (options = {}) => tree => {
 function processTree(options) {
   const filledSlots = {};
 
-  let processCounter = 0;
+  // let processCounter = 0;
 
   return function (tree) {
     if (options.plugins.length > 0) {
@@ -121,7 +121,7 @@ function processTree(options) {
         return currentNode;
       }
 
-      console.log(`${++processCounter}) Processing component ${componentPath}`);
+      // console.log(`${++processCounter}) Processing component ${componentPath}`);
 
       // log(currentNode, 'currentNode');
 
