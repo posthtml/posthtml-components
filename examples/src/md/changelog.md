@@ -1,3 +1,7 @@
+## 1.0.0-beta.9 (2022-10-26)
+
+* Fix override class and style
+
 ## 1.0.0-beta.8 (2022-10-25)
 
 * Fix merge locals with global
