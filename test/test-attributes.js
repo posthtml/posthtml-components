@@ -40,3 +40,12 @@ test('Must not map attributes for component without any elements', async t => {
 
   t.is(html, expected);
 });
+
+test('Must override class and style attributes', async t => {
+  const actual = `<component src="components/component-mapped-attributes.html" override:class="override-class" override:style="background: black"></component>`;
+  const expected = `<div class="override-class" style="background: black">Default title Default body</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});

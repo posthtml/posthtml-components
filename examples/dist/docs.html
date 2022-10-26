@@ -193,6 +193,12 @@
                     </li>
                   </ul>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#contributing">Contributing</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#credits">Credits</a>
+                </li>
               </ul>
             </nav>
             <h2 id="installation" tabindex="-1">
@@ -1110,6 +1116,59 @@ You can also notice how the
               .
 By default, it's used to concat array.
             </p>
+            <p>
+              By default, all props are scoped to the component, and are not available to nested components. You can however change this accordingly to your need.
+Let's see below example.
+            </p>
+            <p>Create a component:</p>
+            <pre><code class="language-html">&lt;!-- src/child.html --&gt;
+&lt;script props&gt;
+  module.exports = {
+    prop: 'Default prop value'
+  }
+&lt;/script&gt;
+&lt;div&gt;
+  Prop in child: {{ prop }}
+&lt;/div&gt;</code></pre>
+            <p>Create another component that use the first one:</p>
+            <pre><code class="language-html">&lt;!-- src/parent.html --&gt;
+&lt;script props&gt;
+  module.exports = {
+    prop: 'Default prop value'
+  }
+&lt;/script&gt;
+&lt;div&gt;
+  Prop in parent: {{ prop }}
+  &lt;x-child&gt;&lt;/x-child&gt;
+&lt;/div&gt;</code></pre>
+            <p>Use:</p>
+            <pre><code class="language-html">&lt;x-parent prop=&quot;My prop&quot;&gt;&lt;/x-parent&gt;</code></pre>
+            <p>The output will be:</p>
+            <pre><code class="language-html">&lt;div&gt;
+  Prop in parent: My prop
+  &lt;div&gt;
+    Prop in child: Default prop value
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            <p>
+              As you can see
+              <code>prop</code>
+              in
+              <code>x-child</code>
+              component are default value and not the one set via
+              <code>x-parent</code>
+              . Prepend
+              <code>aware:</code>
+              to the attribute name to pass the props to nested components.
+            </p>
+            <pre><code class="language-html">&lt;x-parent aware:prop=&quot;My prop&quot;&gt;&lt;/x-parent&gt;</code></pre>
+            <p>The output now will be:</p>
+            <pre><code class="language-html">&lt;div&gt;
+  Prop in parent: My prop
+  &lt;div&gt;
+    Prop in child: My prop
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
             <h3 id="attributes" tabindex="-1">
               <a class="header-anchor" href="#attributes">#</a>
               Attributes
@@ -1439,7 +1498,36 @@ For continue to use current code with this plugin without changing it, see below
               <a class="header-anchor" href="#posthtml-extends">#</a>
               PostHTML Extends
             </h3>
-            <p>Not yet tested.</p>
+            <p>
+              So far it works fine together with
+              <code>posthtml-components</code>
+              plugin.
+            </p>
+            <h2 id="contributing" tabindex="-1">
+              <a class="header-anchor" href="#contributing">#</a>
+              Contributing
+            </h2>
+            <p>
+              See
+              <a href="https://github.com/posthtml/posthtml/tree/master/docs">PostHTML Guidelines</a>
+              and
+              <a href="CONTRIBUTING.md">contribution guide</a>
+              .
+            </p>
+            <h2 id="credits" tabindex="-1">
+              <a class="header-anchor" href="#credits">#</a>
+              Credits
+            </h2>
+            <p>
+              Thanks to all PostHTML contributors and especially to
+              <code>posthtml-extend</code>
+              and
+              <code>posthtml-modules</code>
+              contributors, as part of code are
+              <s>stolen</s>
+              inspired from these plugins.
+Huge thanks also to Laravel Blade template engine.
+            </p>
           </div>
         </div>
       </div>
@@ -1466,7 +1554,7 @@ For continue to use current code with this plugin without changing it, see below
         <div class="modal-content modal-content-custom">
           <div class="modal-header">
             <h5 class="modal-title" id="modalWithComponentsLabel">Changelog</h5>
-            <button type="button" class="btn" override:class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <!-- /.modal-header -->
           <div class="modal-body">

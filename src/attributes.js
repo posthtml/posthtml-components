@@ -54,7 +54,7 @@ module.exports = (currentNode, attributes, locals, options) => {
         nodeAttrs.style = extend(nodeAttrs.style, styleToObject(attributes.style));
       }
     } else {
-      nodeAttrs[key] = attributes[key];
+      nodeAttrs[key.replace('override:', '')] = attributes[key];
     }
 
     delete attributes[key];

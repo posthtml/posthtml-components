@@ -50,8 +50,6 @@ module.exports = (options = {}) => tree => {
     }
   });
 
-  options.mergeCustomizer();
-
   if (!(options.slot instanceof RegExp)) {
     options.slot = new RegExp(`^${options.slot}${options.slotSeparator}`, 'i');
   }

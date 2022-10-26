@@ -609,6 +609,74 @@ You can also notice how the `class` attribute is merged with `class` attribute o
 You can change how attributes are merged by passing via options a callback function used by lodash method [mergeWith](https://lodash.com/docs/4.17.15#mergeWith).
 By default, it's used to concat array.
 
+By default, all props are scoped to the component, and are not available to nested components. You can however change this accordingly to your need.
+Let's see below example.
+
+Create a component:
+
+```html
+<!-- src/child.html -->
+<script props>
+  module.exports = {
+    prop: 'Default prop value'
+  }
+</script>
+<div>
+  Prop in child: {{ prop }}
+</div>
+```
+
+Create another component that use the first one:
+
+
+```html
+<!-- src/parent.html -->
+<script props>
+  module.exports = {
+    prop: 'Default prop value'
+  }
+</script>
+<div>
+  Prop in parent: {{ prop }}
+  <x-child></x-child>
+</div>
+```
+
+Use:
+
+```html
+<x-parent prop="My prop"></x-parent>
+```
+
+The output will be:
+
+```html
+<div>
+  Prop in parent: My prop
+  <div>
+    Prop in child: Default prop value
+  </div>
+</div>
+```
+
+As you can see `prop` in `x-child` component are default value and not the one set via `x-parent`. Prepend `aware:` to the attribute name to pass the props to nested components.
+
+
+```html
+<x-parent aware:prop="My prop"></x-parent>
+```
+
+The output now will be:
+
+```html
+<div>
+  Prop in parent: My prop
+  <div>
+    Prop in child: My prop
+  </div>
+</div>
+```
+
 ### Attributes
 
 Your can pass any attributes to your components and this will be added to the first node of your component, or to the node with an attribute named `attributes`.
@@ -916,7 +984,7 @@ NOTE: If you change `<yield>` tag to `<content>` to support your existing code, 
 
 ### PostHTML Extends
 
-Not yet tested.
+So far it works fine together with `posthtml-components` plugin.
 
 ## Contributing
 
