@@ -1,3 +1,7 @@
+## 1.0.0-beta.10 (2022-10-28)
+
+* Remove `computed:` and `merge:` by keeping this logic inside `<script props>`.
+
 ## 1.0.0-beta.9 (2022-10-26)
 
 * Fix override class and style
