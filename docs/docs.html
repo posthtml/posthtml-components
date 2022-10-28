@@ -181,23 +181,6 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#migration">Migration</a>
-                  <ul class="nav flex-column">
-                    <li class="nav-item">
-                      <a class="nav-link" href="#posthtml-include">PostHTML Include</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#posthtml-modules">PostHTML Modules</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#posthtml-extends">PostHTML Extends</a>
-                    </li>
-                  </ul>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#contributing">Contributing</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#credits">Credits</a>
                 </li>
               </ul>
             </nav>
@@ -562,11 +545,11 @@ posthtml(components({ root: './src' }))
                   <td style="text-align:left">
                     Function callback passed to lodash
                     <code>mergeWith</code>
-                    for attribute
+                    for merge
+                    <code>options.expressions.locals</code>
+                    and locals passed via attribute
                     <code>locals</code>
-                    and
-                    <code>merge:attribute</code>
-                    . By default it's used to concat array.
+                    .
                   </td>
                 </tr>
               </tbody>
@@ -1006,18 +989,16 @@ If you would like to prepend content onto the beginning of a stack, you should u
               <a href="https://github.com/posthtml/posthtml-expressions">posthtml-expressions</a>
               plugin, with feature to pass
               <code>props</code>
-              (locals) via attributes, define default via
+              (locals) via attributes and manipulate them via
               <code>&lt;script props&gt;</code>
-              , merge with default and use
-              <code>&lt;script props&gt;</code>
-              as computed.
+              .
             </p>
             <p>Let's see how it works with a few examples starting with a basic one.</p>
             <p>Create the component:</p>
             <pre><code class="language-html">&lt;!-- src/my-component.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    prop: 'Default prop value'
+    prop: locals.prop || 'Default prop value'
   }
 &lt;/script&gt;
 &lt;div&gt;
@@ -1051,24 +1032,19 @@ If you would like to prepend content onto the beginning of a stack, you should u
 More details on this in the next section.
             </p>
             <p>
-              So by default
+              So in the
               <code>&lt;script props&gt;</code>
-              act as default value, like the
-              <code>@props</code>
-              you define with Laravel Blade.
-You can change this behaviour by prepending
-              <code>computed</code>
-              or
-              <code>merge</code>
-              to the attribute name like shown below.
+              you have access to passed props via object
+              <code>locals</code>
+              , and you can add any logic you need inside of it.
             </p>
             <p>Create the component:</p>
             <pre><code class="language-html">&lt;!-- src/modal.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    title: 'Default title', // This will be the default value
-    size: locals.size ? `modal-${locals.size}` : '', // This will be a computed value, so it's always used
-    items: ['first', 'second'] // This will be merged
+    title: locals.title || 'Default title', 
+    size: locals.size ? `modal-${locals.size}` : '', 
+    items: Array.isArray(locals.items) ? locals.items.concat(['first', 'second']) : ['first', 'second']
   }
 &lt;/script&gt;
 &lt;div class=&quot;modal {{ size }}&quot;&gt;
@@ -1080,7 +1056,7 @@ You can change this behaviour by prepending
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
             <p>Use:</p>
-            <pre><code class="language-html">&lt;x-modal computed:size=&quot;xl&quot; title=&quot;My modal title&quot; merge:items='[&quot;third&quot;, &quot;fourth&quot;]' class=&quot;modal-custom&quot;&gt;&lt;/x-modal&gt;</code></pre>
+            <pre><code class="language-html">&lt;x-modal size=&quot;xl&quot; title=&quot;My modal title&quot; items='[&quot;third&quot;, &quot;fourth&quot;]' class=&quot;modal-custom&quot;&gt;&lt;/x-modal&gt;</code></pre>
             <p>The output will be:</p>
             <pre><code class="language-html">&lt;div class=&quot;modal modal-custom modal-xl&quot;&gt;
   &lt;div class=&quot;modal-header&quot;&gt;
@@ -1094,27 +1070,16 @@ You can change this behaviour by prepending
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
             <p>
-              So the prop
-              <code>size</code>
-              is not override since we prepend
-              <code>computed:</code>
-              to the attribute, while the prop
-              <code>title</code>
-              is override.
-And the prop
-              <code>items</code>
-              is merged and not override.
-You can also notice how the
+              You can also notice how the
               <code>class</code>
               attribute is merged with
               <code>class</code>
               attribute of the first node. Let's see in next section more about this.
             </p>
             <p>
-              You can change how attributes are merged by passing via options a callback function used by lodash method
+              You can change how attributes are merged with global locals defined via options by passing a callback function used by lodash method
               <a href="https://lodash.com/docs/4.17.15#mergeWith">mergeWith</a>
               .
-By default, it's used to concat array.
             </p>
             <p>
               By default, all props are scoped to the component, and are not available to nested components. You can however change this accordingly to your need.
@@ -1124,7 +1089,7 @@ Let's see below example.
             <pre><code class="language-html">&lt;!-- src/child.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    prop: 'Default prop value'
+    prop: locals.prop || 'Default prop value'
   }
 &lt;/script&gt;
 &lt;div&gt;
@@ -1134,7 +1099,7 @@ Let's see below example.
             <pre><code class="language-html">&lt;!-- src/parent.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    prop: 'Default prop value'
+    prop: locals.prop || 'Default prop value'
   }
 &lt;/script&gt;
 &lt;div&gt;
@@ -1195,7 +1160,7 @@ Only attribute not defined as
             <pre><code class="language-html">&lt;!-- src/button.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    label: 'A button'
+    label: locals.label || 'A button'
   }
 &lt;/script&gt;
 &lt;button type=&quot;button&quot; class=&quot;btn&quot;&gt;
@@ -1437,96 +1402,9 @@ via
               <code>posthtml-extend</code>
               and/or
               <code>posthtml-modules</code>
-              then you can continue to keep them until you migrate all of your components.
-For continue to use current code with this plugin without changing it, see below examples. Any more updates on this will be added in this issue:
+              please to follow updates here:
               <a href="https://github.com/thewebartisan7/posthtml-components/issues/16">posthtml-components/issues/16</a>
               .
-            </p>
-            <h3 id="posthtml-include" tabindex="-1">
-              <a class="header-anchor" href="#posthtml-include">#</a>
-              PostHTML Include
-            </h3>
-            <p>
-              PostHTML Include plugin can work when passed via
-              <code>options.plugins</code>
-              like below example:
-            </p>
-            <pre><code class="language-js">require(&quot;posthtml-component&quot;)({
-  root: &quot;./src&quot;,
-  folders: [&quot;components&quot;, &quot;layouts&quot;],
-  plugins: [
-    require(&quot;posthtml-include&quot;)({
-      encoding: &quot;utf8&quot;,
-      root: &quot;./src&quot;
-    }),
-  ]
-})</code></pre>
-            <h3 id="posthtml-modules" tabindex="-1">
-              <a class="header-anchor" href="#posthtml-modules">#</a>
-              PostHTML Modules
-            </h3>
-            <p>
-              At the moment doesn't work when nested inside PostHTML Components plugin since it use
-              <code>tree.match</code>
-              and even trying with something like PostHTML Include is doing here https://github.com/posthtml/posthtml-include/blob/master/lib/index.js#L16 doesn't work. But a workaround is to use PostHTML Components custom tag and attributes like below:
-            </p>
-            <pre><code class="language-js">require(&quot;posthtml-component&quot;)({
-  root: &quot;./src&quot;,
-  folders: [&quot;components&quot;, &quot;layouts&quot;],
-  tag: 'module',
-  attribute: 'href',
-  yield: 'content',
-  plugins: [
-    require(&quot;posthtml-include&quot;)({
-      encoding: &quot;utf8&quot;,
-      root: &quot;./src/www/posthtml-templates/&quot;
-    }),
-  ]
-})</code></pre>
-            <p>
-              NOTE: If you change
-              <code>&lt;yield&gt;</code>
-              tag to
-              <code>&lt;content&gt;</code>
-              to support your existing code, then you need to use it always. Maybe you can just replace all
-              <code>&lt;content&gt;</code>
-              with
-              <code>&lt;yield&gt;</code>
-              and it should works fine.
-            </p>
-            <h3 id="posthtml-extends" tabindex="-1">
-              <a class="header-anchor" href="#posthtml-extends">#</a>
-              PostHTML Extends
-            </h3>
-            <p>
-              So far it works fine together with
-              <code>posthtml-components</code>
-              plugin.
-            </p>
-            <h2 id="contributing" tabindex="-1">
-              <a class="header-anchor" href="#contributing">#</a>
-              Contributing
-            </h2>
-            <p>
-              See
-              <a href="https://github.com/posthtml/posthtml/tree/master/docs">PostHTML Guidelines</a>
-              and
-              <a href="CONTRIBUTING.md">contribution guide</a>
-              .
-            </p>
-            <h2 id="credits" tabindex="-1">
-              <a class="header-anchor" href="#credits">#</a>
-              Credits
-            </h2>
-            <p>
-              Thanks to all PostHTML contributors and especially to
-              <code>posthtml-extend</code>
-              and
-              <code>posthtml-modules</code>
-              contributors, as part of code are
-              <s>stolen</s>
-              inspired from these plugins.
-Huge thanks also to Laravel Blade template engine.
             </p>
           </div>
         </div>
@@ -1549,9 +1427,9 @@ Huge thanks also to Laravel Blade template engine.
         </div>
       </div>
     </footer>
-    <div class="modal fade" id="modalWithComponents" data-bs-backdrop="true" data-bs-keyboard="true" aria-labelledby="modalWithComponents" tabindex="-1" aria-hidden="true" aria-modal="true" role="dialog">
-      <div class="modal-dialog modal-lg modal-fullscreen-lg-down modal-dialog-centered modal-dialog-custom">
-        <div class="modal-content modal-content-custom">
+    <div class="modal fade" id="modalWithComponents" data-bs-backdrop="true" data-bs-keyboard="true" aria-labelledby="modalWithComponents" tabindex="-1" aria-hidden="true" aria-modal="true" role="dialog" dialogclass="modal-dialog-custom" contentclass="modal-content-custom">
+      <div class="modal-dialog modal-lg modal-fullscreen-lg-down modal-dialog-centered">
+        <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="modalWithComponentsLabel">Changelog</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

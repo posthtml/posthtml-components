@@ -96,29 +96,29 @@ See also the `examples` folder. You can run `npm run build-examples` to compile 
 
 ## Options
 
-|         Option         |           Default            | Description                                                                                                                        |
-|:----------------------:|:----------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------|
-|        **root**        |            `'./'`            | String value as root path for components lookup.                                                                                   |
-|      **folders**       |            `['']`            | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom.                     |
-|     **tagPrefix**      |             `x-`             | String for tag prefix. The plugin will use RegExp with this string.                                                                |
-|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.                                  |
-|     **attribute**      |            `src`             | String value for component attribute for set path.                                                                                 |
-|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                                        |
-| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                                     |
-|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                                                    |
-|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                                                  |
-|        **slot**        |            `slot`            | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).                                |
-|        **fill**        |            `fill`            | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).                                |
-|   **slotSeparator**    |             `:`              | String value used for separate `<slot>` and `<fill>` tag from their names.                                                         |
-|        **push**        |            `push`            | String value for `<push>` tag name.                                                                                                |
-|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                                               |
-|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.                                   |
-|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.                        |
-|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                                             |
-|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                                            |
-|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                                                     |
-|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                                            |
-|  **mergeCustomizer**   |          `function`          | Function callback passed to lodash `mergeWith` for attribute `locals` and `merge:attribute`. By default it's used to concat array. |
+|         Option         |           Default            | Description                                                                                                                     |
+|:----------------------:|:----------------------------:|:--------------------------------------------------------------------------------------------------------------------------------|
+|        **root**        |            `'./'`            | String value as root path for components lookup.                                                                                |
+|      **folders**       |            `['']`            | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom.                  |
+|     **tagPrefix**      |             `x-`             | String for tag prefix. The plugin will use RegExp with this string.                                                             |
+|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.                               |
+|     **attribute**      |            `src`             | String value for component attribute for set path.                                                                              |
+|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                                     |
+| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                                  |
+|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                                                 |
+|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                                               |
+|        **slot**        |            `slot`            | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).                             |
+|        **fill**        |            `fill`            | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).                             |
+|   **slotSeparator**    |             `:`              | String value used for separate `<slot>` and `<fill>` tag from their names.                                                      |
+|        **push**        |            `push`            | String value for `<push>` tag name.                                                                                             |
+|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                                            |
+|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.                                |
+|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.                     |
+|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                                          |
+|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                                         |
+|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                                                  |
+|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                                         |
+|  **mergeCustomizer**   |          `function`          | Function callback passed to lodash `mergeWith` for merge `options.expressions.locals` and locals passed via attribute `locals`. |
 
 ## Features
 
@@ -505,7 +505,7 @@ If you would like to prepend content onto the beginning of a stack, you should u
 
 ### Props
 
-Behind the `props` there is powerful [posthtml-expressions](https://github.com/posthtml/posthtml-expressions) plugin, with feature to pass `props` (locals) via attributes, define default via `<script props>`, merge with default and use `<script props>` as computed.
+Behind the `props` there is powerful [posthtml-expressions](https://github.com/posthtml/posthtml-expressions) plugin, with feature to pass `props` (locals) via attributes and manipulate them via `<script props>`.
 
 Let's see how it works with a few examples starting with a basic one.
 
@@ -515,7 +515,7 @@ Create the component:
 <!-- src/my-component.html -->
 <script props>
   module.exports = {
-    prop: 'Default prop value'
+    prop: locals.prop || 'Default prop value'
   }
 </script>
 <div>
@@ -556,8 +556,7 @@ The output will be:
 If you don't add the props in `<script props>` inside your component, all props will be added as attributes to the first node of your component or to the node with attribute `attributes`. 
 More details on this in the next section.
 
-So by default `<script props>` act as default value, like the `@props` you define with Laravel Blade.
-You can change this behaviour by prepending `computed` or `merge` to the attribute name like shown below.
+So in the `<script props>` you have access to passed props via object `locals`, and you can add any logic you need inside of it.
 
 Create the component:
 
@@ -565,9 +564,9 @@ Create the component:
 <!-- src/modal.html -->
 <script props>
   module.exports = {
-    title: 'Default title', // This will be the default value
-    size: locals.size ? `modal-${locals.size}` : '', // This will be a computed value, so it's always used
-    items: ['first', 'second'] // This will be merged
+    title: locals.title || 'Default title', 
+    size: locals.size ? `modal-${locals.size}` : '', 
+    items: Array.isArray(locals.items) ? locals.items.concat(['first', 'second']) : ['first', 'second']
   }
 </script>
 <div class="modal {{ size }}">
@@ -583,7 +582,7 @@ Create the component:
 Use:
 
 ```html
-<x-modal computed:size="xl" title="My modal title" merge:items='["third", "fourth"]' class="modal-custom"></x-modal>
+<x-modal size="xl" title="My modal title" items='["third", "fourth"]' class="modal-custom"></x-modal>
 ```
 
 The output will be:
@@ -602,12 +601,9 @@ The output will be:
 </div>
 ```
 
-So the prop `size` is not override since we prepend `computed:` to the attribute, while the prop `title` is override.
-And the prop `items` is merged and not override. 
 You can also notice how the `class` attribute is merged with `class` attribute of the first node. Let's see in next section more about this.
 
-You can change how attributes are merged by passing via options a callback function used by lodash method [mergeWith](https://lodash.com/docs/4.17.15#mergeWith).
-By default, it's used to concat array.
+You can change how attributes are merged with global locals defined via options by passing a callback function used by lodash method [mergeWith](https://lodash.com/docs/4.17.15#mergeWith).
 
 By default, all props are scoped to the component, and are not available to nested components. You can however change this accordingly to your need.
 Let's see below example.
@@ -618,7 +614,7 @@ Create a component:
 <!-- src/child.html -->
 <script props>
   module.exports = {
-    prop: 'Default prop value'
+    prop: locals.prop || 'Default prop value'
   }
 </script>
 <div>
@@ -633,7 +629,7 @@ Create another component that use the first one:
 <!-- src/parent.html -->
 <script props>
   module.exports = {
-    prop: 'Default prop value'
+    prop: locals.prop || 'Default prop value'
   }
 </script>
 <div>
@@ -690,7 +686,7 @@ As already seen in basic example:
 <!-- src/button.html -->
 <script props>
   module.exports = {
-    label: 'A button'
+    label: locals.label || 'A button'
   }
 </script>
 <button type="button" class="btn">
@@ -939,52 +935,8 @@ via `$slots` which has all the `props` passed via slot, and as well check if slo
 
 ## Migration
 
-If you are migrating from `posthtml-extend` and/or `posthtml-modules` then you can continue to keep them until you migrate all of your components.
-For continue to use current code with this plugin without changing it, see below examples. Any more updates on this will be added in this issue:
+If you are migrating from `posthtml-extend` and/or `posthtml-modules` please to follow updates here:
 [posthtml-components/issues/16](https://github.com/thewebartisan7/posthtml-components/issues/16).
-
-### PostHTML Include
-
-PostHTML Include plugin can work when passed via `options.plugins` like below example:
-
-```js
-require("posthtml-component")({
-  root: "./src",
-  folders: ["components", "layouts"],
-  plugins: [
-    require("posthtml-include")({
-      encoding: "utf8",
-      root: "./src"
-    }),
-  ]
-})
-```
-
-### PostHTML Modules
-
-At the moment doesn't work when nested inside PostHTML Components plugin since it use `tree.match` and even trying with something like PostHTML Include is doing here https://github.com/posthtml/posthtml-include/blob/master/lib/index.js#L16 doesn't work. But a workaround is to use PostHTML Components custom tag and attributes like below:
-
-```js
-require("posthtml-component")({
-  root: "./src",
-  folders: ["components", "layouts"],
-  tag: 'module',
-  attribute: 'href',
-  yield: 'content',
-  plugins: [
-    require("posthtml-include")({
-      encoding: "utf8",
-      root: "./src/www/posthtml-templates/"
-    }),
-  ]
-})
-```
-
-NOTE: If you change `<yield>` tag to `<content>` to support your existing code, then you need to use it always. Maybe you can just replace all `<content>` with `<yield>` and it should works fine.
-
-### PostHTML Extends
-
-So far it works fine together with `posthtml-components` plugin.
 
 ## Contributing
 

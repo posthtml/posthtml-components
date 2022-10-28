@@ -25,12 +25,12 @@ test('Must process attributes as locals', async t => {
 
 test('Must process component with locals as JSON and string', async t => {
   const actual = `<component src="components/component-locals-json-and-string.html"
-                    merge:titles='{ "suptitle": "This is custom suptitle" }'
+                    titles='{ "suptitle": "This is custom suptitle" }'
                     title="Custom title from JSON and String"
                     items='["another item", "yet another"]'
-                    computed:mycomputed="true"
+                    myboolean="true"
                     merge:locals='{ "items": ["first item", "second item"] }'></component>`;
-  const expected = `<div><div>Computed is true</div><div><h1>Custom title from JSON and String</h1></div><div><span>another item</span><span>yet another</span><span>first item</span><span>second item</span></div><div><span>title: This is default main title</span><span>subtitle: This is default subtitle</span><span>suptitle: This is custom suptitle</span></div></div>`;
+  const expected = `<div><div>myboolean is true</div><div><h1>Custom title from JSON and String</h1></div><div><span>another item</span><span>yet another</span><span>first item</span><span>second item</span></div><div><span>title: This is default main title</span><span>subtitle: This is default subtitle</span><span>suptitle: This is custom suptitle</span></div></div>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
 
@@ -65,7 +65,11 @@ test('Must pass locals from parent to child via aware', async t => {
 });
 
 test('Must process default, merged and override props', async t => {
-  const actual = `<component src="components/component-locals-type.html" aStringOverride="My override string changed" anObjectOverride='{ "third": "Third override item", "fourth": "Fourth override item" }' merge:anObjectMerged='{ "third": "Third merged item", "fourth": "Fourth merged item" }'></component>`;
+  const actual = `<component src="components/component-locals-type.html"
+    aStringOverride="My override string changed"
+    anObjectOverride='{ "third": "Third override item", "fourth": "Fourth override item" }'
+    anObjectMerged='{ "third": "Third merged item", "fourth": "Fourth merged item" }'></component>`;
+
   const expected = `<div>  <h1>anObjectDefault</h1>      <p><strong>first</strong>: First default item</p>      <p><strong>second</strong>: Second default item</p>    <h1>anObjectOverride</h1>      <p><strong>third</strong>: Third override item</p>      <p><strong>fourth</strong>: Fourth override item</p>    <h1>anObjectMerged</h1>      <p><strong>first</strong>: First merged item</p>      <p><strong>second</strong>: Second merged item</p>      <p><strong>third</strong>: Third merged item</p>      <p><strong>fourth</strong>: Fourth merged item</p>    <h1>aStringDefault</h1>  <p>My default string</p>  <h1>aStringOverride</h1>  <p>My override string changed</p></div>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));

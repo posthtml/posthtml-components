@@ -15,9 +15,7 @@
    * contentClass:  any additional class for modal-content
    */
   module.exports = {
-    dialogClass: '',
-    contentClass: '',
-    backdrop: true,
+    backdrop: locals.backdrop || true,
     keyboard: locals.backdrop === "static" || locals.keyboard === true,
     scrollable: locals.scrollable === true ? 'modal-dialog-scrollable' : '',
     centered: locals.centered === true ? 'modal-dialog-centered' : '',
@@ -40,9 +38,9 @@
     role="dialog"
 >
     <div
-       class="modal-dialog {{ size }} {{ fullscreen }} {{ centered }} {{ scrollable }} {{ dialogClass }}"
+       class="modal-dialog {{ size }} {{ fullscreen }} {{ centered }} {{ scrollable }}"
     >
-        <div class="modal-content {{ contentClass }}">
+        <div class="modal-content">
             <yield></yield>
             <if condition="$slots.header?.filled">
                 <x-modal.header>
