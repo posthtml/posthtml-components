@@ -1,6 +1,6 @@
 node_modules
 coverage
-examples
+docs-src
 docs
 test
 .gitignore

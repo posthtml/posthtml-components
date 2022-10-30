@@ -9,14 +9,13 @@ const markdownItToc = require('markdown-it-toc-done-right');
 // const {render} = require('posthtml-render');
 // const hljs = require('highlight.js');
 
-const src = './examples/src/pages/';
-const dist = './examples/dist/';
-const md = './examples/src/md';
-const docs = './docs/';
+const src = './docs-src/pages/';
+const dist = './docs/';
+const md = './docs-src/md';
 
 const plugins = [
   components({
-    root: './examples/src',
+    root: './docs-src',
     folders: ['components', 'layouts'],
     strict: true,
     expressions: {
@@ -74,7 +73,6 @@ readdirSync(src).forEach(file => {
     .process(html, options)
     .then(result => {
       writeFileSync(path.resolve(`${dist}${file}`), result.html, 'utf-8');
-      writeFileSync(path.resolve(`${docs}${file}`), result.html, 'utf-8');
     });
 });
 

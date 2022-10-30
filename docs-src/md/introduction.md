@@ -84,7 +84,7 @@ This is where your content will be injected.
 
 In next section you can find all available options and then more examples.
 
-See also the `examples` folder. You can run `npm run build-examples` to compile them.
+See also the `docs-src` folder. You can run `npm run build` to compile them.
 
 ## Options
 
@@ -752,7 +752,7 @@ You can add custom rules how attributes are parsed, as behind the scene it's use
 ## Examples
 
 You can work with `<slot>` and `<fill>` or you can create component for each "block" of your component, and you can also support both of them.
-You can find an example of this inside `examples/components/modal`. Below is a short explanation about the both approach.
+You can find an example of this inside `docs-src/components/modal`. Below is a short explanation about the both approach.
 
 ### Using slots
 
