@@ -16,3 +16,4 @@ ava.config.js
 changelog.md
 xo.config.js
 .lintstagedrc
+.github
