@@ -1,3 +1,9 @@
+## 1.0.0-beta.11 (2022-10-30)
+
+* Add new options to pass utilities methods to script like lodash `mergeWith` and `template`
+* Allow to create a separated script file instead of `<script props>` inside component file
+* Add options for set props object name passed to `<script props>`, props object name of `$slots` and props attribute name.
+
 ## 1.0.0-beta.10 (2022-10-28)
 
 * Remove `computed:` and `merge:` by keeping this logic inside `<script props>`.
