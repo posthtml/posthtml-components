@@ -109,7 +109,7 @@ See also the `docs-src` folder where you can find more examples. You can run `np
 |         **push**         |                    `push`                    | String value for `<push>` tag name.                                                                                           |
 |        **stack**         |                   `stack`                    | String value for `<stack>` tag name.                                                                                          |
 | **propsScriptAttribute** |                   `props`                    | String value used as attribute in `<script props>` parsed by the plugin to retrieve props of the component.                   |
-|     **propsContext**     |                   `props`                    | String value used as object name inside the script to process process before passed to the component.                         |
+|     **propsContext**     |                   `props`                    | String value used as object name inside the script to process props before passed to the component.                           |
 |    **propsAttribute**    |                   `props`                    | String value for props attribute to define props as JSON.                                                                     |
 |      **propsSlot**       |                   `props`                    | String value used to retrieve the props passed to slot via `$slots.slotName.props`.                                           |
 |     **expressions**      |                     `{}`                     | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.                   |
