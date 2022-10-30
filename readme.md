@@ -17,7 +17,7 @@ npm i -D posthtml-component
 ## Introduction
 
 This PostHTML plugin provides an HTML-friendly syntax for write components in your templates.
-If you are familiar with Blade, you will find similar syntax as this plugin was inspired by it.
+If you are familiar with Blade, you will find similar syntax as this plugin is inspired by it.
 See below a basic example, as code is worth a thousand words.
 
 > This plugin is still in early stage of development and the current API may change.
@@ -69,13 +69,11 @@ Result:
 </html>
 ```
 
-You may ask yourself many questions about this basic examples, and you will find most if not all answers in this readme. In case is missing something, feel free to ask via discussions.
+You may notice that our `src/button.html` component has a `type` and `class` attribute, and when we use the component in `src/index.html` we add type and class attribute. 
+The result is that `type` is override, and `class` is merged. 
 
-But I want to explain a few things now.
-
-First you may notice that our `src/button.html` component has a `type` and `class` attribute, and when we use the component in `src/index.html` we add type and class attribute. The result is that `type` is override, and `class` is merged. 
-
-By default `class` and `style` attributes are merged, while all others attribute are override. You can also override class and style attribute by prepending `override:` to the class attribute. Example:
+By default `class` and `style` attributes are merged, while all others attribute are override. 
+You can also override class and style attribute by prepending `override:` to the class attribute. Example:
 
 ```html
 <x-button override:class="btn-custom">Submit</x-button>
@@ -84,41 +82,43 @@ By default `class` and `style` attributes are merged, while all others attribute
 <button type="button" class="btn-custom">Submit</button>
 ```
 
-All attributes you pass to the component will be added to the first root element of your component, and only if they are not defined as `props` via `<script props>`. More details on this later.
+All attributes you pass to the component will be added to the first node of your component or to the node with an attribute names `attributes`, 
+and only if they are not defined as `props` via `<script props>`. More details on this in [Attributes](#attributes) section.
 
-Second you may notice a `<yield>` tag.
+The `<yield>` tag is where your content will be injected.
+In next section you can find all available options and then examples for each features.
 
-This is where your content will be injected.
-
-In next section you can find all available options and then more examples.
-
-See also the `docs-src` folder. You can run `npm run build` to compile them.
+See also the `docs-src` folder where you can find more examples. You can run `npm run build` to compile them.
 
 ## Options
 
-|         Option         |           Default            | Description                                                                                                                     |
-|:----------------------:|:----------------------------:|:--------------------------------------------------------------------------------------------------------------------------------|
-|        **root**        |            `'./'`            | String value as root path for components lookup.                                                                                |
-|      **folders**       |            `['']`            | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom.                  |
-|     **tagPrefix**      |             `x-`             | String for tag prefix. The plugin will use RegExp with this string.                                                             |
-|        **tag**         |           `false`            | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.                               |
-|     **attribute**      |            `src`             | String value for component attribute for set path.                                                                              |
-|     **namespaces**     |             `[]`             | Array of namespace's root path, fallback path and custom path for override.                                                     |
-| **namespaceSeparator** |             `::`             | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                                  |
-|   **fileExtension**    |            `html`            | String value for file extension of the components used for retrieve x-tag file.                                                 |
-|       **yield**        |           `yield`            | String value for `<yield>` tag name. Where main content of component is injected.                                               |
-|        **slot**        |            `slot`            | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).                             |
-|        **fill**        |            `fill`            | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).                             |
-|   **slotSeparator**    |             `:`              | String value used for separate `<slot>` and `<fill>` tag from their names.                                                      |
-|        **push**        |            `push`            | String value for `<push>` tag name.                                                                                             |
-|       **stack**        |           `stack`            | String value for `<stack>` tag name.                                                                                            |
-|     **localsAttr**     |           `props`            | String value used in `<script props>` parsed by the plugin to retrieve locals in the components.                                |
-|    **expressions**     |             `{}`             | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.                     |
-|      **plugins**       |             `[]`             | PostHTML plugins to apply for every parsed components.                                                                          |
-|      **matcher**       | `[{tag: options.tagPrefix}]` | Array of object used to match the tags.                                                                                         |
-|  **attrsParserRules**  |             `{}`             | Additional rules for attributes parser plugin.                                                                                  |
-|       **strict**       |            `true`            | Boolean value for enable or disable throw an exception.                                                                         |
-|  **mergeCustomizer**   |          `function`          | Function callback passed to lodash `mergeWith` for merge `options.expressions.locals` and locals passed via attribute `locals`. |
+|          Option          |                   Default                    | Description                                                                                                                   |
+|:------------------------:|:--------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------|
+|         **root**         |                    `'./'`                    | String value as root path for components lookup.                                                                              |
+|       **folders**        |                    `['']`                    | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom.                |
+|      **tagPrefix**       |                     `x-`                     | String for tag prefix. The plugin will use RegExp with this string.                                                           |
+|         **tag**          |                   `false`                    | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.                             |
+|      **attribute**       |                    `src`                     | String value for component attribute for set path.                                                                            |
+|      **namespaces**      |                     `[]`                     | Array of namespace's root path, fallback path and custom path for override.                                                   |
+|  **namespaceSeparator**  |                     `::`                     | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                                |
+|    **fileExtension**     |                    `html`                    | String value for file extension of the components used for retrieve x-tag file.                                               |
+|        **yield**         |                   `yield`                    | String value for `<yield>` tag name. Where main content of component is injected.                                             |
+|         **slot**         |                    `slot`                    | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).                           |
+|         **fill**         |                    `fill`                    | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).                           |
+|    **slotSeparator**     |                     `:`                      | String value used for separate `<slot>` and `<fill>` tag from their names.                                                    |
+|         **push**         |                    `push`                    | String value for `<push>` tag name.                                                                                           |
+|        **stack**         |                   `stack`                    | String value for `<stack>` tag name.                                                                                          |
+| **propsScriptAttribute** |                   `props`                    | String value used as attribute in `<script props>` parsed by the plugin to retrieve props of the component.                   |
+|     **propsContext**     |                   `props`                    | String value used as object name inside the script to process process before passed to the component.                         |
+|    **propsAttribute**    |                   `props`                    | String value for props attribute to define props as JSON.                                                                     |
+|      **propsSlot**       |                   `props`                    | String value used to retrieve the props passed to slot via `$slots.slotName.props`.                                           |
+|     **expressions**      |                     `{}`                     | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.                   |
+|       **plugins**        |                     `[]`                     | PostHTML plugins to apply for every parsed components.                                                                        |
+|       **matcher**        |         `[{tag: options.tagPrefix}]`         | Array of object used to match the tags.                                                                                       |
+|   **attrsParserRules**   |                     `{}`                     | Additional rules for attributes parser plugin.                                                                                |
+|        **strict**        |                    `true`                    | Boolean value for enable or disable throw an exception.                                                                       |
+|   **mergeCustomizer**    |                  `function`                  | Function callback passed to lodash `mergeWith` for merge `options.expressions.locals` and props passed via attribute `props`. |
+|      **utilities**       | `{merge: _.mergeWith, template: _.template}` | Object of utilities methods to be passed to `<script props>`. By default lodash `mergeWith` and `template`.                   |
 
 ## Features
 
@@ -515,7 +515,7 @@ Create the component:
 <!-- src/my-component.html -->
 <script props>
   module.exports = {
-    prop: locals.prop || 'Default prop value'
+    prop: props.prop || 'Default prop value'
   }
 </script>
 <div>
@@ -556,7 +556,7 @@ The output will be:
 If you don't add the props in `<script props>` inside your component, all props will be added as attributes to the first node of your component or to the node with attribute `attributes`. 
 More details on this in the next section.
 
-So in the `<script props>` you have access to passed props via object `locals`, and you can add any logic you need inside of it.
+So in the `<script props>` you have access to passed props via object `props`, and you can add any logic you need inside it.
 
 Create the component:
 
@@ -564,9 +564,9 @@ Create the component:
 <!-- src/modal.html -->
 <script props>
   module.exports = {
-    title: locals.title || 'Default title', 
-    size: locals.size ? `modal-${locals.size}` : '', 
-    items: Array.isArray(locals.items) ? locals.items.concat(['first', 'second']) : ['first', 'second']
+    title: props.title || 'Default title', 
+    size: props.size ? `modal-${props.size}` : '', 
+    items: Array.isArray(props.items) ? props.items.concat(['first', 'second']) : ['first', 'second']
   }
 </script>
 <div class="modal {{ size }}">
@@ -603,7 +603,7 @@ The output will be:
 
 You can also notice how the `class` attribute is merged with `class` attribute of the first node. Let's see in next section more about this.
 
-You can change how attributes are merged with global locals defined via options by passing a callback function used by lodash method [mergeWith](https://lodash.com/docs/4.17.15#mergeWith).
+You can change how attributes are merged with global props defined via options by passing a callback function used by lodash method [mergeWith](https://lodash.com/docs/4.17.15#mergeWith).
 
 By default, all props are scoped to the component, and are not available to nested components. You can however change this accordingly to your need.
 Let's see below example.
@@ -614,7 +614,7 @@ Create a component:
 <!-- src/child.html -->
 <script props>
   module.exports = {
-    prop: locals.prop || 'Default prop value'
+    prop: props.prop || 'Default prop value'
   }
 </script>
 <div>
@@ -629,7 +629,7 @@ Create another component that use the first one:
 <!-- src/parent.html -->
 <script props>
   module.exports = {
-    prop: locals.prop || 'Default prop value'
+    prop: props.prop || 'Default prop value'
   }
 </script>
 <div>
@@ -686,7 +686,7 @@ As already seen in basic example:
 <!-- src/button.html -->
 <script props>
   module.exports = {
-    label: locals.label || 'A button'
+    label: props.label || 'A button'
   }
 </script>
 <button type="button" class="btn">
@@ -919,7 +919,7 @@ You can also combine both way, and then use them with slots or with small compon
           </x-modal.body>
       </if>
       <if condition="$slots.footer?.filled">
-          <x-modal.footer close="{{ $slots.footer?.locals.close }}">
+          <x-modal.footer close="{{ $slots.footer?.props.close }}">
               <slot:footer></slot:footer>
           </x-modal.footer>
       </if>

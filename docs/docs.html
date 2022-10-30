@@ -195,7 +195,7 @@
             </h2>
             <p>
               This PostHTML plugin provides an HTML-friendly syntax for write components in your templates.
-If you are familiar with Blade, you will find similar syntax as this plugin was inspired by it.
+If you are familiar with Blade, you will find similar syntax as this plugin is inspired by it.
 See below a basic example, as code is worth a thousand words.
             </p>
             <blockquote>
@@ -237,11 +237,7 @@ posthtml(components({ root: './src' }))
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
             <p>
-              You may ask yourself many questions about this basic examples, and you will find most if not all answers in this readme. In case is missing something, feel free to ask via discussions.
-            </p>
-            <p>But I want to explain a few things now.</p>
-            <p>
-              First you may notice that our
+              You may notice that our
               <code>src/button.html</code>
               component has a
               <code>type</code>
@@ -249,7 +245,8 @@ posthtml(components({ root: './src' }))
               <code>class</code>
               attribute, and when we use the component in
               <code>src/index.html</code>
-              we add type and class attribute. The result is that
+              we add type and class attribute.
+The result is that
               <code>type</code>
               is override, and
               <code>class</code>
@@ -260,7 +257,8 @@ posthtml(components({ root: './src' }))
               <code>class</code>
               and
               <code>style</code>
-              attributes are merged, while all others attribute are override. You can also override class and style attribute by prepending
+              attributes are merged, while all others attribute are override.
+You can also override class and style attribute by prepending
               <code>override:</code>
               to the class attribute. Example:
             </p>
@@ -269,23 +267,27 @@ posthtml(components({ root: './src' }))
 &lt;!-- Output --&gt;
 &lt;button type=&quot;button&quot; class=&quot;btn-custom&quot;&gt;Submit&lt;/button&gt;</code></pre>
             <p>
-              All attributes you pass to the component will be added to the first root element of your component, and only if they are not defined as
+              All attributes you pass to the component will be added to the first node of your component or to the node with an attribute names
+              <code>attributes</code>
+              ,
+and only if they are not defined as
               <code>props</code>
               via
               <code>&lt;script props&gt;</code>
-              . More details on this later.
+              . More details on this in
+              <a href="#attributes">Attributes</a>
+              section.
             </p>
             <p>
-              Second you may notice a
+              The
               <code>&lt;yield&gt;</code>
-              tag.
+              tag is where your content will be injected.
+In next section you can find all available options and then examples for each features.
             </p>
-            <p>This is where your content will be injected.</p>
-            <p>In next section you can find all available options and then more examples.</p>
             <p>
               See also the
               <code>docs-src</code>
-              folder. You can run
+              folder where you can find more examples. You can run
               <code>npm run build</code>
               to compile them.
             </p>
@@ -475,15 +477,48 @@ posthtml(components({ root: './src' }))
                 </tr>
                 <tr>
                   <td style="text-align:center">
-                    <strong>localsAttr</strong>
+                    <strong>propsScriptAttribute</strong>
                   </td>
                   <td style="text-align:center">
                     <code>props</code>
                   </td>
                   <td style="text-align:left">
-                    String value used in
+                    String value used as attribute in
                     <code>&lt;script props&gt;</code>
-                    parsed by the plugin to retrieve locals in the components.
+                    parsed by the plugin to retrieve props of the component.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align:center">
+                    <strong>propsContext</strong>
+                  </td>
+                  <td style="text-align:center">
+                    <code>props</code>
+                  </td>
+                  <td style="text-align:left">
+                    String value used as object name inside the script to process process before passed to the component.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align:center">
+                    <strong>propsAttribute</strong>
+                  </td>
+                  <td style="text-align:center">
+                    <code>props</code>
+                  </td>
+                  <td style="text-align:left">String value for props attribute to define props as JSON.</td>
+                </tr>
+                <tr>
+                  <td style="text-align:center">
+                    <strong>propsSlot</strong>
+                  </td>
+                  <td style="text-align:center">
+                    <code>props</code>
+                  </td>
+                  <td style="text-align:left">
+                    String value used to retrieve the props passed to slot via
+                    <code>$slots.slotName.props</code>
+                    .
                   </td>
                 </tr>
                 <tr>
@@ -547,8 +582,25 @@ posthtml(components({ root: './src' }))
                     <code>mergeWith</code>
                     for merge
                     <code>options.expressions.locals</code>
-                    and locals passed via attribute
-                    <code>locals</code>
+                    and props passed via attribute
+                    <code>props</code>
+                    .
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align:center">
+                    <strong>utilities</strong>
+                  </td>
+                  <td style="text-align:center">
+                    <code>{merge: _.mergeWith, template: _.template}</code>
+                  </td>
+                  <td style="text-align:left">
+                    Object of utilities methods to be passed to
+                    <code>&lt;script props&gt;</code>
+                    . By default lodash
+                    <code>mergeWith</code>
+                    and
+                    <code>template</code>
                     .
                   </td>
                 </tr>
@@ -998,7 +1050,7 @@ If you would like to prepend content onto the beginning of a stack, you should u
             <pre><code class="language-html">&lt;!-- src/my-component.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    prop: locals.prop || 'Default prop value'
+    prop: props.prop || 'Default prop value'
   }
 &lt;/script&gt;
 &lt;div&gt;
@@ -1035,16 +1087,16 @@ More details on this in the next section.
               So in the
               <code>&lt;script props&gt;</code>
               you have access to passed props via object
-              <code>locals</code>
-              , and you can add any logic you need inside of it.
+              <code>props</code>
+              , and you can add any logic you need inside it.
             </p>
             <p>Create the component:</p>
             <pre><code class="language-html">&lt;!-- src/modal.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    title: locals.title || 'Default title', 
-    size: locals.size ? `modal-${locals.size}` : '', 
-    items: Array.isArray(locals.items) ? locals.items.concat(['first', 'second']) : ['first', 'second']
+    title: props.title || 'Default title', 
+    size: props.size ? `modal-${props.size}` : '', 
+    items: Array.isArray(props.items) ? props.items.concat(['first', 'second']) : ['first', 'second']
   }
 &lt;/script&gt;
 &lt;div class=&quot;modal {{ size }}&quot;&gt;
@@ -1077,7 +1129,7 @@ More details on this in the next section.
               attribute of the first node. Let's see in next section more about this.
             </p>
             <p>
-              You can change how attributes are merged with global locals defined via options by passing a callback function used by lodash method
+              You can change how attributes are merged with global props defined via options by passing a callback function used by lodash method
               <a href="https://lodash.com/docs/4.17.15#mergeWith">mergeWith</a>
               .
             </p>
@@ -1089,7 +1141,7 @@ Let's see below example.
             <pre><code class="language-html">&lt;!-- src/child.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    prop: locals.prop || 'Default prop value'
+    prop: props.prop || 'Default prop value'
   }
 &lt;/script&gt;
 &lt;div&gt;
@@ -1099,7 +1151,7 @@ Let's see below example.
             <pre><code class="language-html">&lt;!-- src/parent.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    prop: locals.prop || 'Default prop value'
+    prop: props.prop || 'Default prop value'
   }
 &lt;/script&gt;
 &lt;div&gt;
@@ -1160,7 +1212,7 @@ Only attribute not defined as
             <pre><code class="language-html">&lt;!-- src/button.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    label: locals.label || 'A button'
+    label: props.label || 'A button'
   }
 &lt;/script&gt;
 &lt;button type=&quot;button&quot; class=&quot;btn&quot;&gt;
@@ -1376,7 +1428,7 @@ So we create the component with a main component and then three different small 
           &lt;/x-modal.body&gt;
       &lt;/if&gt;
       &lt;if condition=&quot;$slots.footer?.filled&quot;&gt;
-          &lt;x-modal.footer close=&quot;{{ $slots.footer?.locals.close }}&quot;&gt;
+          &lt;x-modal.footer close=&quot;{{ $slots.footer?.props.close }}&quot;&gt;
               &lt;slot:footer&gt;&lt;/slot:footer&gt;
           &lt;/x-modal.footer&gt;
       &lt;/if&gt;
