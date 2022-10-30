@@ -11,15 +11,15 @@ const has = require('lodash/has');
 const extend = require('lodash/extend');
 
 /**
- * Map component attributes that it's not defined as locals to first element of node
+ * Map component attributes that it's not defined as props to first element of node
  *
  * @param {Object} currentNode
  * @param {Object} attributes
- * @param {Object} locals
+ * @param {Object} props
  * @param {Object} options
  * @return {void}
  */
-module.exports = (currentNode, attributes, locals, options) => {
+module.exports = (currentNode, attributes, props, options) => {
   let mainNode;
   match.call(currentNode, {attrs: {attributes: ''}}, node => {
     delete node.attrs.attributes;
@@ -40,7 +40,7 @@ module.exports = (currentNode, attributes, locals, options) => {
 
   const nodeAttrs = parseAttrs(mainNode.attrs, options.attrsParserRules);
 
-  const mainNodeAttributes = omit(attributes, union(keys(locals), [options.attribute], keys(options.aware), keys(options.locals), ['$slots']));
+  const mainNodeAttributes = omit(attributes, union(keys(props), [options.attribute], keys(options.aware), keys(options.props), ['$slots']));
 
   each(mainNodeAttributes, (value, key) => {
     if (['class', 'style'].includes(key)) {

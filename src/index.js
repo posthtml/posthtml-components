@@ -10,6 +10,8 @@ const processLocals = require('./locals');
 const processAttributes = require('./attributes');
 const {processPushes, processStacks} = require('./stacks');
 const {setFilledSlots, processSlotContent, processFillContent} = require('./slots');
+const mergeWith = require('lodash/mergeWith');
+const template = require('lodash/template');
 
 // const {inspect} = require('util');
 // const debug = true;
@@ -35,14 +37,18 @@ module.exports = (options = {}) => tree => {
   options.slotSeparator = options.slotSeparator || ':';
   options.push = options.push || 'push';
   options.stack = options.stack || 'stack';
-  options.localsAttr = options.localsAttr || 'props';
+  options.propsScriptAttribute = options.propsScriptAttribute || 'props';
+  options.propsContext = options.propsContext || 'props';
+  options.propsAttribute = options.propsAttribute || 'props';
+  options.propsSlot = options.propsSlot || 'props';
   options.expressions = options.expressions || {};
   options.plugins = options.plugins || [];
   options.attrsParserRules = options.attrsParserRules || {};
   options.strict = typeof options.strict === 'undefined' ? true : options.strict;
+  options.utilities = options.utilities || {merge: mergeWith, template};
 
   // Merge customizer callback passed to lodash mergeWith
-  //  for merge attribute `locals` and all attributes starting with `merge:`
+  //  for merge attribute `props` and all attributes starting with `merge:`
   //  @see https://lodash.com/docs/4.17.15#mergeWith
   options.mergeCustomizer = options.mergeCustomizer || ((objectValue, sourceValue) => {
     if (Array.isArray(objectValue)) {
@@ -86,7 +92,7 @@ module.exports = (options = {}) => tree => {
     }
   });
 
-  options.locals = {...options.expressions.locals};
+  options.props = {...options.expressions.locals};
   options.aware = {};
 
   const pushedContent = {};
@@ -140,10 +146,10 @@ function processTree(options) {
       setFilledSlots(currentNode, filledSlots, options);
       // setFilledSlots(nextNode, filledSlots, options);
 
-      // Reset previous locals with passed global and keep aware locals
-      options.expressions.locals = {...options.locals, ...options.aware};
+      // Reset options.expressions.locals and keep aware locals
+      options.expressions.locals = {...options.props, ...options.aware};
 
-      const {attributes, locals} = processLocals(currentNode, nextNode, filledSlots, options);
+      const {attributes, props} = processLocals(currentNode, nextNode, filledSlots, options);
 
       options.expressions.locals = attributes;
       options.expressions.locals.$slots = filledSlots;
@@ -172,11 +178,11 @@ function processTree(options) {
       currentNode.tag = false;
       currentNode.content = content;
 
-      processAttributes(currentNode, attributes, locals, options);
+      processAttributes(currentNode, attributes, props, options);
 
       // log(currentNode, 'currentNode', 'currentNode')
       // currentNode.attrs.counter = processCounter;
-      // currentNode.attrs.data = JSON.stringify({ attributes, locals });
+      // currentNode.attrs.data = JSON.stringify({ attributes, props });
 
       // messages.push({
       //   type: 'dependency',

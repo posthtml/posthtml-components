@@ -1,7 +1,7 @@
 <script props>
   module.exports = {
-    title: locals.title || 'Default title',
-    body: locals.body || 'Default body'
+    title: props.title || 'Default title',
+    body: props.body || 'Default body'
   }
 </script>
 <div class="mapped"><div class="text-dark m-3" attributes>{{ title }} {{ body }}</div></div>

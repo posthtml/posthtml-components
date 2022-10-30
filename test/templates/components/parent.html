@@ -1,12 +1,12 @@
 <script props>
   module.exports = {
-    aBoolean: typeof locals.aBoolean !== 'undefined' ? locals.aBoolean : true,
-    aString: locals.aString || 'My String',
-    aString2: locals.aString2 === 'yes' ? 'I am string 2' : 'I am not string 2',
-    anArray: locals.anArray || ['one', 'two', 'three'],
-    anArray2: locals.anArray2 || ['one2', 'two2', 'three2'],
-    anObject: locals.anObject || { one: 'One', two: 'Two', three: 'Three'},
-    anObject2: locals.anObject2 || { one: 'One2', two: 'Two2', three: 'Three2'}
+    aBoolean: typeof props.aBoolean !== 'undefined' ? props.aBoolean : true,
+    aString: props.aString || 'My String',
+    aString2: props.aString2 === 'yes' ? 'I am string 2' : 'I am not string 2',
+    anArray: props.anArray || ['one', 'two', 'three'],
+    anArray2: props.anArray2 || ['one2', 'two2', 'three2'],
+    anObject: props.anObject || { one: 'One', two: 'Two', three: 'Three'},
+    anObject2: props.anObject2 || { one: 'One2', two: 'Two2', three: 'Three2'}
   };
 </script>
 PARENT:

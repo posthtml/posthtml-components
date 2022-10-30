@@ -1,6 +1,6 @@
 <script props>
     module.exports = {
-        title: locals.title || 'Default title'
+        title: props.title || 'Default title'
     }
 </script>
 <html><head><title>{{ title }}</title></head><body><main><yield></yield></main><footer><slot:footer></slot:footer></footer></body></html>

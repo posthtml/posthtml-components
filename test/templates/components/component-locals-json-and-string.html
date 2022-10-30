@@ -1,13 +1,13 @@
 <script props>
     module.exports = {
-      myboolean: (locals.myboolean === true ? 'myboolean is true' : 'myboolean is false'),
-      title: locals.title || 'Default title',
-      items: locals.items || ['default first item', 'default second item'],
+      myboolean: (props.myboolean === true ? 'myboolean is true' : 'myboolean is false'),
+      title: props.title || 'Default title',
+      items: props.items || ['default first item', 'default second item'],
       titles: Object.assign({
         title: 'This is default main title',
         subtitle: 'This is default subtitle',
         suptitle: 'This is default suptitle'
-      }, locals.titles || {}),
+      }, props.titles || {}),
     }
 </script>
 <div>

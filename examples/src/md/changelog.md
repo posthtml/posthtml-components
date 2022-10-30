@@ -8,7 +8,7 @@
 
 ## 1.0.0-beta.8 (2022-10-25)
 
-* Fix merge locals with global
+* Fix merge props with global
 
 ## 1.0.0-beta.7 (2022-10-25)
 

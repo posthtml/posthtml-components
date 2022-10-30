@@ -15,13 +15,13 @@
    * contentClass:  any additional class for modal-content
    */
   module.exports = {
-    backdrop: locals.backdrop || true,
-    keyboard: locals.backdrop === "static" || locals.keyboard === true,
-    scrollable: locals.scrollable === true ? 'modal-dialog-scrollable' : '',
-    centered: locals.centered === true ? 'modal-dialog-centered' : '',
-    size: locals.size ? `modal-${locals.size}` : '',
-    fullscreen: [true, "sm", "md", "lg", "xl", "xxl"].includes(locals.fullscreen)
-      ? (locals.fullscreen === true ? "modal-fullscreen" : `modal-fullscreen-${locals.fullscreen}-down`)
+    backdrop: props.backdrop || true,
+    keyboard: props.backdrop === "static" || props.keyboard === true,
+    scrollable: props.scrollable === true ? 'modal-dialog-scrollable' : '',
+    centered: props.centered === true ? 'modal-dialog-centered' : '',
+    size: props.size ? `modal-${props.size}` : '',
+    fullscreen: [true, "sm", "md", "lg", "xl", "xxl"].includes(props.fullscreen)
+      ? (props.fullscreen === true ? "modal-fullscreen" : `modal-fullscreen-${props.fullscreen}-down`)
       : ''
   };
 </script>
@@ -54,7 +54,7 @@
                 </x-modal.body>
             </if>
             <if condition="$slots.footer?.filled">
-                <x-modal.footer close="{{ $slots.footer?.locals.close }}">
+                <x-modal.footer close="{{ $slots.footer?.props.close }}">
                     <slot:footer></slot:footer>
                 </x-modal.footer>
             </if>

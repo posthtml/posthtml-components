@@ -1,19 +1,19 @@
 <script props>
   module.exports = {
-    aStringDefault: locals.aStringDefault || 'My default string',
-    aStringOverride: locals.aStringOverride || 'My default override string',
-    anObjectDefault: locals.anObjectDefault || {
+    aStringDefault: props.aStringDefault || 'My default string',
+    aStringOverride: props.aStringOverride || 'My default override string',
+    anObjectDefault: props.anObjectDefault || {
       first: 'First default item',
       second: 'Second default item'
     },
-    anObjectOverride: locals.anObjectOverride || {
+    anObjectOverride: props.anObjectOverride || {
       first: 'First overriden item',
       second: 'Second overriden item'
     },
     anObjectMerged: Object.assign({
       first: 'First merged item',
       second: 'Second merged item'
-    }, locals.anObjectMerged || {})
+    }, props.anObjectMerged || {})
   };
 </script>
 <div>

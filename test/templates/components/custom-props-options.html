@@ -1,0 +1,8 @@
+<script locals>
+  module.exports = {
+    title: locals.title || 'Default title',
+    body: locals.body || 'Default body',
+    prop: locals.prop || 'Default prop'
+  }
+</script>
+<div><h1>{{title}}</h1></div><div><slot:body>{{body}}-{{ $slots.body.locals.slotProp }}</slot:body></div><div>{{ prop }}</div>

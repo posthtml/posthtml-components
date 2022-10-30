@@ -14,7 +14,7 @@ const omit = require('lodash/omit');
  * @param  {String} slotSeparator Slot separator
  * @return {void}
  */
-function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator}) {
+function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator, propsSlot}) {
   match.call(currentNode, {tag: fill}, fillNode => {
     if (!fillNode.attrs) {
       fillNode.attrs = {};
@@ -22,10 +22,10 @@ function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator}) {
 
     const name = fillNode.tag.split(slotSeparator)[1];
 
-    const locals = omit(fillNode.attrs, ['append', 'prepend', 'aware']);
+    const props = omit(fillNode.attrs, ['append', 'prepend', 'aware']);
 
-    if (locals) {
-      each(locals, (value, key, attrs) => {
+    if (props) {
+      each(props, (value, key, attrs) => {
         try {
           attrs[key] = JSON.parse(value);
         } catch {}
@@ -39,7 +39,7 @@ function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator}) {
       attrs: fillNode.attrs,
       content: fillNode.content,
       source: render(fillNode.content),
-      locals
+      [propsSlot]: props
     };
 
     return fillNode;

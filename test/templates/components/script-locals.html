@@ -1,7 +1,7 @@
 <script props>
   module.exports = {
-    title: locals.title || 'Default title',
-    slotsAccessibleViaScript: locals.$slots
+    title: props.title || 'Default title',
+    slotsAccessibleViaScript: $slots
   }
 </script>
 {{ slotsAccessibleViaScript }}

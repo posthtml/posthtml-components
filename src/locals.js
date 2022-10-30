@@ -1,6 +1,6 @@
 'use strict';
 
-const scriptDataLocals = require('posthtml-expressions/lib/locals');
+const scriptProps = require('./script-props');
 const pick = require('lodash/pick');
 const each = require('lodash/each');
 const assign = require('lodash/assign');
@@ -9,13 +9,13 @@ const mergeWith = require('lodash/mergeWith');
 const attributeTypes = ['aware', 'merge'];
 
 /**
- * Parse locals from attributes, globals and via script
+ * Parse props from attributes, globals and via script
  *
  * @param {Object} currentNode - PostHTML tree
  * @param {Array} nextNode - PostHTML tree
- * @param {Object} filledSlots - Slot locals
+ * @param {Object} filledSlots - Filled slots
  * @param {Object} options - Plugin options
- * @return {Object} - Attribute locals and script locals
+ * @return {Object} - Attribute props and script props
  */
 module.exports = (currentNode, nextNode, filledSlots, options) => {
   let attributes = {...currentNode.attrs};
@@ -47,26 +47,26 @@ module.exports = (currentNode, nextNode, filledSlots, options) => {
     } catch {}
   });
 
-  // Merge or extend attribute locals
-  if (attributes.locals) {
-    if (attributesByTypeName.merge.includes('locals')) {
-      attributesByTypeName.merge.splice(attributesByTypeName.merge.indexOf('locals'), 1);
-      mergeWith(attributes, attributes.locals, options.mergeCustomizer);
+  // Merge or extend attribute props
+  if (attributes[options.propsAttribute]) {
+    if (attributesByTypeName.merge.includes(options.propsAttribute)) {
+      attributesByTypeName.merge.splice(attributesByTypeName.merge.indexOf(options.propsAttribute), 1);
+      mergeWith(attributes, attributes[options.propsAttribute], options.mergeCustomizer);
     } else {
-      assign(attributes, attributes.locals);
+      assign(attributes, attributes[options.propsAttribute]);
     }
 
-    delete attributes.locals;
+    delete attributes[options.propsAttribute];
   }
 
   // Merge with global
   attributes = mergeWith({}, options.expressions.locals, attributes, options.mergeCustomizer);
 
-  // Retrieve default locals from <script props> for merge with attributes
-  const {locals} = scriptDataLocals(nextNode, {localsAttr: options.localsAttr, removeScriptLocals: true, locals: {...attributes, $slots: filledSlots}});
+  // Process props from <script props>
+  const {props} = scriptProps(nextNode, {props: {...attributes}, $slots: filledSlots, propsScriptAttribute: options.propsScriptAttribute, propsContext: options.propsContext, utilities: options.utilities});
 
-  if (locals) {
-    assign(attributes, locals);
+  if (props) {
+    assign(attributes, props);
     // if (attributesByTypeName.merge.length > 0) {
     //   assign(attributes, mergeWith(pick(locals, attributesByTypeName.merge), pick(attributes, attributesByTypeName.merge), options.mergeCustomizer));
     // }
@@ -77,5 +77,5 @@ module.exports = (currentNode, nextNode, filledSlots, options) => {
     options.aware = pick(attributes, attributesByTypeName.aware);
   }
 
-  return {attributes, locals};
+  return {attributes, props};
 };

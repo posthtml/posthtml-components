@@ -1,5 +1,8 @@
 <script props>
   module.exports = {
+    allProps: props,
+    tplLink: template('<a href="<%= url %>">hi, <strong><%= user %></strong></a>!'),
+    somethingMerged: merge({}, props.anObjectOverride, { something: 'Merged', again: 'Again merged'}),
     aStringDefault: 'My default string',
     aStringOverride: 'My default override string',
     anObjectDefault: {
@@ -47,11 +50,19 @@
       }
     ],
     anArray: ['first', 'second'],
-    aComputed: locals.aComputed === true ? 'Yes' : 'No'
+    aComputed: props.aComputed === true ? 'Yes' : 'No'
   };
 </script>
 <div class="wrapper">
   <div class="demo" attributes>
+    {{ allProps }}
+    <div>
+      {{{ tplLink({ 'url': '/my-page.html', 'user': 'fred' }) }}}
+
+      {{{ tplLink({ 'url': '/my-page2.html', 'user': 'Damir' }) }}}
+    </div>
+
+    {{ somethingMerged }}
     <h1>anObjectDefault</h1>
     <each loop="o,i in anObjectDefault">
       <p><strong>{{ i }}</strong>: {{ o }}</p>
@@ -97,7 +108,7 @@
     <p>{{ aComputed }}</p>
 
     <slot:name>
-      {{ $slots.name.locals.aslotlocal }}
+      {{ $slots.name.props.aslotlocal }}
     </slot:name>
   </div>
 </div>

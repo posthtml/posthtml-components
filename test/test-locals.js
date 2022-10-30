@@ -5,8 +5,8 @@ const plugin = require('../src');
 const posthtml = require('posthtml');
 const clean = html => html.replace(/(\n|\t)/g, '').trim();
 
-test('Must process layout with locals', async t => {
-  const actual = `<component src="layouts/base-locals.html" locals='{ "title": "My Page" }'><div>Content</div><fill:footer>Footer</fill:footer></component>`;
+test('Must process layout with props', async t => {
+  const actual = `<component src="layouts/base-locals.html" props='{ "title": "My Page" }'><div>Content</div><fill:footer>Footer</fill:footer></component>`;
   const expected = `<html><head><title>My Page</title></head><body><main><div>Content</div></main><footer>Footer</footer></body></html>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
@@ -14,7 +14,7 @@ test('Must process layout with locals', async t => {
   t.is(html, expected);
 });
 
-test('Must process attributes as locals', async t => {
+test('Must process attributes as props', async t => {
   const actual = `<component src="components/component-locals.html" title="My Component Title" body="Content"><fill:body prepend><span>Body</span></fill:body></component>`;
   const expected = `<div><h1>My Component Title</h1></div><div><span>Body</span>Content</div>`;
 
@@ -23,13 +23,13 @@ test('Must process attributes as locals', async t => {
   t.is(html, expected);
 });
 
-test('Must process component with locals as JSON and string', async t => {
+test('Must process component with props as JSON and string', async t => {
   const actual = `<component src="components/component-locals-json-and-string.html"
                     titles='{ "suptitle": "This is custom suptitle" }'
                     title="Custom title from JSON and String"
                     items='["another item", "yet another"]'
                     myboolean="true"
-                    merge:locals='{ "items": ["first item", "second item"] }'></component>`;
+                    merge:props='{ "items": ["first item", "second item"] }'></component>`;
   const expected = `<div><div>myboolean is true</div><div><h1>Custom title from JSON and String</h1></div><div><span>another item</span><span>yet another</span><span>first item</span><span>second item</span></div><div><span>title: This is default main title</span><span>subtitle: This is default subtitle</span><span>suptitle: This is custom suptitle</span></div></div>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
@@ -37,7 +37,7 @@ test('Must process component with locals as JSON and string', async t => {
   t.is(html, expected);
 });
 
-test('Must process parent and child locals via component', async t => {
+test('Must process parent and child props via component', async t => {
   const actual = `<x-parent aString="I am custom aString for PARENT via component (1)"><x-child></x-child></x-parent>`;
   const expected = `PARENT:<div>  aBoolean  value: true  type: boolean  aString  value: I am custom aString for PARENT via component (1)  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>CHILD:<div>  aBoolean  value: true  type: boolean  aString  value: My String Child  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>`;
 
@@ -46,16 +46,16 @@ test('Must process parent and child locals via component', async t => {
   t.is(html, expected);
 });
 
-test('Must has access to $slots in script locals', async t => {
+test('Must has access to $slots in script props', async t => {
   const actual = `<x-script-locals><fill:filled>filled slot content...</fill:filled></x-script-locals>`;
-  const expected = `{"filled":{"filled":true,"rendered":false,"tag":"fill:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","locals":{}}}<div>{"filled":{"filled":true,"rendered":false,"tag":"fill:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","locals":{}}}</div><div><h1>Default title</h1></div><div>filled slot content...</div>`;
+  const expected = `{"filled":{"filled":true,"rendered":false,"tag":"fill:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","props":{}}}<div>{"filled":{"filled":true,"rendered":false,"tag":"fill:filled","attrs":{},"content":["filled slot content..."],"source":"filled slot content...","props":{}}}</div><div><h1>Default title</h1></div><div>filled slot content...</div>`;
 
   const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
 
   t.is(html, expected);
 });
 
-test('Must pass locals from parent to child via aware', async t => {
+test('Must pass props from parent to child via aware', async t => {
   const actual = `<x-parent aware:aString="I am custom aString for PARENT via component (1)"><x-child></x-child></x-parent>`;
   const expected = `PARENT:<div>  aBoolean  value: true  type: boolean  aString  value: I am custom aString for PARENT via component (1)  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>CHILD:<div>  aBoolean  value: true  type: boolean  aString  value: I am custom aString for PARENT via component (1)  type: string  aString2  value: I am not string 2  type: string  anArray  value: ["one","two","three"]  type: object  anObject  value: {"one":"One","two":"Two","three":"Three"}  type: object  anArray2  value: ["one2","two2","three2"]  type: object  anObject2  value: {"one":"One2","two":"Two2","three":"Three2"}  type: object</div>`;
 
@@ -77,11 +77,20 @@ test('Must process default, merged and override props', async t => {
   t.is(html, expected);
 });
 
-test('Must process slot with locals', async t => {
+test('Must process slot with props', async t => {
   const actual = `<component src="components/slot-with-locals.html"><fill:name mySlotLocal=" Via Slot" prepend>My Local</fill:name></component>`;
   const expected = `<div>My Local Via Slot</div>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must process props with custom options', async t => {
+  const actual = `<component src="components/custom-props-options.html" title="My Component Title" body="Content" locals='{ "prop": "My prop via locals attribute" }'><fill:body slotProp="My slot prop" prepend><span>Body</span></fill:body></component>`;
+  const expected = `<div><h1>My Component Title</h1></div><div><span>Body</span>Content-My slot prop</div><div>My prop via locals attribute</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates', tag: 'component', propsScriptAttribute: 'locals', propsContext: 'locals', propsAttribute: 'locals', propsSlot: 'locals'})]).process(actual).then(result => clean(result.html));
 
   t.is(html, expected);
 });

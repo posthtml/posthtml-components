@@ -49,6 +49,20 @@
             <h1 class="display-1 fw-bold mb-4">Playground</h1>
             <div class="wrapper">
               <div class="demo my-demo" computed:acomputed="" something="alocal">
+                {"title":"PostHTML Components","close":true,"$slots":{},"aStringOverride":"My override string changed","anObjectOverride":{"third":"Third override item","fourth":"Fourth override item"},"computed:aComputed":true,"class":"my-demo","anObjectMerged":{"third":"Third merged item","fourth":"Fourth merged item","anObjectMerged1":{"third":"Third merged item (UPDATED?)","fourth1":"Fourth merged item"}},"post":{"title":"My post title","body":"My post body","comments":[{"id":1,"body":"My comment 1 new"},{"id":3,"body":"My comment 3"}]},"anArrayOfObjects":[{"id":1,"title":"My new title 1"},{"id":2,"title":"My new title 2","somethingnew":"New"}],"anArray":["first","third","fourth","ten"],"something":"alocal"}
+                <div>
+                  <a href="/my-page.html">
+                    hi,
+                    <strong>fred</strong>
+                  </a>
+                  !
+                  <a href="/my-page2.html">
+                    hi,
+                    <strong>Damir</strong>
+                  </a>
+                  !
+                </div>
+                {"third":"Third override item","fourth":"Fourth override item","something":"Merged","again":"Again merged"}
                 <h1>anObjectDefault</h1>
                 <p>
                   <strong>first</strong>
@@ -153,12 +167,12 @@
             </div>
             <div class="wrapper">
               <div class="parent">
-                {"name":{"filled":true,"rendered":false,"tag":"fill:name","attrs":{},"content":["Slot parent"],"source":"Slot parent","locals":{}}}
+                {"name":{"filled":true,"rendered":false,"tag":"fill:name","attrs":{},"content":["Slot parent"],"source":"Slot parent","props":{}}}
                 <div class="parent-content">I'm parent</div>
                 <div class="parent-yield">
                   <h1>Parent yield</h1>
                   <div class="child">
-                    {"name":{"filled":true,"rendered":false,"tag":"fill:name","attrs":{},"content":["Slot child"],"source":"Slot child","locals":{}}}
+                    {"name":{"filled":true,"rendered":false,"tag":"fill:name","attrs":{},"content":["Slot child"],"source":"Slot child","props":{}}}
                     <div class="child-content">I'm child</div>
                     <div class="child-yield">
                       <h1>Child yield</h1>
@@ -170,7 +184,7 @@
               </div>
               {"name":{"filled":true,"rendered":false,"tag":"fill:name","attrs":{},"content":["\n          ",{"tag":"div","attrs":{"class":"parent2-child2-slot"},"content":["\n            parent2-child2 slot\n          "]},"\n        "],"source":"\n
               <div class="\&quot;parent2-child2-slot\&quot;">\n            parent2-child2 slot\n</div>
-              \n        ","locals":{}},"myslot":{"filled":true,"rendered":true,"tag":"fill:myslot","attrs":{},"content":["\n          SLOT CHILD INSIDE TEST.html\n        "],"source":"\n          SLOT CHILD INSIDE TEST.html\n        ","locals":{}}}
+              \n        ","props":{}},"myslot":{"filled":true,"rendered":true,"tag":"fill:myslot","attrs":{},"content":["\n          SLOT CHILD INSIDE TEST.html\n        "],"source":"\n          SLOT CHILD INSIDE TEST.html\n        ","props":{}}}
 
   
     yes is filled
@@ -234,7 +248,7 @@
               1.0.0-beta.8 (2022-10-25)
             </h2>
             <ul>
-              <li>Fix merge locals with global</li>
+              <li>Fix merge props with global</li>
             </ul>
             <h2 id="1.0.0-beta.7-(2022-10-25)" tabindex="-1">
               <a class="header-anchor" href="#1.0.0-beta.7-(2022-10-25)">#</a>
