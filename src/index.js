@@ -6,10 +6,10 @@ const {parser} = require('posthtml-parser');
 const {match} = require('posthtml/lib/api');
 const expressions = require('posthtml-expressions');
 const findPathFromTag = require('./find-path');
-const processProps = require('./props');
-const processAttributes = require('./attributes');
-const {processPushes, processStacks} = require('./stacks');
-const {setFilledSlots, processSlotContent, processFillContent} = require('./slots');
+const processProps = require('./process-props');
+const processAttributes = require('./process-attributes');
+const {processPushes, processStacks} = require('./process-stacks');
+const {setFilledSlots, processSlotContent, processFillContent} = require('./process-slots');
 const mergeWith = require('lodash/mergeWith');
 const template = require('lodash/template');
 

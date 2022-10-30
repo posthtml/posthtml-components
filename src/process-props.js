@@ -1,6 +1,6 @@
 'use strict';
 
-const scriptProps = require('./script-props');
+const processScript = require('./process-script');
 const pick = require('lodash/pick');
 const each = require('lodash/each');
 const assign = require('lodash/assign');
@@ -64,7 +64,7 @@ module.exports = (currentNode, nextNode, filledSlots, options, componentPath) =>
   attributes = mergeWith({}, options.expressions.locals, attributes, options.mergeCustomizer);
 
   // Process props from <script props>
-  const {props} = scriptProps(nextNode, {props: {...attributes}, $slots: filledSlots, propsScriptAttribute: options.propsScriptAttribute, propsContext: options.propsContext, utilities: options.utilities}, componentPath.replace(`.${options.fileExtension}`, '.js'));
+  const {props} = processScript(nextNode, {props: {...attributes}, $slots: filledSlots, propsScriptAttribute: options.propsScriptAttribute, propsContext: options.propsContext, utilities: options.utilities}, componentPath.replace(`.${options.fileExtension}`, '.js'));
 
   if (props) {
     assign(attributes, props);

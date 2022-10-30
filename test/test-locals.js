@@ -103,3 +103,12 @@ test('Must process components with script file', async t => {
 
   t.is(html, expected);
 });
+
+test('Must process components with invalid script file', async t => {
+  const actual = `<component src="components/invalid-script-file.html"></component>`;
+  const expected = `<div>Component content (undefined)</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
