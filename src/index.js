@@ -6,7 +6,7 @@ const {parser} = require('posthtml-parser');
 const {match} = require('posthtml/lib/api');
 const expressions = require('posthtml-expressions');
 const findPathFromTag = require('./find-path');
-const processLocals = require('./locals');
+const processProps = require('./props');
 const processAttributes = require('./attributes');
 const {processPushes, processStacks} = require('./stacks');
 const {setFilledSlots, processSlotContent, processFillContent} = require('./slots');
@@ -149,7 +149,7 @@ function processTree(options) {
       // Reset options.expressions.locals and keep aware locals
       options.expressions.locals = {...options.props, ...options.aware};
 
-      const {attributes, props} = processLocals(currentNode, nextNode, filledSlots, options);
+      const {attributes, props} = processProps(currentNode, nextNode, filledSlots, options, componentPath);
 
       options.expressions.locals = attributes;
       options.expressions.locals.$slots = filledSlots;

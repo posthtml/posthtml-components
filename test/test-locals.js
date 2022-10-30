@@ -94,3 +94,12 @@ test('Must process props with custom options', async t => {
 
   t.is(html, expected);
 });
+
+test('Must process components with script file', async t => {
+  const actual = `<component src="components/component-script-file.html" myStringProp="My custom string prop" myObjectProp='{ "one": "New one value", "three": "New third value" }'></component>`;
+  const expected = `<div>A default string</div><div>My custom string prop</div><div>{"one":"New one value","three":"New third value"}</div>`;
+
+  const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});

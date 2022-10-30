@@ -1,5 +1,9 @@
 const config = {
-  verbose: true
+  verbose: true,
+  files: [
+    'test/**',
+    '!test/templates'
+  ]
 };
 
 export default config;

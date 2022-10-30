@@ -15,9 +15,10 @@ const attributeTypes = ['aware', 'merge'];
  * @param {Array} nextNode - PostHTML tree
  * @param {Object} filledSlots - Filled slots
  * @param {Object} options - Plugin options
+ * @param {string} componentPath - Component path
  * @return {Object} - Attribute props and script props
  */
-module.exports = (currentNode, nextNode, filledSlots, options) => {
+module.exports = (currentNode, nextNode, filledSlots, options, componentPath) => {
   let attributes = {...currentNode.attrs};
 
   const attributesByTypeName = {};
@@ -63,7 +64,7 @@ module.exports = (currentNode, nextNode, filledSlots, options) => {
   attributes = mergeWith({}, options.expressions.locals, attributes, options.mergeCustomizer);
 
   // Process props from <script props>
-  const {props} = scriptProps(nextNode, {props: {...attributes}, $slots: filledSlots, propsScriptAttribute: options.propsScriptAttribute, propsContext: options.propsContext, utilities: options.utilities});
+  const {props} = scriptProps(nextNode, {props: {...attributes}, $slots: filledSlots, propsScriptAttribute: options.propsScriptAttribute, propsContext: options.propsContext, utilities: options.utilities}, componentPath.replace(`.${options.fileExtension}`, '.js'));
 
   if (props) {
     assign(attributes, props);
