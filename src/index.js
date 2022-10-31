@@ -10,8 +10,19 @@ const processProps = require('./process-props');
 const processAttributes = require('./process-attributes');
 const {processPushes, processStacks} = require('./process-stacks');
 const {setFilledSlots, processSlotContent, processFillContent} = require('./process-slots');
+const defaults = require('lodash/defaults');
+const assignWith = require('lodash/assignWith');
 const mergeWith = require('lodash/mergeWith');
 const template = require('lodash/template');
+const get = require('lodash/get');
+const has = require('lodash/has');
+const isObjectLike = require('lodash/isObjectLike');
+const isArray = require('lodash/isArray');
+const isEmpty = require('lodash/isEmpty');
+const isBoolean = require('lodash/isBoolean');
+const isUndefined = require('lodash/isUndefined'); // value === undefined
+const isNull = require('lodash/isNull'); // value === null
+const isNil = require('lodash/isNil'); // value == null
 
 // const {inspect} = require('util');
 // const debug = true;
@@ -45,7 +56,21 @@ module.exports = (options = {}) => tree => {
   options.plugins = options.plugins || [];
   options.attrsParserRules = options.attrsParserRules || {};
   options.strict = typeof options.strict === 'undefined' ? true : options.strict;
-  options.utilities = options.utilities || {merge: mergeWith, template};
+  options.utilities = options.utilities || {
+    defaults,
+    assign: assignWith,
+    merge: mergeWith,
+    template,
+    get,
+    has,
+    isObject: isObjectLike,
+    isArray,
+    isEmpty,
+    isBoolean,
+    isUndefined,
+    isNull,
+    isNil
+  };
 
   // Merge customizer callback passed to lodash mergeWith
   //  for merge attribute `props` and all attributes starting with `merge:`

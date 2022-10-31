@@ -1,3 +1,7 @@
+## 1.0.0-beta.12 (2022-10-31)
+
+* Added more utilities
+* 
 ## 1.0.0-beta.11 (2022-10-30)
 
 * Add new options to pass utilities methods to script like lodash `mergeWith` and `template`
