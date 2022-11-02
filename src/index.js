@@ -10,6 +10,7 @@ const processProps = require('./process-props');
 const processAttributes = require('./process-attributes');
 const {processPushes, processStacks} = require('./process-stacks');
 const {setFilledSlots, processSlotContent, processFillContent} = require('./process-slots');
+const each = require('lodash/each');
 const defaults = require('lodash/defaults');
 const assignWith = require('lodash/assignWith');
 const mergeWith = require('lodash/mergeWith');
@@ -57,6 +58,7 @@ module.exports = (options = {}) => tree => {
   options.attrsParserRules = options.attrsParserRules || {};
   options.strict = typeof options.strict === 'undefined' ? true : options.strict;
   options.utilities = options.utilities || {
+    each,
     defaults,
     assign: assignWith,
     merge: mergeWith,
