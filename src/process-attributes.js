@@ -9,6 +9,7 @@ const union = require('lodash/union');
 const each = require('lodash/each');
 const has = require('lodash/has');
 const extend = require('lodash/extend');
+const isString = require('lodash/isString');
 const isObject = require('lodash/isObject');
 
 /**
@@ -66,7 +67,7 @@ module.exports = (currentNode, attributes, props, options) => {
   each(nodeAttrs, (value, key) => {
     if (['undefined', 'null'].includes(value)) {
       delete nodeAttrs[key];
-    } else if (!isObject(nodeAttrs[key])) {
+    } else if (key !== 'compose' && !isObject(nodeAttrs[key]) && !isString(nodeAttrs[key])) {
       nodeAttrs[key] = nodeAttrs[key].toString();
     }
   });

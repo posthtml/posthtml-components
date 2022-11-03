@@ -1,3 +1,7 @@
+## 1.0.0-beta.14 (2022-11-03)
+
+* Fix node attributes not string
+
 ## 1.0.0-beta.13 (2022-11-03)
 
 * Remove attributes that have "undefined" or "null" value
