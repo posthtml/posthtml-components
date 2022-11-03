@@ -9,6 +9,7 @@ const union = require('lodash/union');
 const each = require('lodash/each');
 const has = require('lodash/has');
 const extend = require('lodash/extend');
+const isObject = require('lodash/isObject');
 
 /**
  * Map component attributes that it's not defined as props to first element of node
@@ -65,6 +66,8 @@ module.exports = (currentNode, attributes, props, options) => {
   each(nodeAttrs, (value, key) => {
     if (['undefined', 'null'].includes(value)) {
       delete nodeAttrs[key];
+    } else if (!isObject(nodeAttrs[key])) {
+      nodeAttrs[key] = nodeAttrs[key].toString();
     }
   });
 
