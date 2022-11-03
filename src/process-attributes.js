@@ -60,5 +60,13 @@ module.exports = (currentNode, attributes, props, options) => {
     delete attributes[key];
   });
 
+  // Remove an attribute if value is 'null' or 'undefined'
+  //  so we can conditionally add an attribute
+  each(nodeAttrs, (value, key) => {
+    if (['undefined', 'null'].includes(value)) {
+      delete nodeAttrs[key];
+    }
+  });
+
   mainNode.attrs = nodeAttrs.compose();
 };

@@ -49,3 +49,12 @@ test('Must override class and style attributes', async t => {
 
   t.is(html, expected);
 });
+
+test('Must remove an attributes that has "undefined" or "null" value', async t => {
+  const actual = `<component src="components/remove-attributes.html">My button</component>`;
+  const expected = `<button class="btn btn-primary" data-bs-dismiss="true" data-bs-backdrop="false">My button</button>`;
+
+  const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});

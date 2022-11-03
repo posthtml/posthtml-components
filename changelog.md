@@ -1,3 +1,7 @@
+## 1.0.0-beta.13 (2022-11-03)
+
+* Remove attributes that have "undefined" or "null" value
+
 ## 1.0.0-beta.12 (2022-10-31)
 
 * Added more utilities
