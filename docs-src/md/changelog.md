@@ -1,3 +1,7 @@
+## 1.0.0-beta.15 (2022-11-04)
+
+* Fix aware props must be available only to nested components
+
 ## 1.0.0-beta.14 (2022-11-03)
 
 * Fix node attributes not string
