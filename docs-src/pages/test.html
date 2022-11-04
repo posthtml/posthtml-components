@@ -3,6 +3,40 @@
     <div class="col-lg-8">
       <h1 class="display-1 fw-bold mb-4">Playground</h1>
 
+      <x-test.div1 aware:myprop="My CUSTOM prop in div1">
+        <x-test.div2>
+          <x-test.div3>
+            <x-test.div4>
+              hi
+            </x-test.div4>
+          </x-test.div3>
+        </x-test.div2>
+      </x-test.div1>
+
+      <hr>
+
+      <x-test.div1>
+        <x-test.div2>
+          <x-test.div3 aware:myprop="My CUSTOM prop in div3">
+            <x-test.div4>
+              hi
+            </x-test.div4>
+          </x-test.div3>
+        </x-test.div2>
+      </x-test.div1>
+
+      <hr>
+
+      <x-test.div1 aware:myprop="My NEW CUSTOM prop in div1">
+        <x-test.div2>
+          <x-test.div3 myprop="My NEW CUSTOM prop in div3">
+            <x-test.div4>
+              hi
+            </x-test.div4>
+          </x-test.div3>
+        </x-test.div2>
+      </x-test.div1>
+
       <x-test
         aStringOverride="My override string changed"
         anObjectOverride='{ "third": "Third override item", "fourth": "Fourth override item" }'

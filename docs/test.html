@@ -47,6 +47,44 @@
         <div class="row">
           <div class="col-lg-8">
             <h1 class="display-1 fw-bold mb-4">Playground</h1>
+            <div>
+              div1: My CUSTOM prop in div1
+              <div>
+                div2: My CUSTOM prop in div1
+                <div>
+                  div3: My CUSTOM prop in div1
+                  <div>div4: My CUSTOM prop in div1
+  
+              hi</div>
+                </div>
+              </div>
+            </div>
+            <hr>
+            <div>
+              div1: My DEFAULT prop in div1
+              <div>
+                div2: My DEFAULT prop in div2
+                <div>
+                  div3: My CUSTOM prop in div3
+                  <div>div4: My CUSTOM prop in div3
+  
+              hi</div>
+                </div>
+              </div>
+            </div>
+            <hr>
+            <div>
+              div1: My NEW CUSTOM prop in div1
+              <div>
+                div2: My NEW CUSTOM prop in div1
+                <div>
+                  div3: My NEW CUSTOM prop in div3
+                  <div>div4: My NEW CUSTOM prop in div1
+  
+              hi</div>
+                </div>
+              </div>
+            </div>
             <div class="wrapper">
               <div class="demo my-demo" computed:acomputed="true" something="alocal">
                 {"title":"PostHTML Components","aStringOverride":"My override string changed","anObjectOverride":{"third":"Third override item","fourth":"Fourth override item"},"computed:aComputed":true,"class":"my-demo","anObjectMerged":{"third":"Third merged item","fourth":"Fourth merged item","anObjectMerged1":{"third":"Third merged item (UPDATED?)","fourth1":"Fourth merged item"}},"post":{"title":"My post title","body":"My post body","comments":[{"id":1,"body":"My comment 1 new"},{"id":3,"body":"My comment 3"}]},"anArrayOfObjects":[{"id":1,"title":"My new title 1"},{"id":2,"title":"My new title 2","somethingnew":"New"}],"anArray":["first","third","fourth","ten"],"something":"alocal"}
@@ -212,7 +250,7 @@
         </div>
       </div>
     </footer>
-    <div class="modal fade" id="modalWithComponents" data-bs-backdrop="true" data-bs-keyboard="true" aria-labelledby="modalWithComponents" tabindex="-1" aria-hidden="true" aria-modal="true" role="dialog" dialogclass="modal-dialog-custom" contentclass="modal-content-custom">
+    <div class="modal fade" id="modalWithComponents" data-bs-backdrop="true" data-bs-keyboard="true" aria-labelledby="modalWithComponents" tabindex="-1" aria-hidden="true" aria-modal="true" role="dialog" dialogclass="modal-dialog-custom" contentclass="modal-content-custom" close="true">
       <div class="modal-dialog modal-lg modal-fullscreen-lg-down modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">

@@ -1,0 +1,10 @@
+<script props>
+  module.exports = {
+    myprop: props.myprop || 'My DEFAULT prop in div1'
+  };
+</script>
+
+<div>
+  div1: {{ myprop }}
+  <yield></yield>
+</div>

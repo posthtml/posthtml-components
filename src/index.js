@@ -120,7 +120,6 @@ module.exports = (options = {}) => tree => {
   });
 
   options.props = {...options.expressions.locals};
-  options.aware = {};
 
   const pushedContent = {};
 
@@ -142,10 +141,10 @@ module.exports = (options = {}) => tree => {
  * @param  {Object} options Plugin options
  * @return {Object} PostHTML tree
  */
+let processCounter = 0;
+
 function processTree(options) {
   const filledSlots = {};
-
-  // let processCounter = 0;
 
   return function (tree) {
     if (options.plugins.length > 0) {
@@ -163,7 +162,7 @@ function processTree(options) {
         return currentNode;
       }
 
-      // console.log(`${++processCounter}) Processing component ${componentPath}`);
+      console.log(`${++processCounter}) Processing "${currentNode.tag}" component from "${componentPath}"`);
 
       // log(currentNode, 'currentNode');
 
@@ -171,7 +170,11 @@ function processTree(options) {
 
       // Set filled slots
       setFilledSlots(currentNode, filledSlots, options);
-      // setFilledSlots(nextNode, filledSlots, options);
+
+      // Reset options.aware when new nested start
+      if (processCounter === 1) {
+        options.aware = {};
+      }
 
       // Reset options.expressions.locals and keep aware locals
       options.expressions.locals = {...options.props, ...options.aware};
@@ -207,15 +210,8 @@ function processTree(options) {
 
       processAttributes(currentNode, attributes, props, options);
 
-      // log(currentNode, 'currentNode', 'currentNode')
-      // currentNode.attrs.counter = processCounter;
-      // currentNode.attrs.data = JSON.stringify({ attributes, props });
-
-      // messages.push({
-      //   type: 'dependency',
-      //   file: componentPath,
-      //   from: options.root
-      // });
+      // Reset counter
+      processCounter = 0;
 
       return currentNode;
     });
