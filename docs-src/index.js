@@ -13,63 +13,61 @@ const src = './docs-src/pages/';
 const dist = './docs/';
 const md = './docs-src/md';
 
-const plugins = [
-  components({
-    root: './docs-src',
-    folders: ['components', 'layouts'],
-    strict: true,
-    expressions: {
-      locals: {
-        title: 'PostHTML Components'
-      }
-    }
-  }),
-
-  markdownIt({
-    root: md,
-    plugins: [
-      {
-        plugin: anchor,
-        options: {
-          level: [1, 2, 3],
-          permalink: anchor.permalink.linkInsideHeader({
-            symbol: '#',
-            placement: 'before'
-          })
-        }
-      },
-      {
-        plugin: markdownItToc,
-        options: {
-          level: [1, 2, 3],
-          containerClass: 'h-100 flex-column align-items-stretch ps-4 p-3 bg-white rounded-3 doc-shadow',
-          containerId: 'header-toc',
-          listClass: 'nav flex-column',
-          itemClass: 'nav-item',
-          linkClass: 'nav-link',
-          listType: 'ul'
-        }
-      }
-    ]
-  }),
-
-  beautify({
-    rules: {
-      indent: 2,
-      blankLines: false,
-      sortAttr: false
-    }
-  }),
-
-  processCodeTags()
-];
-
 const options = {};
 
 readdirSync(src).forEach(file => {
   const html = readFileSync(path.resolve(`${src}${file}`), 'utf-8');
 
-  posthtml(plugins)
+  posthtml([
+    components({
+      root: './docs-src',
+      folders: ['components', 'layouts'],
+      strict: true,
+      expressions: {
+        locals: {
+          title: 'PostHTML Components'
+        }
+      }
+    }),
+
+    markdownIt({
+      root: md,
+      plugins: [
+        {
+          plugin: anchor,
+          options: {
+            level: [1, 2, 3],
+            permalink: anchor.permalink.linkInsideHeader({
+              symbol: '#',
+              placement: 'before'
+            })
+          }
+        },
+        {
+          plugin: markdownItToc,
+          options: {
+            level: [1, 2, 3],
+            containerClass: 'h-100 flex-column align-items-stretch ps-4 p-3 bg-white rounded-3 doc-shadow',
+            containerId: 'header-toc',
+            listClass: 'nav flex-column',
+            itemClass: 'nav-item',
+            linkClass: 'nav-link',
+            listType: 'ul'
+          }
+        }
+      ]
+    }),
+
+    beautify({
+      rules: {
+        indent: 2,
+        blankLines: false,
+        sortAttr: false
+      }
+    }),
+
+    processCodeTags()
+  ])
     .process(html, options)
     .then(result => {
       writeFileSync(path.resolve(`${dist}${file}`), result.html, 'utf-8');
