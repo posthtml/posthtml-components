@@ -1,3 +1,8 @@
+## 1.0.0-beta.16 (2022-11-06)
+
+* Fix aware props propagation
+* Add utility `isEnabled` to check if a prop is either `<div myprop>` or `<div myprop="true">`
+
 ## 1.0.0-beta.15 (2022-11-04)
 
 * Fix aware props must be available only to nested components

@@ -1,0 +1,10 @@
+<script props>
+  module.exports = {
+    layoutprop: props.layoutprop || 'Default layoutprop'
+  }
+</script>
+
+<div>
+  {{ layoutprop }}
+  <yield></yield>
+</div>

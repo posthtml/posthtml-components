@@ -16,6 +16,10 @@ const md = './docs-src/md';
 const options = {};
 
 readdirSync(src).forEach(file => {
+  if (file !== 'test.html') {
+    return;
+  }
+
   const html = readFileSync(path.resolve(`${src}${file}`), 'utf-8');
 
   posthtml([

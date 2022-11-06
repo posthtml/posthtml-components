@@ -16,9 +16,10 @@ const attributeTypes = ['aware', 'merge'];
  * @param {Object} filledSlots - Filled slots
  * @param {Object} options - Plugin options
  * @param {string} componentPath - Component path
+ * @param {number} processCounter
  * @return {Object} - Attribute props and script props
  */
-module.exports = (currentNode, nextNode, filledSlots, options, componentPath) => {
+module.exports = (currentNode, nextNode, filledSlots, options, componentPath, processCounter) => {
   let attributes = {...currentNode.attrs};
 
   const attributesByTypeName = {};
@@ -75,7 +76,7 @@ module.exports = (currentNode, nextNode, filledSlots, options, componentPath) =>
 
   // Set aware attributes
   if (attributesByTypeName.aware.length > 0) {
-    options.aware = pick(attributes, attributesByTypeName.aware);
+    options.aware[processCounter] = pick(attributes, attributesByTypeName.aware);
   }
 
   return {attributes, props};

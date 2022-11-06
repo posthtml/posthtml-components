@@ -112,3 +112,15 @@ test('Must process components with invalid script file', async t => {
 
   t.is(html, expected);
 });
+
+test('Must reset not nested aware props that it', async t => {
+  const actual = `
+<x-parent-aware aware:myprop="I am aware prop"><x-child-aware></x-child-aware><x-child-aware></x-child-aware></x-parent-aware>
+<x-parent-aware><x-child-aware></x-child-aware></x-parent-aware>
+`;
+  const expected = `<div><div>I am aware prop</div><div>I am aware prop</div></div><div><div>Default prop</div></div>`;
+
+  const html = await posthtml([plugin({root: './test/templates/components'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});

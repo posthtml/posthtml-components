@@ -3,13 +3,14 @@
 const {readFileSync, existsSync} = require('fs');
 const path = require('path');
 const {parser} = require('posthtml-parser');
-const {match} = require('posthtml/lib/api');
+const {match, walk} = require('posthtml/lib/api');
 const expressions = require('posthtml-expressions');
 const findPathFromTag = require('./find-path');
 const processProps = require('./process-props');
 const processAttributes = require('./process-attributes');
 const {processPushes, processStacks} = require('./process-stacks');
 const {setFilledSlots, processSlotContent, processFillContent} = require('./process-slots');
+const log = require('./log');
 const each = require('lodash/each');
 const defaults = require('lodash/defaults');
 const assignWith = require('lodash/assignWith');
@@ -24,14 +25,9 @@ const isBoolean = require('lodash/isBoolean');
 const isUndefined = require('lodash/isUndefined'); // value === undefined
 const isNull = require('lodash/isNull'); // value === null
 const isNil = require('lodash/isNil'); // value == null
-
-// const {inspect} = require('util');
-// const debug = true;
-// const log = (object, what, method) => {
-//   if (debug === true || method === debug) {
-//     console.log(what, inspect(object, false, null, true));
-//   }
-// };
+const uniqueId = require('lodash/uniqueId');
+const transform = require('lodash/transform');
+const assign = require('lodash/assign');
 
 /* eslint-disable complexity */
 module.exports = (options = {}) => tree => {
@@ -71,7 +67,9 @@ module.exports = (options = {}) => tree => {
     isBoolean,
     isUndefined,
     isNull,
-    isNil
+    isNil,
+    uniqueId,
+    isEnabled: prop => prop === true || prop === ''
   };
 
   // Merge customizer callback passed to lodash mergeWith
@@ -120,8 +118,11 @@ module.exports = (options = {}) => tree => {
   });
 
   options.props = {...options.expressions.locals};
+  options.aware = {};
 
   const pushedContent = {};
+
+  log('Start of processing..', 'init', 'success');
 
   return processStacks(
     processPushes(
@@ -137,21 +138,27 @@ module.exports = (options = {}) => tree => {
 };
 /* eslint-enable complexity */
 
+// Used for reset aware props
+let processCounter = 0;
+
 /**
  * @param  {Object} options Plugin options
  * @return {Object} PostHTML tree
  */
-let processCounter = 0;
 
 function processTree(options) {
   const filledSlots = {};
 
   return function (tree) {
+    log(`Processing tree number ${processCounter}..`, 'processTree');
+
     if (options.plugins.length > 0) {
       tree = applyPluginsToTree(tree, options.plugins);
     }
 
     match.call(tree, options.matcher, currentNode => {
+      log(`Match found for tag "${currentNode.tag}"..`, 'processTree');
+
       if (!currentNode.attrs) {
         currentNode.attrs = {};
       }
@@ -162,24 +169,21 @@ function processTree(options) {
         return currentNode;
       }
 
-      console.log(`${++processCounter}) Processing "${currentNode.tag}" component from "${componentPath}"`);
-
-      // log(currentNode, 'currentNode');
+      log(`${++processCounter}) Processing "${currentNode.tag}" from "${componentPath}"`, 'processTree');
 
       let nextNode = parser(readFileSync(componentPath, 'utf8'));
 
       // Set filled slots
       setFilledSlots(currentNode, filledSlots, options);
 
-      // Reset options.aware when new nested start
-      if (processCounter === 1) {
-        options.aware = {};
-      }
+      const aware = transform(options.aware, (result, value) => {
+        assign(result, value);
+      }, {});
 
       // Reset options.expressions.locals and keep aware locals
-      options.expressions.locals = {...options.props, ...options.aware};
+      options.expressions.locals = {...options.props, ...aware};
 
-      const {attributes, props} = processProps(currentNode, nextNode, filledSlots, options, componentPath);
+      const {attributes, props} = processProps(currentNode, nextNode, filledSlots, options, componentPath, processCounter);
 
       options.expressions.locals = attributes;
       options.expressions.locals.$slots = filledSlots;
@@ -208,13 +212,36 @@ function processTree(options) {
       currentNode.tag = false;
       currentNode.content = content;
 
-      processAttributes(currentNode, attributes, props, options);
+      processAttributes(currentNode, attributes, props, options, aware);
 
-      // Reset counter
-      processCounter = 0;
+      // Remove attributes when value is 'null' or 'undefined'
+      //  so we can conditionally add an attribute by setting value to 'undefined' or 'null'.
+      walk.call(currentNode, node => {
+        if (node && node.attrs) {
+          each(node.attrs, (value, key) => {
+            if (['undefined', 'null'].includes(value)) {
+              delete node.attrs[key];
+            }
+          });
+        }
+
+        return node;
+      });
+
+      log(`Done processing number ${processCounter}.`, 'processTree', 'success');
+
+      // Reset options.aware for current processCounter
+      delete options.aware[processCounter];
+
+      // Decrement counter
+      processCounter--;
 
       return currentNode;
     });
+
+    if (processCounter === 0) {
+      log('End of processing', 'processTree', 'success');
+    }
 
     return tree;
   };

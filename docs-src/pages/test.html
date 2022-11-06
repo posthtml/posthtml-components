@@ -37,6 +37,28 @@
         </x-test.div2>
       </x-test.div1>
 
+      <x-test.a aware:myprop="I am aware prop">
+        <x-test.b></x-test.b>
+        <x-test.b></x-test.b>
+      </x-test.a>
+
+      <x-test.a>
+        <x-test.b></x-test.b>
+        <x-test.b></x-test.b>
+      </x-test.a>
+
+      <x-test.layout aware:layoutprop="Title">
+        <x-test.a aware:myprop="I am aware prop">
+          <x-test.b></x-test.b>
+          <x-test.b></x-test.b>
+        </x-test.a>
+
+        <x-test.a>
+          <x-test.b></x-test.b>
+          <x-test.b></x-test.b>
+        </x-test.a>
+      </x-test.layout>
+
       <x-test
         aStringOverride="My override string changed"
         anObjectOverride='{ "third": "Third override item", "fourth": "Fourth override item" }'

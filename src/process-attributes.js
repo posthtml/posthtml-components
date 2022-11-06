@@ -19,9 +19,10 @@ const isObject = require('lodash/isObject');
  * @param {Object} attributes
  * @param {Object} props
  * @param {Object} options
+ * @param {Object} aware
  * @return {void}
  */
-module.exports = (currentNode, attributes, props, options) => {
+module.exports = (currentNode, attributes, props, options, aware) => {
   let mainNode;
   match.call(currentNode, {attrs: {attributes: ''}}, node => {
     delete node.attrs.attributes;
@@ -42,7 +43,7 @@ module.exports = (currentNode, attributes, props, options) => {
 
   const nodeAttrs = parseAttrs(mainNode.attrs, options.attrsParserRules);
 
-  const mainNodeAttributes = omit(attributes, union(keys(props), [options.attribute], keys(options.aware), keys(options.props), ['$slots']));
+  const mainNodeAttributes = omit(attributes, union(keys(props), [options.attribute], keys(aware), keys(options.props), ['$slots']));
 
   each(mainNodeAttributes, (value, key) => {
     if (['class', 'style'].includes(key)) {
@@ -62,12 +63,11 @@ module.exports = (currentNode, attributes, props, options) => {
     delete attributes[key];
   });
 
-  // Remove an attribute if value is 'null' or 'undefined'
-  //  so we can conditionally add an attribute
+  // The plugin posthtml-attrs-parser compose() method expects a string,
+  //  but since we are JSON parsing, values like "-1" become number -1.
+  //  So below we convert non string values to string.
   each(nodeAttrs, (value, key) => {
-    if (['undefined', 'null'].includes(value)) {
-      delete nodeAttrs[key];
-    } else if (key !== 'compose' && !isObject(nodeAttrs[key]) && !isString(nodeAttrs[key])) {
+    if (key !== 'compose' && !isObject(nodeAttrs[key]) && !isString(nodeAttrs[key])) {
       nodeAttrs[key] = nodeAttrs[key].toString();
     }
   });
