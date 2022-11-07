@@ -8,6 +8,8 @@
   <p>A PostHTML plugin for create components with HTML-friendly syntax inspired by Laravel Blade. Slots, stack/push, props, custom tag and much more.</p>
 </div>
 
+> This plugin is still in early stage of development and the current API may change.
+
 ## Installation
 
 ```bash
@@ -20,7 +22,7 @@ This PostHTML plugin provides an HTML-friendly syntax for write components in yo
 If you are familiar with Blade, you will find similar syntax as this plugin is inspired by it.
 See below a basic example, as code is worth a thousand words.
 
-> This plugin is still in early stage of development and the current API may change.
+**See also the first [PostHTML Bootstrap UI](https://github.com/thewebartisan7/posthtml-bootstrap-ui) using this plugin and check also the [starter template here](https://github.com/thewebartisan7/posthtml-bootstrap-ui-starter).**
 
 ## Basic example
 
