@@ -3,14 +3,16 @@
 const {match} = require('posthtml/lib/api');
 const parseAttrs = require('posthtml-attrs-parser');
 const styleToObject = require('style-to-object');
-const omit = require('lodash/omit');
 const keys = require('lodash/keys');
 const union = require('lodash/union');
+const pick = require('lodash/pick');
+const difference = require('lodash/difference');
 const each = require('lodash/each');
 const has = require('lodash/has');
 const extend = require('lodash/extend');
 const isString = require('lodash/isString');
 const isObject = require('lodash/isObject');
+const validAttributes = require('./valid-attributes');
 
 /**
  * Map component attributes that it's not defined as props to first element of node
@@ -43,7 +45,26 @@ module.exports = (currentNode, attributes, props, options, aware) => {
 
   const nodeAttrs = parseAttrs(mainNode.attrs, options.attrsParserRules);
 
-  const mainNodeAttributes = omit(attributes, union(keys(props), [options.attribute], keys(aware), keys(options.props), ['$slots']));
+  // Attributes to be excluded
+  const excludeAttributes = union(validAttributes.blacklist, keys(props), [options.attribute], keys(aware), keys(options.props), ['$slots']);
+  // All valid HTML attributes for the main element
+  const allValidElementAttributes = validAttributes.elementAttributes[mainNode.tag.toUpperCase()];
+  // Valid HTML attributes without the excluded
+  const validElementAttributes = difference(allValidElementAttributes, excludeAttributes);
+  // Add override attributes
+  validElementAttributes.push('override:style');
+  validElementAttributes.push('override:class');
+  // Pick valid attributes from passed
+  const mainNodeAttributes = pick(attributes, validElementAttributes);
+
+  // Get additional specified attributes
+  each(attributes, (value, attr) => {
+    each(validAttributes.additionalAttributes, additionalAttr => {
+      if (additionalAttr === attr || (additionalAttr.endsWith('*') && attr.startsWith(additionalAttr.replace('*', '')))) {
+        mainNodeAttributes[attr] = value;
+      }
+    });
+  });
 
   each(mainNodeAttributes, (value, key) => {
     if (['class', 'style'].includes(key)) {

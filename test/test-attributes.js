@@ -7,7 +7,7 @@ const clean = html => html.replace(/(\n|\t)/g, '').trim();
 
 test('Must merge and map attributes not props to first node', async t => {
   const actual = `<component src="components/component-mapped-attributes.html" data-something="Test an attribute" title="My Title" class="bg-light p-2" style="display: flex; font-size: 20px"></component>`;
-  const expected = `<div class="text-dark m-3 bg-light p-2" data-something="Test an attribute" style="display: flex; font-size: 20px">My Title Default body</div>`;
+  const expected = `<div class="text-dark m-3 bg-light p-2" style="background: red; display: flex; font-size: 20px" data-something="Test an attribute">My Title Default body</div>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
 
