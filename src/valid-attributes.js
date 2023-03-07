@@ -3551,7 +3551,8 @@ module.exports = {
   // Add additional attributes, use '*' in the end to check by startsWith
   // Example: 'start-with-*'
   safelistAttributes: [
-    'data-*'
+    'data-*',
+    'aria-*'
   ],
 
   // Skip this attributes
