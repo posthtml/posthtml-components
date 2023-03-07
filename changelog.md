@@ -1,3 +1,10 @@
+## 1.0.0-RC.1 (2023-03-08)
+
+First Release Candidate
+
+* Prevent attributes used for passing props from being added to first node
+* Updated docs
+
 ## 1.0.0-beta.16 (2022-11-06)
 
 * Fix aware props propagation
