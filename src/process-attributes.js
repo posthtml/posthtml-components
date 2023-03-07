@@ -3,6 +3,7 @@
 const {match} = require('posthtml/lib/api');
 const parseAttrs = require('posthtml-attrs-parser');
 const styleToObject = require('style-to-object');
+const validAttributes = require('./valid-attributes');
 const keys = require('lodash/keys');
 const union = require('lodash/union');
 const pick = require('lodash/pick');
@@ -12,7 +13,7 @@ const has = require('lodash/has');
 const extend = require('lodash/extend');
 const isString = require('lodash/isString');
 const isObject = require('lodash/isObject');
-const validAttributes = require('./valid-attributes');
+const isEmpty = require('lodash/isEmpty');
 
 /**
  * Map component attributes that it's not defined as props to first element of node
@@ -45,10 +46,27 @@ module.exports = (currentNode, attributes, props, options, aware) => {
 
   const nodeAttrs = parseAttrs(mainNode.attrs, options.attrsParserRules);
 
+  // Merge elementAttributes and blacklistAttributes with options provided
+  validAttributes.blacklistAttributes = union(validAttributes.blacklistAttributes, options.blacklistAttributes);
+  validAttributes.safelistAttributes = union(validAttributes.safelistAttributes, options.safelistAttributes);
+
+  // Merge or override elementAttributes from options provided
+  if (!isEmpty(options.elementAttributes)) {
+    each(options.elementAttributes, (tagName, modifier) => {
+      if (typeof modifier === 'function' && isString(tagName)) {
+        tagName = tagName.toUpperCase();
+        const attributes = modifier(validAttributes.elementAttributes[tagName]);
+        if (Array.isArray(attributes)) {
+          validAttributes.elementAttributes[tagName] = attributes;
+        }
+      }
+    });
+  }
+
   // Attributes to be excluded
-  const excludeAttributes = union(validAttributes.blacklist, keys(props), [options.attribute], keys(aware), keys(options.props), ['$slots']);
+  const excludeAttributes = union(validAttributes.blacklistAttributes, keys(props), [options.attribute], keys(aware), keys(options.props), ['$slots']);
   // All valid HTML attributes for the main element
-  const allValidElementAttributes = validAttributes.elementAttributes[mainNode.tag.toUpperCase()];
+  const allValidElementAttributes = isString(mainNode.tag) && has(validAttributes.elementAttributes, mainNode.tag.toUpperCase()) ? validAttributes.elementAttributes[mainNode.tag.toUpperCase()] : [];
   // Valid HTML attributes without the excluded
   const validElementAttributes = difference(allValidElementAttributes, excludeAttributes);
   // Add override attributes
@@ -59,7 +77,7 @@ module.exports = (currentNode, attributes, props, options, aware) => {
 
   // Get additional specified attributes
   each(attributes, (value, attr) => {
-    each(validAttributes.additionalAttributes, additionalAttr => {
+    each(validAttributes.safelistAttributes, additionalAttr => {
       if (additionalAttr === attr || (additionalAttr.endsWith('*') && attr.startsWith(additionalAttr.replace('*', '')))) {
         mainNodeAttributes[attr] = value;
       }

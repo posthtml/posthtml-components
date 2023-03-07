@@ -28,6 +28,7 @@ const isNil = require('lodash/isNil'); // value == null
 const uniqueId = require('lodash/uniqueId');
 const transform = require('lodash/transform');
 const assign = require('lodash/assign');
+const isPlainObject = require('lodash/isPlainObject');
 
 /* eslint-disable complexity */
 module.exports = (options = {}) => tree => {
@@ -61,6 +62,7 @@ module.exports = (options = {}) => tree => {
     template,
     get,
     has,
+    isPlainObject,
     isObject: isObjectLike,
     isArray,
     isEmpty,
@@ -71,6 +73,13 @@ module.exports = (options = {}) => tree => {
     uniqueId,
     isEnabled: prop => prop === true || prop === ''
   };
+  // Additional element attributes, in case already exist in valid-attributes.js it will replace all attributes
+  // It should be an object with key as tag name and as value a function modifier which receive
+  // the default attributes and return an array of attributes. Example:
+  // { TAG: (attrsibutes) => { attrsibutes[] = 'attribute-name'; return attributes; } }
+  options.elementAttributes = isPlainObject(options.elementAttributes) ? options.elementAttributes : {};
+  options.safelistAttributes = Array.isArray(options.safelistAttributes) ? options.safelistAttributes : [];
+  options.blacklistAttributes = Array.isArray(options.blacklistAttributes) ? options.blacklistAttributes : [];
 
   // Merge customizer callback passed to lodash mergeWith
   //  for merge attribute `props` and all attributes starting with `merge:`

@@ -91,12 +91,14 @@ module.exports = {
     VAR: ['class', 'dir', 'id', 'lang', 'onclick', 'ondblclick', 'onkeydown', 'onkeypress', 'onkeyup', 'onmousedown', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'style', 'tabindex', 'title']
   },
 
+  // Safelist and blacklist attributes will be applied to all tags
+
   // Add additional attributes, use '*' in the end to check by startsWith
   // Example: 'start-with-*'
-  additionalAttributes: [
+  safelistAttributes: [
     'data-*'
   ],
 
   // Skip this attributes
-  blacklist: []
+  blacklistAttributes: []
 };
