@@ -64,7 +64,7 @@ module.exports = (currentNode, attributes, props, options, aware) => {
   }
 
   // Attributes to be excluded
-  const excludeAttributes = union(validAttributes.blacklistAttributes, keys(props), [options.attribute], keys(aware), keys(options.props), ['$slots']);
+  const excludeAttributes = union(validAttributes.blacklistAttributes, keys(props), keys(aware), keys(options.props), ['$slots']);
   // All valid HTML attributes for the main element
   const allValidElementAttributes = isString(mainNode.tag) && has(validAttributes.elementAttributes, mainNode.tag.toUpperCase()) ? validAttributes.elementAttributes[mainNode.tag.toUpperCase()] : [];
   // Valid HTML attributes without the excluded

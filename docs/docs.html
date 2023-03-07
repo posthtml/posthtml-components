@@ -162,6 +162,9 @@
                     <li class="nav-item">
                       <a class="nav-link" href="#attributes">Attributes</a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#advanced-attributes-configurations">Advanced attributes configurations</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="nav-item">
@@ -183,11 +186,6 @@
                 </li>
               </ul>
             </nav>
-            <blockquote>
-              <p>
-                This plugin is still in early stage of development and the current API may change.
-              </p>
-            </blockquote>
             <h2 id="installation" tabindex="-1">
               <a class="header-anchor" href="#installation">#</a>
               Installation
@@ -199,7 +197,7 @@
             </h2>
             <p>
               This PostHTML plugin provides an HTML-friendly syntax for write components in your templates.
-If you are familiar with Blade, you will find similar syntax as this plugin is inspired by it.
+If you are familiar with Blade, React, Vue or similar, you will find familiar syntax as this plugin is inspired by them.
 See below a basic example, as code is worth a thousand words.
             </p>
             <p>
@@ -245,7 +243,7 @@ posthtml(components({ root: './src' }))
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
             <p>
-              You may notice that our
+              You may notice that the
               <code>src/button.html</code>
               component has a
               <code>type</code>
@@ -253,7 +251,11 @@ posthtml(components({ root: './src' }))
               <code>class</code>
               attribute, and when we use the component in
               <code>src/index.html</code>
-              we add type and class attribute.
+              we pass
+              <code>type</code>
+              and
+              <code>class</code>
+              attribute.
 The result is that
               <code>type</code>
               is override, and
@@ -266,7 +268,11 @@ The result is that
               and
               <code>style</code>
               attributes are merged, while all others attribute are override.
-You can also override class and style attribute by prepending
+You can also override
+              <code>class</code>
+              and
+              <code>style</code>
+              attributes by prepending
               <code>override:</code>
               to the class attribute. Example:
             </p>
@@ -282,7 +288,11 @@ and only if they are not defined as
               <code>props</code>
               via
               <code>&lt;script props&gt;</code>
-              . More details on this in
+              or if they are not in the following file
+              <a href="https://github.com/thewebartisan7/posthtml-components/blob/main/src/valid-attributes.js">valid-attributes.js</a>
+              .
+You can also manage valid attributes via options.
+More details on this in
               <a href="#attributes">Attributes</a>
               section.
             </p>
@@ -290,12 +300,13 @@ and only if they are not defined as
               The
               <code>&lt;yield&gt;</code>
               tag is where your content will be injected.
-In next section you can find all available options and then examples for each features.
+In next section you can find all available options and then examples for each feature.
             </p>
             <p>
               See also the
               <code>docs-src</code>
-              folder where you can find more examples. You can run
+              folder where you can find more examples.
+You can run
               <code>npm run build</code>
               to compile them.
             </p>
@@ -612,6 +623,33 @@ In next section you can find all available options and then examples for each fe
                     .
                   </td>
                 </tr>
+                <tr>
+                  <td style="text-align:center">
+                    <strong>elementAttributes</strong>
+                  </td>
+                  <td style="text-align:center">
+                    <code>{}</code>
+                  </td>
+                  <td style="text-align:left">An object with tag name and a function modifier of valid-attributes.js.</td>
+                </tr>
+                <tr>
+                  <td style="text-align:center">
+                    <strong>safelistAttributes</strong>
+                  </td>
+                  <td style="text-align:center">
+                    <code>['data-*']</code>
+                  </td>
+                  <td style="text-align:left">An array of attributes name to be added to default valid attributes.</td>
+                </tr>
+                <tr>
+                  <td style="text-align:center">
+                    <strong>blacklistAttributes</strong>
+                  </td>
+                  <td style="text-align:center">
+                    <code>[]</code>
+                  </td>
+                  <td style="text-align:left">An array of attributes name to be removed from default valid attributes.</td>
+                </tr>
               </tbody>
             </table>
             <h2 id="features" tabindex="-1">
@@ -718,7 +756,7 @@ For example let's suppose your main root is
               and
               <code>./src/layouts</code>
               .
-You can setup the plugin like below:
+You can set up the plugin like below:
             </p>
             <pre><code class="language-js">// index.js
 const options = { 
@@ -734,7 +772,7 @@ require('posthtml')(require('posthtml-components')(options))
               Namespaces
             </h3>
             <p>
-              With namespaces you can define a top level root path to your components like shown in below example.
+              With namespaces, you can define a top level root path to your components like shown in below example.
 It can be useful for handle custom theme, where you define a specific top level root, with fallback root when component it's not found,
 and a custom root for override, something like a child theme.
             </p>
@@ -896,7 +934,7 @@ Find below a simple example.
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
             <p>
-              By default the content is replaced, but you can also prepend or append the content, or keep the default content by not filling the slot.
+              By default, the content is replaced, but you can also prepend or append the content, or keep the default content by not filling the slot.
             </p>
             <p>Add some default content in the component:</p>
             <pre><code class="language-html">&lt;!-- src/modal.html --&gt;
@@ -1022,7 +1060,7 @@ Find below a simple example.
   &lt;script src=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js&quot;&gt;&lt;/script&gt;
 &lt;/push&gt;</code></pre>
             <p>
-              By default the content is pushed in the stack in the given order.
+              By default, the content is pushed in the stack in the given order.
 If you would like to prepend content onto the beginning of a stack, you should use the
               <code>prepend</code>
               attribute:
@@ -1084,15 +1122,7 @@ If you would like to prepend content onto the beginning of a stack, you should u
   Default prop value
 &lt;/div&gt;</code></pre>
             <p>
-              If you don't add the props in
-              <code>&lt;script props&gt;</code>
-              inside your component, all props will be added as attributes to the first node of your component or to the node with attribute
-              <code>attributes</code>
-              .
-More details on this in the next section.
-            </p>
-            <p>
-              So in the
+              In the
               <code>&lt;script props&gt;</code>
               you have access to passed props via object
               <code>props</code>
@@ -1134,7 +1164,7 @@ More details on this in the next section.
               <code>class</code>
               attribute is merged with
               <code>class</code>
-              attribute of the first node. Let's see in next section more about this.
+              attribute of the first node. In the next section you will know more about this.
             </p>
             <p>
               You can change how attributes are merged with global props defined via options by passing a callback function used by lodash method
@@ -1199,10 +1229,17 @@ Let's see below example.
               Attributes
             </h3>
             <p>
-              Your can pass any attributes to your components and this will be added to the first node of your component, or to the node with an attribute named
+              You can pass any attributes to your components and this will be added to the first node of your component,
+or to the node with an attribute named
               <code>attributes</code>
+              . If you are familiar with VueJS this is the same as so called
+              <a href="https://vuejs.org/guide/components/attrs.html">fallthrough attribute</a>
+              , or with Laravel Blade is
+              <a href="https://laravel.com/docs/10.x/blade#component-attributes">component-attributes</a>
               .
-By default
+            </p>
+            <p>
+              By default
               <code>class</code>
               and
               <code>style</code>
@@ -1212,9 +1249,13 @@ By default
               <code>style</code>
               attribute.
 All others attributes are override by default.
-Only attribute not defined as
+Only attributes defined in
+              <a href="https://github.com/thewebartisan7/posthtml-components/blob/main/src/valid-attributes.js">valid-attributes.js</a>
+              or not defined as
               <code>props</code>
-              will be used.
+              in the
+              <code>&lt;script props&gt;</code>
+              .
             </p>
             <p>As already seen in basic example:</p>
             <pre><code class="language-html">&lt;!-- src/button.html --&gt;
@@ -1239,7 +1280,6 @@ Only attribute not defined as
               <code>props</code>
               .
             </p>
-            <p>If you are familiar with Laravel Blade, this is also how Blade handle this.</p>
             <p>
               As said early,
               <code>class</code>
@@ -1255,7 +1295,7 @@ Only attribute not defined as
             <pre><code class="language-html">&lt;!-- dist/index.html --&gt;
 &lt;button type=&quot;submit&quot; class=&quot;btn-custom&quot;&gt;My button&lt;/button&gt;</code></pre>
             <p>
-              If you want to use another node for add such attributes, then you can add the attribute
+              If you want to use another node and not the first one, then you can add the attribute
               <code>attributes</code>
               like shown below.
             </p>
@@ -1280,6 +1320,53 @@ Only attribute not defined as
               <a href="https://github.com/posthtml/posthtml-attrs-parser">posthtml-attrs-parser</a>
               plugin.
             </p>
+            <h3 id="advanced-attributes-configurations" tabindex="-1">
+              <a class="header-anchor" href="#advanced-attributes-configurations">#</a>
+              Advanced attributes configurations
+            </h3>
+            <p>
+              If default configurations for valid attributes are not right for you, then you can configure them as explained below.
+            </p>
+            <pre><code class="language-js">// index.js
+const { readFileSync, writeFileSync } = require('fs')
+
+const posthtml = require('posthtml')
+const components = require('posthtml-components')
+
+const options = {
+  root: './src',
+  
+  // Add attributes to specific tag or override defaults
+  elementAttributes: {
+    DIV: (defaultAttributes) =&gt; {
+      /* Add new one */
+      defaultAttributes.push('custom-attribute-name');
+
+      return defaultAttributes;
+    },
+    DIV: (defaultAttributes) =&gt; {
+      /* Override all */
+      defaultAttributes = ['custom-attribute-name', 'another-one'];
+
+      return defaultAttributes;
+    },
+  },
+  
+  // Add attributes to all tags, use '*' as wildcard for attribute name that starts with
+  safelistAttributes: [
+    'custom-attribute-name',
+    'attribute-name-start-with-*'
+  ],
+
+  // Remove attributes from all tags that support it
+  blacklistAttributes: [
+    'role'
+  ]
+}
+
+posthtml(components(options))
+  .process(readFileSync('src/index.html', 'utf8'))
+  .then((result) =&gt; writeFileSync('dist/index.html', result.html, 'utf8'))</code></pre>
             <h2 id="examples" tabindex="-1">
               <a class="header-anchor" href="#examples">#</a>
               Examples
@@ -1289,7 +1376,7 @@ Only attribute not defined as
               <code>&lt;slot&gt;</code>
               and
               <code>&lt;fill&gt;</code>
-              or you can create component for each &quot;block&quot; of your component, and you can also support both of them.
+              or you can create component for each block of your component, and you can also support both of them.
 You can find an example of this inside
               <code>docs-src/components/modal</code>
               . Below is a short explanation about the both approach.
@@ -1470,7 +1557,7 @@ via
         </div>
       </div>
     </main>
-    <footer>
+    <footer class="footer mt-auto py-3">
       <div class="container-lg">
         <div class="text-muted text-center">
           Handcrafted with
@@ -1496,6 +1583,15 @@ via
           </div>
           <!-- /.modal-header -->
           <div class="modal-body">
+            <h2 id="1.0.0-rc.1-(2023-03-08)" tabindex="-1">
+              <a class="header-anchor" href="#1.0.0-rc.1-(2023-03-08)">#</a>
+              1.0.0-RC.1 (2023-03-08)
+            </h2>
+            <p>First Release Candidate</p>
+            <ul>
+              <li>Prevent attributes used for passing props from being added to first node</li>
+              <li>Updated docs</li>
+            </ul>
             <h2 id="1.0.0-beta.16-(2022-11-06)" tabindex="-1">
               <a class="header-anchor" href="#1.0.0-beta.16-(2022-11-06)">#</a>
               1.0.0-beta.16 (2022-11-06)

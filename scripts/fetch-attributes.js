@@ -1,79 +1,146 @@
+/**
+ * Script for retrieve all valid HTML5 attributes from https://html.spec.whatwg.org/multipage/indices.html
+ * Test here https://jsfiddle.net/wLyor7e1/4/
+ */
+
 /* eslint-disable no-undef */
 /* eslint-disable curly */
 /* eslint-disable padded-blocks */
+/* eslint-disable quotes */
+/* eslint-disable unicorn/prefer-set-has */
+/* eslint-disable unicorn/prefer-spread */
 const elementAttributes = {};
 
-// Exception
-// tabindex seem to be allowed on any element according to https://www.w3schools.com/tags/att_global_tabindex.asp
-// but here https://www.w3.org/TR/html4/index/attributes.html seem not
-// So below we add this exception
-const allowedAttributes = ['tabindex'];
+// All global attributes https://html.spec.whatwg.org/multipage/dom.html#global-attributes
+const allowedAttributes = [
+  'accesskey',
+  'autocapitalize',
+  'autofocus',
+  'class',
+  'contenteditable',
+  'dir',
+  'draggable',
+  'enterkeyhint',
+  'hidden',
+  'id',
+  'inert',
+  'inputmode',
+  'is',
+  'itemid',
+  'itemprop',
+  'itemref',
+  'itemscope',
+  'itemtype',
+  'lang',
+  'nonce',
+  'popover',
+  'role',
+  'spellcheck',
+  'style',
+  'tabindex',
+  'title',
+  'translate'
+];
 
-// Fetch valid html elements (not deprecated)
-fetch('https://www.w3.org/TR/html4/index/elements.html').then(response => {
+const invalidTagName = [
+  'AUTONOMOUS CUSTOM ELEMENTS'
+];
+
+const renameTags = {
+  'MATHML MATH': 'MATH',
+  'SVG SVG': 'SVG'
+};
+
+// Fetch all valid HTML5 elements and their attributes from https://html.spec.whatwg.org/multipage/indices.html
+// basic-attributes.html is a copy of https://html.spec.whatwg.org/multipage/indices.html
+fetch('basic-attributes.html').then(response => {
   return response.text();
 }).then(html => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
-  const rows = doc.querySelectorAll('table tbody tr');
+  const table = doc.querySelector('table');
+  const rows = table.querySelectorAll('tbody tr');
 
-  rows.forEach(row => {
-    const elementName = row.querySelector('td[title="Name"]');
-    if (!elementName) return;
+  Array.from(rows).forEach(row => {
+    const elements = row.querySelectorAll("th code[id^='elements-3:'] a, th a[id^='elements-3:']");
+    if (!elements || elements.length === 0) return;
 
-    const isDeprecated = row.querySelector('td[title="Depr."]');
-    if (isDeprecated.textContent.trim() === 'D') return;
+    Array.from(elements).forEach(element => {
+      let tagName = element.textContent.trim().toUpperCase();
 
-    elementAttributes[elementName.textContent.trim()] = [...allowedAttributes];
-  });
+      // Skip invalid tag names
+      if (invalidTagName.includes(tagName)) return;
 
-  console.log('Valid HTML elements', elementAttributes);
+      // Rename tag name
+      if (tagName in renameTags) tagName = renameTags[tagName];
 
-}).catch(error => {
-  console.warn(error.message);
-});
+      // console.log('Processing tag', tagName);
 
-// Fetch valid HTML attributes (not deprecated)
+      // Add global attributes
+      elementAttributes[tagName] = [...allowedAttributes];
 
-fetch('https://www.w3.org/TR/html4/index/attributes.html').then(response => {
-  return response.text();
-}).then(html => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const rows = doc.querySelectorAll('table tbody tr');
+      // Add specific attributes
+      const cell = row.querySelectorAll('td')[4];
+      if (!cell || cell.length === 0) return;
 
-  rows.forEach(row => {
-    const attributeName = row.querySelector('td[title="Name"]');
-    if (!attributeName) return;
+      const attributes = cell.querySelectorAll("code[id^='elements-3:'] a");
+      if (!attributes || attributes.length === 0) return;
 
-    const isDeprecated = row.querySelector('td[title="Depr."]');
-    if (isDeprecated.textContent.trim() === 'D') return;
+      Array.from(attributes).forEach(attribute => {
+        attribute = attribute.textContent.trim();
+        if (attribute === 'globals') return;
 
-    const relatedElements = row.querySelector('td[title="Related Elements"]').textContent.trim().split(',');
+        elementAttributes[tagName].push(attribute);
 
-    const exclude = relatedElements[0].includes('All elements but');
-    if (exclude) {
-      // Allowed in all but not in relatedElements
-      relatedElements[0].replace('All elements but', '');
-      Object.keys(elementAttributes).forEach(elementName => {
-        // Skip element that doesn't support the attribute
-        if (relatedElements.includes(elementName)) return;
-        elementAttributes[elementName].push(attributeName.textContent.trim());
+        elementAttributes[tagName].sort();
       });
-    } else {
-      relatedElements.forEach(element => {
-        // Skip deprecated element
-        if (!elementAttributes[element]) return;
-        elementAttributes[element].push(attributeName.textContent.trim());
+    });
+  });
+
+  // Print result
+  console.log('Done first basic attributes');
+
+  // Fetch all missing attributes
+  // additional-attributes.html is a copy of https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes
+  fetch('additional-attributes.html').then(response => {
+    return response.text();
+  }).then(html => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const table = doc.querySelector('table');
+
+    const rows = table.querySelectorAll('tbody tr');
+
+    Array.from(rows).forEach(row => {
+      const cells = row.querySelectorAll("td");
+      if (!cells || cells.length === 0 || cells[0].querySelector('.icon-deprecated')) return;
+
+      const attributeElement = cells[0].querySelector('code');
+      if (!attributeElement) return;
+
+      const attributeName = attributeElement.textContent.trim().toUpperCase();
+
+      const tagsElement = cells[1].querySelector('a');
+      if (!tagsElement || tagsElement.length === 0) return;
+
+      Array.from(tagsElement).forEach(tagElement => {
+        tagElement.replace('<', '').replace('>', '');
+
+        elementAttributes[tagElement].push(attributeName);
+        elementAttributes[tagElement].sort();
       });
-    }
+    });
+
+    // Print result
+    console.log('Done additional attributes');
+    console.log(elementAttributes);
+
+    document.querySelector("code").innerHTML = JSON.stringify(elementAttributes, null, 2);
+
+  }).catch(error => {
+    console.warn(error.message);
   });
 
-  Object.keys(elementAttributes).forEach(element => {
-    elementAttributes[element].sort();
-  });
-
-  console.log('elementAttributes', elementAttributes);
 }).catch(error => {
   console.warn(error.message);
 });

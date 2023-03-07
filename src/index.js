@@ -76,7 +76,7 @@ module.exports = (options = {}) => tree => {
   // Additional element attributes, in case already exist in valid-attributes.js it will replace all attributes
   // It should be an object with key as tag name and as value a function modifier which receive
   // the default attributes and return an array of attributes. Example:
-  // { TAG: (attrsibutes) => { attrsibutes[] = 'attribute-name'; return attributes; } }
+  // { TAG: (attrsibutes) => { attributes[] = 'attribute-name'; return attributes; } }
   options.elementAttributes = isPlainObject(options.elementAttributes) ? options.elementAttributes : {};
   options.safelistAttributes = Array.isArray(options.safelistAttributes) ? options.safelistAttributes : [];
   options.blacklistAttributes = Array.isArray(options.blacklistAttributes) ? options.blacklistAttributes : [];
@@ -269,6 +269,9 @@ function getComponentPath(currentNode, options) {
         return false;
       }
     }
+
+    // Delete attribute used as path
+    delete currentNode.attrs[options.attribute];
 
     return componentPath;
   }
