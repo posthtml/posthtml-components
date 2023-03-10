@@ -1,3 +1,10 @@
+## 1.0.0-RC.2 (2023-03-10)
+
+Second Release Candidate
+
+* Fix issue with custom valid attributes
+* Added test for override options of valid attributes
+
 ## 1.0.0-RC.1 (2023-03-08)
 
 First Release Candidate
