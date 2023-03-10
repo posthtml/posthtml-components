@@ -2,7 +2,7 @@
 
 const {match} = require('posthtml/lib/api');
 const {render} = require('posthtml-render');
-const {get} = require('lodash');
+const get = require('lodash/get');
 
 /**
  * Process <push> tag
