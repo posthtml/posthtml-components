@@ -52,7 +52,7 @@ module.exports = (currentNode, attributes, props, options, aware) => {
 
   // Merge or override elementAttributes from options provided
   if (!isEmpty(options.elementAttributes)) {
-    each(options.elementAttributes, (tagName, modifier) => {
+    each(options.elementAttributes, (modifier, tagName) => {
       if (typeof modifier === 'function' && isString(tagName)) {
         tagName = tagName.toUpperCase();
         const attributes = modifier(validAttributes.elementAttributes[tagName]);

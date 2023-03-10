@@ -3,6 +3,7 @@
 const test = require('ava');
 const plugin = require('../src');
 const posthtml = require('posthtml');
+const pull = require('lodash/pull');
 const clean = html => html.replace(/(\n|\t)/g, '').trim();
 
 test('Must merge and map attributes not props to first node', async t => {
@@ -55,6 +56,61 @@ test('Must remove an attributes that has "undefined" or "null" value', async t =
   const expected = `<button class="btn btn-primary" data-bs-dismiss="true" data-bs-backdrop="false" tabindex="-1">My button</button><div>works also in all nodes</div>`;
 
   const html = await posthtml([plugin({root: './test/templates', tag: 'component'})]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must override valid attributes', async t => {
+  const actual = `<component src="components/override-attributes.html" tabindex="-1" title="My button" custom-attribute="A custom attribute">My button</component>`;
+  const expected = `<button tabindex="-1" custom-attribute="A custom attribute">My button</button>`;
+
+  const html = await posthtml([plugin({
+    root: './test/templates',
+    tag: 'component',
+    elementAttributes: {
+      BUTTON: attrs => {
+        // Remove title
+        pull(attrs, 'title');
+
+        // Add custom-attribute
+        attrs.push('custom-attribute');
+
+        return attrs;
+      }
+    }
+  })]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must work with tag without attributes', async t => {
+  const actual = `<component src="components/override-attributes.html" tabindex="-1" title="My button" custom-attribute="A custom attribute">My button</component>`;
+  const expected = `<button>My button</button>`;
+
+  const html = await posthtml([plugin({
+    root: './test/templates',
+    tag: 'component',
+    elementAttributes: {
+      BUTTON: _ => {
+        // Return empty array means no attributes
+        return [];
+      }
+    }
+  })]).process(actual).then(result => clean(result.html));
+
+  t.is(html, expected);
+});
+
+test('Must use safelist and blacklist', async t => {
+  const actual = `<component src="components/override-attributes.html" tabindex="-1" title="My button" custom-attribute="A custom attribute">My button</component>`;
+  const expected = `<button custom-attribute="A custom attribute">My button</button>`;
+
+  const html = await posthtml([plugin({
+    root: './test/templates',
+    tag: 'component',
+    safelistAttributes: ['custom-attribute'],
+    blacklistAttributes: ['role', 'tabindex']
+  })]).process(actual).then(result => clean(result.html));
 
   t.is(html, expected);
 });
