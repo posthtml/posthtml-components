@@ -1,3 +1,9 @@
+## 1.0.0 (2023-03-14)
+
+First Stable Release
+
+* Fix error messages
+
 ## 1.0.0-RC.2 (2023-03-10)
 
 Second Release Candidate
