@@ -44,7 +44,7 @@ function searchInFolders(tag, fileNameFromTag, options) {
   const componentPath = search(options.root, options.folders, fileNameFromTag, options.fileExtension);
 
   if (!componentPath) {
-    throw new Error(`[components] For the tag ${tag} was not found any template in defined root path ${options.folders.join(', ')}`);
+    throw new Error(`[components] <${tag}> could not find ${fileNameFromTag} in the defined root paths (${options.folders.join(', ')})`);
   }
 
   return componentPath;
@@ -63,7 +63,7 @@ function searchInNamespaces(tag, [namespace, fileNameFromTag], options) {
   const namespaceOption = options.namespaces.find(n => n.name === namespace.replace(options.tagPrefix, ''));
 
   if (!namespaceOption) {
-    throw new Error(`[components] Unknown component namespace ${namespace}.`);
+    throw new Error(`[components] Unknown component namespace: ${namespace}.`);
   }
 
   let componentPath;
@@ -84,7 +84,7 @@ function searchInNamespaces(tag, [namespace, fileNameFromTag], options) {
   }
 
   if (!componentPath && options.strict) {
-    throw new Error(`[components] For the tag ${tag} was not found any template in the defined namespace's base path ${namespaceOption.root}.`);
+    throw new Error(`[components] <${tag}> could not find ${fileNameFromTag} in the defined namespace base path ${namespaceOption.root}`);
   }
 
   return componentPath;

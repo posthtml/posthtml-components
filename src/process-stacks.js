@@ -2,6 +2,7 @@
 
 const {match} = require('posthtml/lib/api');
 const {render} = require('posthtml-render');
+const get = require('lodash/get');
 
 /**
  * Process <push> tag
@@ -13,8 +14,12 @@ const {render} = require('posthtml-render');
  */
 function processPushes(tree, content, push) {
   match.call(tree, {tag: push}, pushNode => {
+    if (get(pushNode, 'attrs.name') === '') {
+      throw new Error(`[components] <${push}> tag requires a value for the "name" attribute.`);
+    }
+
     if (!pushNode.attrs || !pushNode.attrs.name) {
-      throw new Error(`[components] Push <${push}> tag must have an attribute "name".`);
+      throw new Error(`[components] <${push}> tag requires a "name" attribute.`);
     }
 
     if (!content[pushNode.attrs.name]) {
