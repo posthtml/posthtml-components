@@ -217,6 +217,37 @@ Please see below example to understand better.
 <x-modal>Submit</x-modal>
 ```
 
+#### Parser options
+
+You may pass options to `posthtml-parser` via `options.parserOptions`.
+
+```js
+// index.js
+const options = { 
+  root: './src', 
+  parserOptions: { decodeEntities: true } 
+};
+
+require('posthtml')(require('posthtml-components')(options))
+  .process('some HTML', options.parserOptions)
+  .then(/* ... */)
+```
+
+Important: as you can see, whatever `parserOptions` you pass to the plugin, must also be passed in the `process` method in your code, otherwise your PostHTML build will use `posthtml-parser` defaults and will override anything you've passed to `posthtml-component`.
+
+#### Self-closing tags
+
+The plugin supports self-closing tags by default, but you need to make sure to enable them in the `process` method in your code too, by passing `recognizeSelfClosing: true` in the options object:
+
+```js
+// index.js
+require('posthtml')(require('posthtml-components')({root: './src'}))
+  .process('your HTML...', {recognizeSelfClosing: true})
+  .then(/* ... */)
+```
+
+If you don't add this to `process`, PostHTML will use `posthtml-parser` defaults and will not support self-closing component tags. This will result in everything after a self-closing tag not being output.
+
 ### Multiple folders
 
 You have full control where to place your components. Once you set the base root path of your components, you can then set multiple folders.
@@ -292,7 +323,7 @@ const options = {
 
 Use the component namespace:
 
-``` html
+```html
 <!-- src/index.html -->
 <html>
 <body>
