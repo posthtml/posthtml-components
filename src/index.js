@@ -181,7 +181,10 @@ function processTree(options) {
 
       log(`${++processCounter}) Processing "${currentNode.tag}" from "${componentPath}"`, 'processTree');
 
-      let nextNode = parser(readFileSync(componentPath, 'utf8'), options.parserOptions);
+      let nextNode = parser(
+        readFileSync(componentPath, 'utf8'),
+        mergeWith({recognizeSelfClosing: true}, options.parserOptions)
+      );
 
       // Set filled slots
       setFilledSlots(currentNode, filledSlots, options);
