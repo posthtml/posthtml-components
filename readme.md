@@ -116,6 +116,7 @@ You can run `npm run build` to compile them.
 |     **propsContext**     |                    `props`                    | String value used as object name inside the script to process process before passed to the component.                         |
 |    **propsAttribute**    |                    `props`                    | String value for props attribute to define props as JSON.                                                                     |
 |      **propsSlot**       |                    `props`                    | String value used to retrieve the props passed to slot via `$slots.slotName.props`.                                           |
+|     **parserOptions**    |        `{recognizeSelfClosing: true}`         | Object to configure `posthtml-parser`. By default, it enables support for self-closing component tags.                        |
 |     **expressions**      |                     `{}`                      | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.                   |
 |       **plugins**        |                     `[]`                      | PostHTML plugins to apply for every parsed components.                                                                        |
 |       **matcher**        |         `[{tag: options.tagPrefix}]`          | Array of object used to match the tags.                                                                                       |
