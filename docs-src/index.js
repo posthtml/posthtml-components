@@ -13,7 +13,9 @@ const src = './docs-src/pages/';
 const dist = './docs/';
 const md = './docs-src/md';
 
-const options = {};
+const options = {
+  recognizeSelfClosing: true
+};
 
 readdirSync(src).forEach(file => {
   const html = readFileSync(path.resolve(`${src}${file}`), 'utf-8');
@@ -27,6 +29,10 @@ readdirSync(src).forEach(file => {
         locals: {
           title: 'PostHTML Components'
         }
+      },
+      parserOptions: {
+        // Don't work
+        recognizeSelfClosing: false
       }
     }),
 
