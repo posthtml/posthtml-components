@@ -116,6 +116,7 @@ You can run `npm run build` to compile them.
 |     **propsContext**     |                    `props`                    | String value used as object name inside the script to process process before passed to the component.                         |
 |    **propsAttribute**    |                    `props`                    | String value for props attribute to define props as JSON.                                                                     |
 |      **propsSlot**       |                    `props`                    | String value used to retrieve the props passed to slot via `$slots.slotName.props`.                                           |
+|     **parserOptions**    |        `{recognizeSelfClosing: true}`         | Object to configure `posthtml-parser`. By default, it enables support for self-closing component tags.                        |
 |     **expressions**      |                     `{}`                      | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.                   |
 |       **plugins**        |                     `[]`                      | PostHTML plugins to apply for every parsed components.                                                                        |
 |       **matcher**        |         `[{tag: options.tagPrefix}]`          | Array of object used to match the tags.                                                                                       |
@@ -216,6 +217,37 @@ Please see below example to understand better.
 <x-modal>Submit</x-modal>
 ```
 
+#### Parser options
+
+You may pass options to `posthtml-parser` via `options.parserOptions`.
+
+```js
+// index.js
+const options = { 
+  root: './src', 
+  parserOptions: { decodeEntities: true } 
+};
+
+require('posthtml')(require('posthtml-components')(options))
+  .process('some HTML', options.parserOptions)
+  .then(/* ... */)
+```
+
+Important: as you can see, whatever `parserOptions` you pass to the plugin, must also be passed in the `process` method in your code, otherwise your PostHTML build will use `posthtml-parser` defaults and will override anything you've passed to `posthtml-component`.
+
+#### Self-closing tags
+
+The plugin supports self-closing tags by default, but you need to make sure to enable them in the `process` method in your code too, by passing `recognizeSelfClosing: true` in the options object:
+
+```js
+// index.js
+require('posthtml')(require('posthtml-components')({root: './src'}))
+  .process('your HTML...', {recognizeSelfClosing: true})
+  .then(/* ... */)
+```
+
+If you don't add this to `process`, PostHTML will use `posthtml-parser` defaults and will not support self-closing component tags. This will result in everything after a self-closing tag not being output.
+
 ### Multiple folders
 
 You have full control where to place your components. Once you set the base root path of your components, you can then set multiple folders.
@@ -291,7 +323,7 @@ const options = {
 
 Use the component namespace:
 
-``` html
+```html
 <!-- src/index.html -->
 <html>
 <body>

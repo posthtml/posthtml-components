@@ -67,3 +67,13 @@ test(`Must process component with namespace's custom path using index file`, asy
 
   t.is(html, expected);
 });
+
+test('Must process self-closing component x-tag', async t => {
+  const actual = `<p>first</p><x-modal /><p>last</p>`;
+  const expected = `<p>first</p><div>Modal</div><p>last</p>`;
+
+  const html = await posthtml([plugin({root: './test/templates', folders: 'components'})])
+    .process(actual, {recognizeSelfClosing: true}).then(result => clean(result.html));
+
+  t.is(html, expected);
+});

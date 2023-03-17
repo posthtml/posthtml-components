@@ -50,6 +50,7 @@ module.exports = (options = {}) => tree => {
   options.propsContext = options.propsContext || 'props';
   options.propsAttribute = options.propsAttribute || 'props';
   options.propsSlot = options.propsSlot || 'props';
+  options.parserOptions = options.parserOptions || {recognizeSelfClosing: true};
   options.expressions = options.expressions || {};
   options.plugins = options.plugins || [];
   options.attrsParserRules = options.attrsParserRules || {};
@@ -180,7 +181,10 @@ function processTree(options) {
 
       log(`${++processCounter}) Processing "${currentNode.tag}" from "${componentPath}"`, 'processTree');
 
-      let nextNode = parser(readFileSync(componentPath, 'utf8'));
+      let nextNode = parser(
+        readFileSync(componentPath, 'utf8'),
+        mergeWith({recognizeSelfClosing: true}, options.parserOptions)
+      );
 
       // Set filled slots
       setFilledSlots(currentNode, filledSlots, options);
