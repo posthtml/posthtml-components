@@ -29,11 +29,10 @@ readdirSync(src).forEach(file => {
         locals: {
           title: 'PostHTML Components'
         }
-      },
-      parserOptions: {
-        // Don't work
-        recognizeSelfClosing: false
       }
+      // parserOptions: {
+      //   recognizeSelfClosing: false
+      // }
     }),
 
     markdownIt({

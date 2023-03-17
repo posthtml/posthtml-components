@@ -1,3 +1,10 @@
+## 1.1.0 (2023-03-17)
+
+v.1.1.0 Stable Release
+
+* Add support for customizing posthtml-parser #31
+* Enable by default self-closing tag
+
 ## 1.0.0 (2023-03-14)
 
 First Stable Release
