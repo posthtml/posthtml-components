@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^12.0.1",
-    "@commitlint/config-angular": "^12.0.1",
+    "@commitlint/config-angular": "^18.1.0",
     "ava": "^3.15.0",
     "c8": "^7.6.0",
     "clinton": "^0.14.0",
