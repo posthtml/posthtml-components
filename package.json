@@ -39,7 +39,7 @@
     "clinton": "^0.14.0",
     "conventional-changelog-cli": "^4.1.0",
     "highlight.js": "^11.6.0",
-    "husky": "^8.0.3",
+    "husky": "^9.0.7",
     "lint-staged": "^15.2.0",
     "markdown-it-anchor": "^8.6.5",
     "markdown-it-include": "^2.0.0",
