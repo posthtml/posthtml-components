@@ -2,7 +2,7 @@
 
 const {match} = require('posthtml/lib/api');
 const parseAttrs = require('posthtml-attrs-parser');
-const styleToObject = require('style-to-object');
+const styleToObject = require('style-to-object').default;
 const validAttributes = require('./valid-attributes');
 const keys = require('lodash/keys');
 const union = require('lodash/union');
