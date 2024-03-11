@@ -47,6 +47,6 @@
     "posthtml-beautify": "^0.7.0",
     "posthtml-include": "^1.7.4",
     "posthtml-markdownit": "^2.0.0",
-    "xo": "^0.37.1"
+    "xo": "^0.58.0"
   }
 }
