@@ -1,9 +1,7 @@
-'use strict';
+import path from 'node:path'
+import { existsSync } from 'node:fs'
 
-const path = require('path');
-const {existsSync} = require('fs');
-
-const folderSeparator = '.';
+const folderSeparator = '.'
 
 /**
  * Find component path from tag name
@@ -12,25 +10,25 @@ const folderSeparator = '.';
  * @param  {Object} options Plugin options
  * @return {String|boolean} Full path or boolean false
  */
-module.exports = (tag, options) => {
+export default (tag, options) => {
   const fileNameFromTag = tag
     .replace(options.tagPrefix, '')
     .split(folderSeparator)
     .join(path.sep)
-    .concat(folderSeparator, options.fileExtension);
+    .concat(folderSeparator, options.fileExtension)
 
   try {
-    return tag.includes(options.namespaceSeparator) ?
-      searchInNamespaces(tag, fileNameFromTag.split(options.namespaceSeparator), options) :
-      searchInFolders(tag, fileNameFromTag, options);
+    return tag.includes(options.namespaceSeparator)
+      ? searchInNamespaces(tag, fileNameFromTag.split(options.namespaceSeparator), options)
+      : searchInFolders(tag, fileNameFromTag, options)
   } catch (error) {
     if (options.strict) {
-      throw new Error(error.message);
+      throw new Error(error.message)
     }
   }
 
-  return false;
-};
+  return false
+}
 
 /**
  * Search component file in root
@@ -41,13 +39,13 @@ module.exports = (tag, options) => {
  * @return {String|boolean} [custom tag root where the module is found]
  */
 function searchInFolders(tag, fileNameFromTag, options) {
-  const componentPath = search(options.root, options.folders, fileNameFromTag, options.fileExtension);
+  const componentPath = search(options.root, options.folders, fileNameFromTag, options.fileExtension)
 
   if (!componentPath) {
-    throw new Error(`[components] <${tag}> could not find ${fileNameFromTag} in the defined root paths (${options.folders.join(', ')})`);
+    throw new Error(`[components] <${tag}> could not find ${fileNameFromTag} in the defined root paths (${options.folders.join(', ')})`)
   }
 
-  return componentPath;
+  return componentPath
 }
 
 /**
@@ -60,34 +58,34 @@ function searchInFolders(tag, fileNameFromTag, options) {
  * @return {String|boolean} [custom tag root where the module is found]
  */
 function searchInNamespaces(tag, [namespace, fileNameFromTag], options) {
-  const namespaceOption = options.namespaces.find(n => n.name === namespace.replace(options.tagPrefix, ''));
+  const namespaceOption = options.namespaces.find(n => n.name === namespace.replace(options.tagPrefix, ''))
 
   if (!namespaceOption) {
-    throw new Error(`[components] Unknown component namespace: ${namespace}.`);
+    throw new Error(`[components] Unknown component namespace: ${namespace}.`)
   }
 
-  let componentPath;
+  let componentPath
 
   // 1) Check in custom root
   if (namespaceOption.custom) {
-    componentPath = search(namespaceOption.custom, options.folders, fileNameFromTag, options.fileExtension);
+    componentPath = search(namespaceOption.custom, options.folders, fileNameFromTag, options.fileExtension)
   }
 
   // 2) Check in base root
   if (!componentPath) {
-    componentPath = search(namespaceOption.root, options.folders, fileNameFromTag, options.fileExtension);
+    componentPath = search(namespaceOption.root, options.folders, fileNameFromTag, options.fileExtension)
   }
 
   // 3) Check in fallback root
   if (!componentPath && namespaceOption.fallback) {
-    componentPath = search(namespaceOption.fallback, options.folders, fileNameFromTag, options.fileExtension);
+    componentPath = search(namespaceOption.fallback, options.folders, fileNameFromTag, options.fileExtension)
   }
 
   if (!componentPath && options.strict) {
-    throw new Error(`[components] <${tag}> could not find ${fileNameFromTag} in the defined namespace base path ${namespaceOption.root}`);
+    throw new Error(`[components] <${tag}> could not find ${fileNameFromTag} in the defined namespace base path ${namespaceOption.root}`)
   }
 
-  return componentPath;
+  return componentPath
 }
 
 /**
@@ -100,20 +98,20 @@ function searchInNamespaces(tag, [namespace, fileNameFromTag], options) {
  * @return {String|boolean} [custom tag root where the module is found]
  */
 function search(root, folders, fileName, extension) {
-  let componentPath;
+  let componentPath
 
   let componentFound = folders.some(folder => {
-    componentPath = path.join(path.resolve(root, folder), fileName);
-    return existsSync(componentPath);
-  });
+    componentPath = path.join(path.resolve(root, folder), fileName)
+    return existsSync(componentPath)
+  })
 
   if (!componentFound) {
-    fileName = fileName.replace(`.${extension}`, `${path.sep}index.${extension}`);
+    fileName = fileName.replace(`.${extension}`, `${path.sep}index.${extension}`)
     componentFound = folders.some(folder => {
-      componentPath = path.join(path.resolve(root, folder), fileName);
-      return existsSync(componentPath);
-    });
+      componentPath = path.join(path.resolve(root, folder), fileName)
+      return existsSync(componentPath)
+    })
   }
 
-  return componentFound ? componentPath : false;
+  return componentFound ? componentPath : false
 }

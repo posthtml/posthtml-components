@@ -1,9 +1,11 @@
-'use strict';
-
-const {match} = require('posthtml/lib/api');
-const {render} = require('posthtml-render');
-const each = require('lodash/each');
-const omit = require('lodash/omit');
+// const {match} = require('posthtml/lib/api');
+import { match } from 'posthtml/lib/api'
+// const {render} = require('posthtml-render');
+import { render } from 'posthtml-render'
+// const each = require('lodash/each');
+import each from 'lodash-es/each'
+// const omit = require('lodash/omit');
+import omit from 'lodash-es/omit'
 
 /**
  * Set filled slots
@@ -14,22 +16,22 @@ const omit = require('lodash/omit');
  * @param  {String} slotSeparator Slot separator
  * @return {void}
  */
-function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator, propsSlot}) {
+export function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator, propsSlot}) {
   match.call(currentNode, {tag: fill}, fillNode => {
     if (!fillNode.attrs) {
-      fillNode.attrs = {};
+      fillNode.attrs = {}
     }
 
-    const name = fillNode.tag.split(slotSeparator)[1];
+    const name = fillNode.tag.split(slotSeparator)[1]
 
-    const props = omit(fillNode.attrs, ['append', 'prepend', 'aware']);
+    const props = omit(fillNode.attrs, ['append', 'prepend', 'aware'])
 
     if (props) {
       each(props, (value, key, attrs) => {
         try {
-          attrs[key] = JSON.parse(value);
+          attrs[key] = JSON.parse(value)
         } catch {}
-      });
+      })
     }
 
     filledSlots[name] = {
@@ -40,10 +42,10 @@ function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator, propsSlo
       content: fillNode.content,
       source: render(fillNode.content),
       [propsSlot]: props
-    };
+    }
 
-    return fillNode;
-  });
+    return fillNode
+  })
 }
 
 /**
@@ -55,21 +57,21 @@ function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator, propsSlo
  * @param  {String} slotSeparator Slot separator
  * @return {void}
  */
-function processFillContent(tree, filledSlots, {fill, slotSeparator}) {
+export function processFillContent(tree, filledSlots, {fill, slotSeparator}) {
   match.call(tree, {tag: fill}, fillNode => {
-    const name = fillNode.tag.split(slotSeparator)[1];
+    const name = fillNode.tag.split(slotSeparator)[1]
 
-    filledSlots[name].tag = fillNode.tag;
-    filledSlots[name].attrs = fillNode.attrs;
-    filledSlots[name].content = fillNode.content;
-    filledSlots[name].source = render(fillNode.content);
-    filledSlots[name].rendered = false;
+    filledSlots[name].tag = fillNode.tag
+    filledSlots[name].attrs = fillNode.attrs
+    filledSlots[name].content = fillNode.content
+    filledSlots[name].source = render(fillNode.content)
+    filledSlots[name].rendered = false
 
-    fillNode.tag = false;
-    fillNode.content = null;
+    fillNode.tag = false
+    fillNode.content = null
 
-    return fillNode;
-  });
+    return fillNode
+  })
 }
 
 /**
@@ -81,36 +83,34 @@ function processFillContent(tree, filledSlots, {fill, slotSeparator}) {
  * @param  {String} slotSeparator Slot separator
  * @return {void}
  */
-function processSlotContent(tree, filledSlots, {slot, slotSeparator}) {
+export function processSlotContent(tree, filledSlots, {slot, slotSeparator}) {
   match.call(tree, {tag: slot}, slotNode => {
-    const name = slotNode.tag.split(slotSeparator)[1];
+    const name = slotNode.tag.split(slotSeparator)[1]
 
-    slotNode.tag = false;
+    slotNode.tag = false
 
     if (!filledSlots[name]) {
-      return slotNode;
+      return slotNode
     }
 
     if (filledSlots[name].rendered) {
-      slotNode.content = null;
-    } else if (slotNode.content && filledSlots[name].attrs && (typeof filledSlots[name].attrs.append !== 'undefined' || typeof filledSlots[name].attrs.prepend !== 'undefined')) {
-      slotNode.content = typeof filledSlots[name].attrs.append === 'undefined' ? filledSlots[name].content.concat(slotNode.content) : slotNode.content.concat(filledSlots[name].content);
+      slotNode.content = null
+    } else if (
+      slotNode.content
+      && filledSlots[name].attrs
+      && (typeof filledSlots[name].attrs.append !== 'undefined' || typeof filledSlots[name].attrs.prepend !== 'undefined')
+    ) {
+      slotNode.content = typeof filledSlots[name].attrs.append === 'undefined' ? filledSlots[name].content.concat(slotNode.content) : slotNode.content.concat(filledSlots[name].content)
     } else {
-      slotNode.content = filledSlots[name].content;
+      slotNode.content = filledSlots[name].content
     }
 
     // Set rendered to true so a slot can be output only once,
     //  when not present "aware" attribute
     if (filledSlots[name] && (!filledSlots[name].attrs || typeof filledSlots[name].attrs.aware === 'undefined')) {
-      filledSlots[name].rendered = true;
+      filledSlots[name].rendered = true
     }
 
-    return slotNode;
-  });
+    return slotNode
+  })
 }
-
-module.exports = {
-  setFilledSlots,
-  processFillContent,
-  processSlotContent
-};
