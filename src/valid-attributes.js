@@ -9,7 +9,7 @@
  */
 
 /* eslint-disable quote-props */
-module.exports = {
+const attributes = {
   elementAttributes: {
     'A': [
       'accesskey',
@@ -3557,4 +3557,6 @@ module.exports = {
 
   // Skip this attributes
   blacklistAttributes: []
-};
+}
+
+export default attributes
