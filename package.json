@@ -1,25 +1,28 @@
 {
   "name": "posthtml-component",
   "version": "1.1.1",
-  "description": "PostHTML Components Blade-like with slots, attributes as props and custom tag",
+  "description": "PostHTML Components Blade-like with slots, attributes as props and custom tags",
   "license": "MIT",
-  "repository": "thewebartisan7/posthtml-components",
+  "repository": "posthtml/posthtml-components",
   "author": "Damir Grgic <damir@tuta.io> (https://github.com/thewebartisan7)",
   "main": "src",
   "engines": {
     "node": ">=10"
   },
   "scripts": {
-    "version": "conventional-changelog -i changelog.md -s -r 0 && git add changelog.md",
-    "test": "c8 ava",
-    "pretest": "clinton && xo",
-    "build": "node ./docs-src"
+    "dev": "vitest",
+    "release": "npx np",
+    "docs": "node ./docs-src",
+    "lint": "biome lint ./src ./scripts",
+    "test": "vitest run --coverage",
+    "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md"
   },
   "keywords": [
     "posthtml",
     "posthtml-component",
     "posthtml-components",
     "components",
+    "include",
     "html"
   ],
   "dependencies": {
@@ -32,21 +35,16 @@
     "style-to-object": "^1.0.5"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.2.1",
-    "@commitlint/config-angular": "^19.1.0",
-    "ava": "^3.15.0",
-    "c8": "^10.1.2",
-    "clinton": "^0.14.0",
+    "@biomejs/biome": "1.8.3",
+    "@vitest/coverage-v8": "^2.0.4",
     "conventional-changelog-cli": "^5.0.0",
     "highlight.js": "^11.6.0",
-    "husky": "^9.0.7",
-    "lint-staged": "^15.2.0",
     "markdown-it-anchor": "^9.0.1",
     "markdown-it-include": "^2.0.0",
     "markdown-it-toc-done-right": "^4.2.0",
     "posthtml-beautify": "^0.7.0",
     "posthtml-include": "^1.7.4",
     "posthtml-markdownit": "^3.1.0",
-    "xo": "^0.37.1"
+    "vitest": "^2.0.4"
   }
 }

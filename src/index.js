@@ -159,7 +159,7 @@ let processCounter = 0;
 function processTree(options) {
   const filledSlots = {};
 
-  return function (tree) {
+  return tree => {
     log(`Processing tree number ${processCounter}..`, 'processTree');
 
     if (options.plugins.length > 0) {
@@ -269,9 +269,9 @@ function getComponentPath(currentNode, options) {
     if (!existsSync(componentPath)) {
       if (options.strict) {
         throw new Error(`[components] The component was not found in ${componentPath}.`);
-      } else {
-        return false;
       }
+
+      return false;
     }
 
     // Delete attribute used as path
