@@ -107,6 +107,8 @@ The `<yield></yield>` tag is where content that you pass to a component will be 
 
 The plugin configures the PostHTML parser to recognize self-closing tags, so you can also just write is as `<yield />`.
 
+For brevity, we will use self-closing tags in the examples.
+
 ### More examples
 
 See also the `docs-src` folder where you can find more examples. 
