@@ -126,7 +126,7 @@ You can run `npm run build` to compile them.
 |      **utilities**       | `{merge: _.mergeWith, template: _.template}`  | Object of utilities methods to be passed to `<script props>`. By default lodash `mergeWith` and `template`.                   |
 |  **elementAttributes**   |                     `{}`                      | An object with tag name and a function modifier of valid-attributes.js.                                                       |
 |  **safelistAttributes**  |         `['data-*']`                          | An array of attributes name to be added to default valid attributes.                                                          |
-| **blacklistAttributes**  |                     `[]`                      | An array of attributes name to be removed from default valid attributes.                                                      |
+| **blocklistAttributes**  |                     `[]`                      | An array of attributes name to be removed from default valid attributes.                                                      |
 
 ## Features
 
@@ -833,7 +833,7 @@ const options = {
   ],
 
   // Remove attributes from all tags that support it
-  blacklistAttributes: [
+  blocklistAttributes: [
     'role'
   ]
 }

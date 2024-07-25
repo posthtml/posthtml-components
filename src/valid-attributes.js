@@ -3546,7 +3546,7 @@ module.exports = {
     ]
   },
 
-  // Safelist and blacklist attributes will be applied to all tags
+  // Safelist and blocklist attributes will be applied to all tags
 
   // Add additional attributes, use '*' in the end to check by startsWith
   // Example: 'start-with-*'
@@ -3556,5 +3556,5 @@ module.exports = {
   ],
 
   // Skip this attributes
-  blacklistAttributes: []
+  blocklistAttributes: []
 };

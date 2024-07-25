@@ -80,7 +80,7 @@ module.exports = (options = {}) => tree => {
   // { TAG: (attributes) => { attributes[] = 'attribute-name'; return attributes; } }
   options.elementAttributes = isPlainObject(options.elementAttributes) ? options.elementAttributes : {};
   options.safelistAttributes = Array.isArray(options.safelistAttributes) ? options.safelistAttributes : [];
-  options.blacklistAttributes = Array.isArray(options.blacklistAttributes) ? options.blacklistAttributes : [];
+  options.blocklistAttributes = Array.isArray(options.blocklistAttributes) ? options.blocklistAttributes : [];
 
   // Merge customizer callback passed to lodash mergeWith
   //  for merge attribute `props` and all attributes starting with `merge:`

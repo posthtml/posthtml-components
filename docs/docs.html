@@ -643,7 +643,7 @@ You can run
                 </tr>
                 <tr>
                   <td style="text-align:center">
-                    <strong>blacklistAttributes</strong>
+                    <strong>blocklistAttributes</strong>
                   </td>
                   <td style="text-align:center">
                     <code>[]</code>
@@ -692,9 +692,9 @@ require('posthtml')(require('posthtml-components')({ root: './src', tagName: 'co
             </p>
             <pre><code class="language-js">// index.js
 
-const options = { 
-  root: './src', 
-  matcher: [{tag: 'a-tag'}, {tag: 'another-one'}, {tag: new RegExp(`^app-`, 'i')}] 
+const options = {
+  root: './src',
+  matcher: [{tag: 'a-tag'}, {tag: 'another-one'}, {tag: new RegExp(`^app-`, 'i')}]
 };
 
 require('posthtml')(require('posthtml-components')(options))
@@ -710,8 +710,8 @@ require('posthtml')(require('posthtml-components')(options))
             <p>Setup PostHTML:</p>
             <pre><code class="language-js">// index.js
 
-const options = { 
-  root: './src', 
+const options = {
+  root: './src',
   tagPrefix: 'x-'
 };
 
@@ -759,9 +759,9 @@ For example let's suppose your main root is
 You can set up the plugin like below:
             </p>
             <pre><code class="language-js">// index.js
-const options = { 
-  root: './src', 
-  folders: ['components', 'layouts'] 
+const options = {
+  root: './src',
+  folders: ['components', 'layouts']
 };
 
 require('posthtml')(require('posthtml-components')(options))
@@ -991,7 +991,7 @@ Find below a simple example.
   &lt;fill:body&gt;Body content&lt;/fill:body&gt;
   &lt;fill:footer&gt;Footer content&lt;/fill:footer&gt;
 &lt;/x-modal&gt;
-  
+
 &lt;stack name=&quot;scripts&quot;&gt;&lt;/stack&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
@@ -1132,8 +1132,8 @@ If you would like to prepend content onto the beginning of a stack, you should u
             <pre><code class="language-html">&lt;!-- src/modal.html --&gt;
 &lt;script props&gt;
   module.exports = {
-    title: props.title || 'Default title', 
-    size: props.size ? `modal-${props.size}` : '', 
+    title: props.title || 'Default title',
+    size: props.size ? `modal-${props.size}` : '',
     items: Array.isArray(props.items) ? props.items.concat(['first', 'second']) : ['first', 'second']
   }
 &lt;/script&gt;
@@ -1335,7 +1335,7 @@ const components = require('posthtml-components')
 
 const options = {
   root: './src',
-  
+
   // Add attributes to specific tag or override defaults
   elementAttributes: {
     DIV: (defaultAttributes) =&gt; {
@@ -1351,7 +1351,7 @@ const options = {
       return defaultAttributes;
     },
   },
-  
+
   // Add attributes to all tags, use '*' as wildcard for attribute name that starts with
   safelistAttributes: [
     'custom-attribute-name',
@@ -1359,7 +1359,7 @@ const options = {
   ],
 
   // Remove attributes from all tags that support it
-  blacklistAttributes: [
+  blocklistAttributes: [
     'role'
   ]
 }

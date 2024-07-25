@@ -100,7 +100,7 @@ test('Must work with tag without attributes', async () => {
   expect(html).toBe(expected);
 });
 
-test('Must use safelist and blacklist', async () => {
+test('Must use safelist and blocklist', async () => {
   const actual = `<component src="components/override-attributes.html" tabindex="-1" title="My button" custom-attribute="A custom attribute">My button</component>`;
   const expected = `<button custom-attribute="A custom attribute">My button</button>`;
 
@@ -108,7 +108,7 @@ test('Must use safelist and blacklist', async () => {
     root: './test/templates',
     tag: 'component',
     safelistAttributes: ['custom-attribute'],
-    blacklistAttributes: ['role', 'tabindex']
+    blocklistAttributes: ['role', 'tabindex']
   })]).process(actual).then(result => clean(result.html));
 
   expect(html).toBe(expected);
