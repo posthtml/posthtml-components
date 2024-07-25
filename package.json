@@ -11,11 +11,11 @@
   },
   "scripts": {
     "dev": "vitest",
-    "release": "npx np",
+    "release": "npm run changelog && npx np",
     "docs": "node ./docs-src",
     "lint": "biome lint ./src ./scripts",
     "test": "vitest run --coverage",
-    "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md"
+    "changelog": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md && git commit -m 'chore: update changelog.md' && git push"
   },
   "keywords": [
     "posthtml",
