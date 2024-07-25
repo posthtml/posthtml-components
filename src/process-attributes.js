@@ -46,8 +46,8 @@ module.exports = (currentNode, attributes, props, options, aware) => {
 
   const nodeAttrs = parseAttrs(mainNode.attrs, options.attrsParserRules);
 
-  // Merge elementAttributes and blacklistAttributes with options provided
-  validAttributes.blacklistAttributes = union(validAttributes.blacklistAttributes, options.blacklistAttributes);
+  // Merge elementAttributes and blocklistAttributes with options provided
+  validAttributes.blocklistAttributes = union(validAttributes.blocklistAttributes, options.blocklistAttributes);
   validAttributes.safelistAttributes = union(validAttributes.safelistAttributes, options.safelistAttributes);
 
   // Merge or override elementAttributes from options provided
@@ -64,7 +64,7 @@ module.exports = (currentNode, attributes, props, options, aware) => {
   }
 
   // Attributes to be excluded
-  const excludeAttributes = union(validAttributes.blacklistAttributes, keys(props), keys(aware), keys(options.props), ['$slots']);
+  const excludeAttributes = union(validAttributes.blocklistAttributes, keys(props), keys(aware), keys(options.props), ['$slots']);
   // All valid HTML attributes for the main element
   const allValidElementAttributes = isString(mainNode.tag) && has(validAttributes.elementAttributes, mainNode.tag.toUpperCase()) ? validAttributes.elementAttributes[mainNode.tag.toUpperCase()] : [];
   // Valid HTML attributes without the excluded
