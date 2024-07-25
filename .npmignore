@@ -10,3 +10,4 @@ test
 CHANGELOG.md
 .github
 scripts
+vitest.config.js
