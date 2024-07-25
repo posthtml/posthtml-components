@@ -1,11 +1,21 @@
-[![NPM][npm]][npm-url]
-[![Coverage][cover]][cover-badge]
-[![XO code style][style]][style-url]
+[npm]: https://www.npmjs.com/package/posthtml-component
+[npm-version-shield]: https://img.shields.io/npm/v/posthtml-component.svg
+[npm-stats]: http://npm-stat.com/charts.html?package=posthtml-component
+[npm-stats-shield]: https://img.shields.io/npm/dt/posthtml-component.svg
+[github-ci]: https://github.com/posthtml/posthtml-components/actions/workflows/build.yml
+[github-ci-shield]: https://github.com/posthtml/posthtml-components/actions/workflows/build.yml/badge.svg
+[license]: ./LICENSE
+[license-shield]: https://img.shields.io/npm/l/posthtml-component.svg
 
 <div align="center">
-  <img width="300" title="PostHTML" src="http://posthtml.github.io/posthtml/logo.svg">
-  <h1>PostHTML Components </h1>
-  <p>A PostHTML plugin for create components with HTML-friendly syntax inspired by Laravel Blade. Slots, stack/push, props, custom tag and much more.</p>
+  <img width="150" height="150" alt="PostHTML" src="https://posthtml.github.io/posthtml/logo.svg">
+  <h1>PostHTML Components</h1>
+  <p>Laravel Blade-inspired components for PostHTML</p>
+
+  [![Version][npm-version-shield]][npm]
+  [![Build][github-ci-shield]][github-ci]
+  [![License][license-shield]][license]
+  [![Downloads][npm-stats-shield]][npm-stats]
 </div>
 
 ## Installation
@@ -16,9 +26,8 @@ npm i -D posthtml-component
 
 ## Introduction
 
-This PostHTML plugin provides an HTML-friendly syntax for write components in your templates.
-If you are familiar with Blade, React, Vue or similar, you will find familiar syntax as this plugin is inspired by them.
-See below a basic example, as code is worth a thousand words.
+This PostHTML plugin provides an HTML-friendly syntax for using components in your HTML templates.
+If you are familiar with Blade, React, Vue or similar, you will find the syntax to be familiar, as this plugin is inspired by them.
 
 **See also the first [PostHTML Bootstrap UI](https://github.com/thewebartisan7/posthtml-bootstrap-ui) using this plugin and check also the [starter template here](https://github.com/thewebartisan7/posthtml-bootstrap-ui-starter).**
 
@@ -33,7 +42,7 @@ Create the component:
 </button>
 ```
 
-Use the component:
+Use it:
 
 ``` html
 <!-- src/index.html -->
@@ -48,14 +57,15 @@ Init PostHTML:
 
 ```js
 // index.js
-const { readFileSync, writeFileSync } = require('fs')
-
 const posthtml = require('posthtml')
 const components = require('posthtml-components')
+const { readFileSync, writeFileSync } = require('node:fs')
 
-posthtml(components({ root: './src' }))
+posthtml([
+  components({ root: './src' })
+])
   .process(readFileSync('src/index.html', 'utf8'))
-  .then((result) => writeFileSync('dist/index.html', result.html, 'utf8'))
+  .then(result => writeFileSync('dist/index.html', result.html, 'utf8'))
 ```
 
 Result:
@@ -69,11 +79,13 @@ Result:
 </html>
 ```
 
-You may notice that the `src/button.html` component has a `type` and `class` attribute, and when we use the component in `src/index.html` we pass `type` and `class` attribute.
-The result is that `type` is override, and `class` is merged.
+You might have noticed that the `src/button.html` component contains `type` and `class` attributes, and that we also passed those attributes when we used it in `src/index.html`.
 
-By default `class` and `style` attributes are merged, while all others attribute are override.
-You can also override `class` and `style` attributes by prepending `override:` to the class attribute. Example:
+The result is that `type` was overridden, and `class` was merged.
+
+By default, `class` and `style` attributes are merged, while all others attribute are overridden. You can also override `class` and `style` attributes by prepending `override:` to the class attribute. 
+
+For example:
 
 ```html
 <x-button override:class="btn-custom">Submit</x-button>
@@ -82,67 +94,75 @@ You can also override `class` and `style` attributes by prepending `override:` t
 <button type="button" class="btn-custom">Submit</button>
 ```
 
-All attributes you pass to the component will be added to the first node of your component or to the node with an attribute names `attributes`,
-and only if they are not defined as `props` via `<script props>` or if they are not in the following file
-[valid-attributes.js](https://github.com/thewebartisan7/posthtml-components/blob/main/src/valid-attributes.js). 
-You can also manage valid attributes via options.
+All attributes that you pass to the component will be added to the first node of your component or to the node with an attribute named `attributes`, _only_ if they are not defined as `props` via `<script props>` or if they are not "known attributes" (see
+[valid-attributes.js](https://github.com/thewebartisan7/posthtml-components/blob/main/src/valid-attributes.js)). 
+
+You can also define which attributes are considered to be valid, via the plugin's options.
+
 More details on this in [Attributes](#attributes) section.
 
-The `<yield>` tag is where your content will be injected.
-In next section you can find all available options and then examples for each feature.
+### yield tag
+
+The `<yield></yield>` tag is where content that you pass to a component will be injected.
+
+The plugin configures the PostHTML parser to recognize self-closing tags, so you can also just write is as `<yield />`.
+
+### More examples
 
 See also the `docs-src` folder where you can find more examples. 
-You can run `npm run build` to compile them.
+
+You can clone this repo and run `npm run build` to compile them.
 
 ## Options
 
-|          Option          |                    Default                    | Description                                                                                                                   |
-|:------------------------:|:---------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------|
-|         **root**         |                    `'./'`                     | String value as root path for components lookup.                                                                              |
-|       **folders**        |                    `['']`                     | Array of additional multi folders path from `options.root` or any defined namespaces root, fallback or custom.                |
-|      **tagPrefix**       |                     `x-`                      | String for tag prefix. The plugin will use RegExp with this string.                                                           |
-|         **tag**          |                    `false`                    | String or boolean value for component tag. Use this with `options.attribute`. Boolean only false.                             |
-|      **attribute**       |                     `src`                     | String value for component attribute for set path.                                                                            |
-|      **namespaces**      |                     `[]`                      | Array of namespace's root path, fallback path and custom path for override.                                                   |
-|  **namespaceSeparator**  |                     `::`                      | String value for namespace separator to be used with tag name. Example `<x-namespace::button>`                                |
-|    **fileExtension**     |                    `html`                     | String value for file extension of the components used for retrieve x-tag file.                                               |
-|        **yield**         |                    `yield`                    | String value for `<yield>` tag name. Where main content of component is injected.                                             |
-|         **slot**         |                    `slot`                     | String value for `<slot>` tag name. Used with RegExp by appending `:` (example `<slot:slot-name>`).                           |
-|         **fill**         |                    `fill`                     | String value for `<fill>` tag name. Used with RegExp by appending `:` (example `<fill:slot-name>`).                           |
-|    **slotSeparator**     |                      `:`                      | String value used for separate `<slot>` and `<fill>` tag from their names.                                                    |
-|         **push**         |                    `push`                     | String value for `<push>` tag name.                                                                                           |
-|        **stack**         |                    `stack`                    | String value for `<stack>` tag name.                                                                                          |
-| **propsScriptAttribute** |                    `props`                    | String value used as attribute in `<script props>` parsed by the plugin to retrieve props of the component.                   |
-|     **propsContext**     |                    `props`                    | String value used as object name inside the script to process process before passed to the component.                         |
-|    **propsAttribute**    |                    `props`                    | String value for props attribute to define props as JSON.                                                                     |
-|      **propsSlot**       |                    `props`                    | String value used to retrieve the props passed to slot via `$slots.slotName.props`.                                           |
-|     **parserOptions**    |        `{recognizeSelfClosing: true}`         | Object to configure `posthtml-parser`. By default, it enables support for self-closing component tags.                        |
-|     **expressions**      |                     `{}`                      | Object to configure `posthtml-expressions`. You can pre-set locals or customize the delimiters for example.                   |
-|       **plugins**        |                     `[]`                      | PostHTML plugins to apply for every parsed components.                                                                        |
-|       **matcher**        |         `[{tag: options.tagPrefix}]`          | Array of object used to match the tags.                                                                                       |
-|   **attrsParserRules**   |                     `{}`                      | Additional rules for attributes parser plugin.                                                                                |
-|        **strict**        |                    `true`                     | Boolean value for enable or disable throw an exception.                                                                       |
-|   **mergeCustomizer**    |                  `function`                   | Function callback passed to lodash `mergeWith` for merge `options.expressions.locals` and props passed via attribute `props`. |
-|      **utilities**       | `{merge: _.mergeWith, template: _.template}`  | Object of utilities methods to be passed to `<script props>`. By default lodash `mergeWith` and `template`.                   |
-|  **elementAttributes**   |                     `{}`                      | An object with tag name and a function modifier of valid-attributes.js.                                                       |
-|  **safelistAttributes**  |         `['data-*']`                          | An array of attributes name to be added to default valid attributes.                                                          |
-| **blocklistAttributes**  |                     `[]`                      | An array of attributes name to be removed from default valid attributes.                                                      |
+| Name                     | Type              | Default                                      | Description                                                                             |
+|--------------------------|-------------------|----------------------------------------------|-----------------------------------------------------------------------------------------|
+| **root**                 | `String`          | `'./'`                                       | Root path for components lookup.                                                        |
+| **folders**              | `String[]`        | `['']`                                       | Array of paths relative to `options.root` or defined namespaces.                        |
+| **tagPrefix**            | `String`          | `'x-'`                                       | Tag prefix.                                                                             |
+| **tag**                  | `String\|Boolean` | `false`                                      | Component tag. Use with `options.attribute`. Boolean only `false`.                      |
+| **attribute**            | `String`          | `'src'`                                      | Component attribute for setting path.                                                   |
+| **namespaces**           | `String[]`        | `[]`                                         | Array of namespace root paths, fallback paths, and custom override paths.               |
+| **namespaceSeparator**   | `String`          | `'::'`                                       | Namespace separator for tag names.                                                      |
+| **fileExtension**        | `String`          | `'html'`                                     | File extension for component files.                                                     |
+| **yield**                | `String`          | `'yield'`                                    | Tag name for injecting main component content.                                          |
+| **slot**                 | `String`          | `'slot'`                                     | Tag name for slots.                                                                     |
+| **fill**                 | `String`          | `'fill'`                                     | Tag name for filling slots.                                                             |
+| **slotSeparator**        | `String`          | `':'`                                        | Name separator for `<slot>` and `<fill>` tags.                                          |
+| **push**                 | `String`          | `'push'`                                     | Tag name for `<push>`.                                                                  |
+| **stack**                | `String`          | `'stack'`                                    | Tag name for `<stack>`.                                                                 |
+| **propsScriptAttribute** | `String`          | `'props'`                                    | Attribute in `<script props>` for retrieving component props.                           |
+| **propsContext**         | `String`          | `'props'`                                    | Name of the object inside the script for processing props.                              |
+| **propsAttribute**       | `String`          | `'props'`                                    | Attribute to define props as JSON.                                                      |
+| **propsSlot**            | `String`          | `'props'`                                    | Used to retrieve props passed to slot via `$slots.slotName.props`.                      |
+| **parserOptions**        | `Object`          | `{recognizeSelfClosing: true}`               | Pass options to `posthtml-parser`.                      |
+| **expressions**          | `Object`          | `{}`                                         | Pass options to `posthtml-expressions`.                  |
+| **plugins**              | `Array`           | `[]`                                         | PostHTML plugins to apply to every parsed component.                                    |
+| **matcher**              | `Object`          | `[{tag: options.tagPrefix}]`                 | Array of objects used to match tags.                                                    |
+| **attrsParserRules**     | `Object`          | `{}`                                         | Additional rules for attributes parser plugin.                                          |
+| **strict**               | `Boolean`         | `true`                                       | Toggle exception throwing.                                                              |
+| **mergeCustomizer**      | `Function`        | `function`                                   | Callback for lodash `mergeWith` to merge `options.expressions.locals` and props.        |
+| **utilities**            | `Object`          | `{merge: _.mergeWith, template: _.template}` | Utility methods passed to `<script props>`. |
+| **elementAttributes**    | `Object`          | `{}`                                         | Object with tag names and function modifiers of `valid-attributes.js`.                  |
+| **safelistAttributes**   | `String[]`        | `['data-*']`                                 | Array of attribute names to add to default valid attributes.                            |
+| **blocklistAttributes**  | `String[]`        | `[]`                                         | Array of attribute names to remove from default valid attributes.                       |
 
 ## Features
 
 ### Tag names and x-tags
 
 You can use the components in multiple ways, or also a combination of them.
-Like with `posthtml-extend` and `posthtml-modules` you can define a tag name in combination with an attribute name for set the path of the components.
 
-For example for the same button component `src/button.html` in the basic example we can define the tag name and attribute name and then use it in this way:
+If you to use components as 'includes', you may define a tag and src attribute name.
 
-``` html
+Using our previous button component example, we can define the tag and attribute names and then use it in this way:
+
+```hbs
 <!-- src/index.html -->
 <html>
-<body>
-  <component src="button.html">Submit</component>
-</body>
+  <body>
+    <component src="button.html">Submit</component>
+  </body>
 </html>
 ```
 
@@ -151,16 +171,20 @@ Init PostHTML:
 ```js
 // index.js
 
-require('posthtml')(require('posthtml-components')({ root: './src', tagName: 'component', attribute: 'src' }))
+require('posthtml')(
+  require('posthtml-components')({ 
+    root: './src', 
+    tag: 'component', 
+    attribute: 'src' 
+  }))
   .process(/* ... */)
   .then(/* ... */)
 ```
 
-If you need more control over how to match the tags, you can pass directly an array of matcher or single object via `options.matcher` like shown in below example:
+If you need more control over tag matching, you can pass an array of matcher or single object via `options.matcher` like this:
 
 ```js
 // index.js
-
 const options = { 
   root: './src', 
   matcher: [{tag: 'a-tag'}, {tag: 'another-one'}, {tag: new RegExp(`^app-`, 'i')}] 
@@ -171,13 +195,12 @@ require('posthtml')(require('posthtml-components')(options))
   .then(/* ... */)
 ```
 
-With `posthtml-components` you don't need to specify the path name when you are using `x-tag-name` syntax. See below example.
+With `posthtml-components` you don't need to specify the path name when you are using `x-tag-name` syntax.
 
 Setup PostHTML:
 
 ```js
 // index.js
-
 const options = { 
   root: './src', 
   tagPrefix: 'x-'
@@ -199,21 +222,22 @@ Use:
 </html>
 ```
 
-If your components are in a subfolder then you can use `dot` to access it, example:
+If your components are in a subfolder then you can use `dot` to access it:
 
 ``` html
-<!-- Supposing your button component is located in ./src/components/forms/button.html -->
+<!-- src/components/forms/button.html -->
 <x-forms.button>Submit</x-forms.button>
 ```
 
-If your components are in a sub-folder with multiple files, then for avoid typing the main file you can use `index.html` without specify it.
-Please see below example to understand better.
+If your components are in a sub-folder with multiple files, then in order to avoid writing out the main file name you can use `index.html` without specifying it.
+
+Here's an example:
 
 ``` html
-<!-- Supposing your modal component is located in ./src/components/modals/index.html -->
+<!-- src/components/modals/index.html -->
 <x-modal.index>Submit</x-modal.index>
 
-<!-- You can omit "index" part since the file is named "index.html" -->
+<!-- You may omit "index" part since the file is named "index.html" -->
 <x-modal>Submit</x-modal>
 ```
 
@@ -250,9 +274,9 @@ If you don't add this to `process`, PostHTML will use `posthtml-parser` defaults
 
 ### Multiple folders
 
-You have full control where to place your components. Once you set the base root path of your components, you can then set multiple folders.
-For example let's suppose your main root is `./src` and then you have several folders where you have your components, for example `./src/components` and `./src/layouts`.
-You can set up the plugin like below:
+You have full control over where your component files exist. Once you set the base root path of your components, you can then set multiple folders.
+
+For example if your root is `./src` and then you have several folders where you have your components, for example `./src/components` and `./src/layouts`, you can set up the plugin like below:
 
 ```js
 // index.js
@@ -268,13 +292,13 @@ require('posthtml')(require('posthtml-components')(options))
 
 ### Namespaces
 
-With namespaces, you can define a top level root path to your components like shown in below example.
-It can be useful for handle custom theme, where you define a specific top level root, with fallback root when component it's not found,
-and a custom root for override, something like a child theme.
+With namespaces, you can define a top level root path to your components.
 
-Thanks to namespace, you can create folders structure like below:
+It can be useful for handling custom themes, where you define a specific top level root with a fallback root for when a component is not found, and a custom root for overriding.
 
-- `src` (base root folder)
+This makes it possible to create folder structures like this:
+
+- `src` (root folder)
   - `components` (folder for components like modal, button, etc.)
   - `layouts` (folder for layout components like base layout, header, footer, etc.)
   - `theme-dark` (namespace folder for theme-dark)
@@ -296,18 +320,18 @@ And the options would be like:
 ```js
 // index.js
 const options = {
-  // Main root for component without namespace
+  // Root for component without namespace
   root: './src',
   // Folders is always appended in 'root' or any defined namespace's folders (base, fallback or custom)
   folders: ['components', 'layouts'],
   namespaces: [{
-    // Namespace name will be prepend to tag name (example <x-theme-dark::button>)
+    // Namespace name will be prepended to tag name (example <x-theme-dark::button>)
     name: 'theme-dark',
-    // Base root of the namespace
+    // Root of the namespace
     root: './src/theme-dark',
-    // Fallback root when a component it's not found in namespace
+    // Fallback root when a component is not found in namespace
     fallback: './src',
-    // Custom root for override, the lookup happen first here
+    // Custom root for overriding, the lookup happens here first
     custom: './src/custom/theme-dark'
   }, {
     // Light theme
@@ -323,7 +347,7 @@ const options = {
 
 Use the component namespace:
 
-```html
+```xml
 <!-- src/index.html -->
 <html>
 <body>
@@ -333,33 +357,30 @@ Use the component namespace:
 </html>
 ```
 
-Of course, you can change this folder structure as you prefer according to your project requirements.
-
 ### Slots
 
-Your components can inject code in specific slots you define, and then you can fill this content when you use the component.
-Find below a simple example.
+Components may define slots that can be filled with content when used.
 
-Create the component:
+For example:
 
-```html
+```xml
 <!-- src/modal.html -->
 <div class="modal">
   <div class="modal-header">
-    <slot:header></slot:header>
+    <slot:header />
   </div>
   <div class="modal-body">
-    <slot:body></slot:body>
+    <slot:body />
   </div>
   <div class="modal-footer">
-    <slot:footer></slot:footer>
+    <slot:footer />
   </div>
 </div>
 ```
 
 Use the component:
 
-```html
+```xml
 <!-- src/index.html -->
 <x-modal>
   <fill:header>Header content</fill:header>
@@ -385,11 +406,11 @@ Result:
 </div>
 ```
 
-By default, the content is replaced, but you can also prepend or append the content, or keep the default content by not filling the slot.
+By default, the slot content is replaced, but you can also prepend or append the content, or keep the default content by not filling the slot.
 
 Add some default content in the component:
 
-```html
+```xml
 <!-- src/modal.html -->
 <div class="modal">
   <div class="modal-header">
@@ -404,7 +425,7 @@ Add some default content in the component:
 </div>
 ```
 
-```html
+```xml
 <!-- src/index.html -->
 <x-modal>
   <fill:body prepend>Prepend body</fill:body>
@@ -431,42 +452,41 @@ Result:
 
 ### Stacks
 
-You can push content to named stacks which can be rendered somewhere else in another place. This can be particularly useful for specifying any JavaScript or CSS required by your components.
+You may push content to named stacks which can be rendered somewhere else, like in another component. This can be particularly useful for specifying any JavaScript or CSS required by your components.
 
-First of all define a `<stack>` anywhere in your code, for example:
+First, add a `<stack>` tag to your HTML:
 
-```html
+```diff
 <!-- src/index.html -->
 <html>
-<head>
-<stack name="styles"></stack>
-</head>
+  <head>
++    <stack name="styles" />
+  </head>
 <body>
-
-<x-modal>
-  <fill:header>Header content</fill:header>
-  <fill:body>Body content</fill:body>
-  <fill:footer>Footer content</fill:footer>
-</x-modal>
+  <x-modal>
+    <fill:header>Header content</fill:header>
+    <fill:body>Body content</fill:body>
+    <fill:footer>Footer content</fill:footer>
+  </x-modal>
   
-<stack name="scripts"></stack>
++  <stack name="scripts" />
 </body>
 </html>
 ```
 
-Then in modal components, or any other child components, you can push content to this stack.
+Then, in modal components or any other child components, you can push content to this stack:
 
-```html
+```xml
 <!-- src/modal.html -->
 <div class="modal">
   <div class="modal-header">
-    <slot:header></slot:header>
+    <slot:header />
   </div>
   <div class="modal-body">
-    <slot:body></slot:body>
+    <slot:body />
   </div>
   <div class="modal-footer">
-    <slot:footer></slot:footer>
+    <slot:footer />
   </div>
 </div>
 
@@ -504,7 +524,9 @@ The output will be:
 </html>
 ```
 
-The `once` attribute allows you to push content only once per rendering cycle. For example, if you are rendering a given component within a loop, you may wish to only push the JavaScript and CSS the first time the component is rendered.
+The `once` attribute allows you to push content only once per rendering cycle. 
+
+For example, if you are rendering a given component within a loop, you may wish to only push the JavaScript and CSS the first time the component is rendered.
 
 Example.
 
@@ -525,8 +547,7 @@ Example.
 </push>
 ```
 
-By default, the content is pushed in the stack in the given order.
-If you would like to prepend content onto the beginning of a stack, you should use the `prepend` attribute:
+By default, the content is pushed in the stack in the given order. If you would like to prepend content onto the beginning of a stack, you may use the `prepend` attribute:
 
 ```html
 <push name="scripts">
@@ -535,7 +556,6 @@ If you would like to prepend content onto the beginning of a stack, you should u
 </push>
 
 <!-- Later... -->
-
 <push name="scripts" prepend>
   <!-- This will be first -->
   <script src="/example-2.js"></script>
@@ -544,28 +564,26 @@ If you would like to prepend content onto the beginning of a stack, you should u
 
 ### Props
 
-Behind the `props` there is powerful [posthtml-expressions](https://github.com/posthtml/posthtml-expressions) plugin, with feature to pass `props` (locals) via attributes and manipulate them via `<script props>`.
+`props` can be passed to components in HTML attributes. To use them in a component, they must be defined in the component's `<script props>` tag.
 
-Let's see how it works with a few examples starting with a basic one.
-
-Create the component:
+For example:
 
 ```html
-<!-- src/my-component.html -->
+<!-- src/alert.html -->
 <script props>
   module.exports = {
-    prop: props.prop || 'Default prop value'
+    title: props.title || 'Default title'
   }
 </script>
 <div>
-  {{ prop }}
+  {{ title }}
 </div>
 ```
 
 Use:
 
 ```html
-<x-my-component prop="Hello world!"></x-my-component>
+<x-alert title="Hello world!" />
 ```
 
 The output will be:
@@ -576,25 +594,23 @@ The output will be:
 </div>
 ```
 
-Without passing `prop` via attribute then the output would be `Default prop value`, as shown below.
-
-Use component without passing prop:
+If no `title` attribute is passed to the component, the default value will be used.
 
 ```html
-<x-my-component></x-my-component>
+<x-my-alert />
 ```
 
 The output will be:
 
 ```html
 <div>
-  Default prop value
+  Default title
 </div>
 ```
 
-In the `<script props>` you have access to passed props via object `props`, and you can add any logic you need inside it.
+Inside `<script props>` you have access to passed props via an object named `props`.
 
-Create the component:
+Here's an example of what you can do with it:
 
 ```html
 <!-- src/modal.html -->
@@ -618,7 +634,12 @@ Create the component:
 Use:
 
 ```html
-<x-modal size="xl" title="My modal title" items='["third", "fourth"]' class="modal-custom"></x-modal>
+<x-modal 
+  size="xl" 
+  title="My modal title" 
+  items='["third", "fourth"]' 
+  class="modal-custom" 
+/>
 ```
 
 The output will be:
@@ -637,12 +658,11 @@ The output will be:
 </div>
 ```
 
-You can also notice how the `class` attribute is merged with `class` attribute of the first node. In the next section you will know more about this.
+Notice how the `class` attribute that we passed to the component is merged with `class` attribute value of the first node inside of it.
 
-You can change how attributes are merged with global props defined via options by passing a callback function used by lodash method [mergeWith](https://lodash.com/docs/4.17.15#mergeWith).
+You can change how attributes are merged with global props defined via options, by passing a callback function.
 
 By default, all props are scoped to the component, and are not available to nested components. You can however change this accordingly to your need.
-Let's see below example.
 
 Create a component:
 
@@ -650,78 +670,79 @@ Create a component:
 <!-- src/child.html -->
 <script props>
   module.exports = {
-    prop: props.prop || 'Default prop value'
+    title: props.title || 'Default title'
   }
 </script>
 <div>
-  Prop in child: {{ prop }}
+  Prop in child: {{ title }}
 </div>
 ```
 
-Create another component that use the first one:
-
+Create a `<x-parent>` component that uses `<x-child>`:
 
 ```html
 <!-- src/parent.html -->
 <script props>
   module.exports = {
-    prop: props.prop || 'Default prop value'
+    title: props.title || 'Default title'
   }
 </script>
 <div>
-  Prop in parent: {{ prop }}
-  <x-child></x-child>
+  Prop in parent: {{ title }}
+  <x-child />
 </div>
 ```
 
-Use:
+Use it:
 
 ```html
-<x-parent prop="My prop"></x-parent>
+<x-parent title="My title" />
 ```
 
 The output will be:
 
 ```html
 <div>
-  Prop in parent: My prop
+  Prop in parent: My title
   <div>
-    Prop in child: Default prop value
+    Prop in child: Default title
   </div>
 </div>
 ```
 
-As you can see `prop` in `x-child` component are default value and not the one set via `x-parent`. Prepend `aware:` to the attribute name to pass the props to nested components.
+As you can see, `title` in `<x-child>` component renders the default value and not the one set via `<x-parent>`. 
 
+To change this, we must prepend `aware:` to the attribute name in order to pass the props to nested components.
 
 ```html
-<x-parent aware:prop="My prop"></x-parent>
+<x-parent aware:title="My title" />
 ```
 
 The output now will be:
 
 ```html
 <div>
-  Prop in parent: My prop
+  Prop in parent: My title
   <div>
-    Prop in child: My prop
+    Prop in child: My title
   </div>
 </div>
 ```
 
 ### Attributes
 
-You can pass any attributes to your components and this will be added to the first node of your component,
-or to the node with an attribute named `attributes`. If you are familiar with VueJS this is the same as so called
-[fallthrough attribute](https://vuejs.org/guide/components/attrs.html), or with Laravel Blade is
-[component-attributes](https://laravel.com/docs/10.x/blade#component-attributes).
+You can pass any attributes to your components and they will be added to the first node of your component,
+or to the node with an attribute named `attributes`. 
 
-By default `class` and `style` are merged with existing `class` and `style` attribute.
-All others attributes are override by default.
-Only attributes defined in [valid-attributes.js](https://github.com/thewebartisan7/posthtml-components/blob/main/src/valid-attributes.js)
-or not defined as `props` in the `<script props>`.
+If you are familiar with Vue.js, this is the same as so-called
+[fallthrough attribute](https://vuejs.org/guide/components/attrs.html). Or, with Laravel Blade, it's
+[component-attributes](https://laravel.com/docs/11.x/blade#component-attributes).
 
-As already seen in basic example:
+By default, `class` and `style` are merged with existing `class` and `style` attribute. All other attributes are overridden by default.
+
+If you pass an attribute that is defined as a `prop`, it will not be added to the component's node.
+
+Here's an example:
 
 ```html
 <!-- src/button.html -->
@@ -739,7 +760,7 @@ Use the component:
 
 ```html
 <!-- src/index.html -->
-<x-button type="submit" class="btn-primary" label="My button"></x-button>
+<x-button type="submit" class="btn-primary" label="My button" />
 ```
 
 Result:
@@ -749,13 +770,11 @@ Result:
 <button type="submit" class="btn btn-primary">My button</button>
 ```
 
-As you may notice the `label` attribute is not added as attribute, since it's defined as a `props`.
-
-As said early, `class` and `style` are merged by default, if you want to override them, just prepend `override:` to the attribute name:
+If you need to override `class` and `style` attribute values (instead of merging them), just prepend `override:` to the attribute name:
 
 ```html
 <!-- src/index.html -->
-<x-button type="submit" override:class="btn-custom" label="My button"></x-button>
+<x-button type="submit" override:class="btn-custom" label="My button" />
 ```
 
 Result:
@@ -765,7 +784,7 @@ Result:
 <button type="submit" class="btn-custom">My button</button>
 ```
 
-If you want to use another node and not the first one, then you can add the attribute `attributes` like shown below.
+If you want the attributes to be passed to a certain node, use the `attributes` attribute:
 
 ```html
 <!-- src/my-component.html -->
@@ -780,7 +799,7 @@ Use the component:
 
 ```html
 <!-- src/index.html -->
-<x-my-component class="my-class"></x-my-component>
+<x-my-component class="my-class" />
 ```
 
 Result:
@@ -794,11 +813,11 @@ Result:
 </div>
 ```
 
-You can add custom rules how attributes are parsed, as behind the scene it's used [posthtml-attrs-parser](https://github.com/posthtml/posthtml-attrs-parser) plugin.
+You can add custom rules to define how attributes are parsed - we use [posthtml-attrs-parser](https://github.com/posthtml/posthtml-attrs-parser) to handle them.
 
 ### Advanced attributes configurations
 
-If default configurations for valid attributes are not right for you, then you can configure them as explained below.
+If default configurations for valid attributes are not right for you, you may configure them as explained below.
 
 ```js
 // index.js
@@ -808,8 +827,7 @@ const posthtml = require('posthtml')
 const components = require('posthtml-components')
 
 const options = {
-  root: './src',
-  
+  root: './src',  
   // Add attributes to specific tag or override defaults
   elementAttributes: {
     DIV: (defaultAttributes) => {
@@ -840,17 +858,20 @@ const options = {
 
 posthtml(components(options))
   .process(readFileSync('src/index.html', 'utf8'))
-  .then((result) => writeFileSync('dist/index.html', result.html, 'utf8'))
+  .then(result => writeFileSync('dist/index.html', result.html, 'utf8'))
 ```
 
 ## Examples
 
 You can work with `<slot>` and `<fill>` or you can create component for each block of your component, and you can also support both of them.
-You can find an example of this inside `docs-src/components/modal`. Below is a short explanation about the both approach.
+
+You can find an example of this inside `docs-src/components/modal`. Following is a short explanation of both approaches.
 
 ### Using slots
 
-Let's suppose we want to create a component for [bootstrap modal](https://getbootstrap.com/docs/5.2/components/modal/). The code required is:
+Let's suppose we want to create a component for [bootstrap modal](https://getbootstrap.com/docs/5.2/components/modal/). 
+
+The code required is:
 
 ```html
 <!-- Modal HTML -->
@@ -874,30 +895,33 @@ Let's suppose we want to create a component for [bootstrap modal](https://getboo
 ```
 
 There is almost three block of code: the header, the body and the footer.
-So we could create our component with three slot like below:
 
-```html
+So we could create a component with three slots:
+
+```diff
 <!-- Modal component -->
 <div class="modal fade" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <slot:header></slot:header>
+-        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
++        <slot:header />
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <slot:body></slot:body>
++        <slot:body />
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <slot:footer></slot:footer>
++        <slot:footer />
+-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>
 </div>
 ```
 
-In this case we can use it like:
+We can then use it like this:
 
 ```html
  <x-modal
@@ -905,30 +929,31 @@ In this case we can use it like:
   aria-labelledby="exampleModalLabel"
 >
   <slot:header>
-      <h5 class="modal-title" id="exampleModalLabel">My modal</h5>
+    <h5 class="modal-title" id="exampleModalLabel">My modal</h5>
   </slot:header>
 
   <slot:body>
-      Modal body content goes here...
+    Modal body content goes here...
   </slot:body>
 
   <slot:footer close="false">
-      <button type="button" class="btn btn-primary">Confirm</button>
+    <button type="button" class="btn btn-primary">Confirm</button>
   </slot:footer>
 </x-modal>
 ```
 
 ### Splitting component in small component
 
-Another way is to split the component in small component, my preferred way, because you can pass attributes to each of them.
-So we create the component with a main component and then three different small component:
+Another approach is to split the component in smaller components, passing attributes to each of them.
+
+So we create a main component and then three different smaller components:
 
 ```html
 <!-- Main modal component -->
 <div class="modal fade" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <yield></yield>
+      <yield />
     </div>
   </div>
 </div>
@@ -937,25 +962,25 @@ So we create the component with a main component and then three different small 
 ```html
 <!-- Header modal component -->
 <div class="modal-header">
-  <yield></yield>
+  <yield />
 </div>
 ```
 
 ```html
 <!-- Body modal component -->
 <div class="modal-body">
-  <yield></yield>
+  <yield />
 </div>
 ```
 
 ```html
 <!-- Footer modal component -->
 <div class="modal-footer">
-  <yield></yield>
+  <yield />
 </div>
 ```
 
-And then you can use it like below example:
+And then you can use it like this:
 
 ```html
 <x-modal
@@ -980,7 +1005,7 @@ As said in this way you can pass attributes to each of them, without defining pr
 
 ### Combine slots and small component
 
-You can also combine both way, and then use them with slots or with small component:
+You can also combine both approaches, and then use them with slots or with small components:
 
 ```html
 
@@ -996,26 +1021,27 @@ You can also combine both way, and then use them with slots or with small compon
     <div class="modal-content">
       <if condition="$slots.header?.filled">
           <x-modal.header>
-            <slot:header></slot:header>
+            <slot:header />
           </x-modal.header>
       </if>
       <if condition="$slots.body?.filled">
           <x-modal.body>
-              <slot:body></slot:body>
+              <slot:body />
           </x-modal.body>
       </if>
       <if condition="$slots.footer?.filled">
           <x-modal.footer close="{{ $slots.footer?.props.close }}">
-              <slot:footer></slot:footer>
+              <slot:footer />
           </x-modal.footer>
       </if>
-      <yield></yield>
+      <yield />
     </div>
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 ```
 
 Now you can use your component with slots or with small components.
+
 As you may notice, by using slots, you already can use also your small components, and so you can also pass props
 via `$slots` which has all the `props` passed via slot, and as well check if slot is filled.
 
@@ -1028,16 +1054,7 @@ If you are migrating from `posthtml-extend` and/or `posthtml-modules` please to 
 
 See [PostHTML Guidelines](https://github.com/posthtml/posthtml/tree/master/docs) and [contribution guide](CONTRIBUTING.md).
 
-[npm]: https://img.shields.io/npm/v/posthtml-component.svg
-[npm-url]: https://www.npmjs.com/package/posthtml-component
-
-[style]: https://img.shields.io/badge/code_style-XO-5ed9c7.svg
-[style-url]: https://github.com/sindresorhus/xo
-
-[cover]: https://coveralls.io/repos/thewebartisan7/posthtml-components/badge.svg?branch=main
-[cover-badge]: https://coveralls.io/r/thewebartisan7/posthtml-components?branch=main
-
 ## Credits
 
-Thanks to all PostHTML contributors and especially to `posthtml-extend` and `posthtml-modules` contributors, as part of code are ~~stolen~~ inspired from these plugins.
+Thanks to all PostHTML contributors and especially to `posthtml-extend` and `posthtml-modules` contributors, as part of code is ~~stolen~~ inspired from these plugins.
 Huge thanks also to Laravel Blade template engine.
