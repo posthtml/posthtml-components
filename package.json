@@ -6,6 +6,7 @@
   "repository": "posthtml/posthtml-components",
   "author": "Damir Grgic <damir@tuta.io> (https://github.com/thewebartisan7)",
   "main": "src",
+  "types": "src/index.d.ts",
   "engines": {
     "node": ">=18"
   },
