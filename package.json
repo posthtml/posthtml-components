@@ -19,7 +19,7 @@
     "test": "vitest run --coverage",
     "lint": "biome lint ./src ./scripts",
     "release": "npm run changelog && npx np",
-    "changelog": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md && git commit -m 'chore: update changelog.md' && git push"
+    "changelog": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md && git commit -m \"chore: update changelog.md\" && git push"
   },
   "keywords": [
     "posthtml",
