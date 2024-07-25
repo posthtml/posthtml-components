@@ -11,10 +11,10 @@
   },
   "scripts": {
     "dev": "vitest",
-    "release": "npm run changelog && npx np",
     "docs": "node ./docs-src",
-    "lint": "biome lint ./src ./scripts",
     "test": "vitest run --coverage",
+    "lint": "biome lint ./src ./scripts",
+    "release": "npm run changelog && npx np",
     "changelog": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md && git commit -m 'chore: update changelog.md' && git push"
   },
   "keywords": [
@@ -43,7 +43,7 @@
     "markdown-it-include": "^2.0.0",
     "markdown-it-toc-done-right": "^4.2.0",
     "posthtml-beautify": "^0.7.0",
-    "posthtml-include": "^1.7.4",
+    "posthtml-include": "^2.0.1",
     "posthtml-markdownit": "^3.1.0",
     "vitest": "^2.0.4"
   }

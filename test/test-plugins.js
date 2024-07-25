@@ -45,7 +45,20 @@ test('Must include file using posthtml-include', async () => {
   const actual = `<component src="components/component-with-include.html"></component>`;
   const expected = `<div><p>Included file</p></div>`;
 
-  const html = await posthtml([plugin({root: './test/templates', tag: 'component', attribute: 'src', plugins: [require('posthtml-include')({root: './test/templates', encoding: 'utf8'})]})]).process(actual).then(result => clean(result.html));
+  const html = await posthtml([
+    plugin({
+      root: './test/templates',
+      tag: 'component',
+      attribute: 'src',
+      plugins: [
+        require('posthtml-include')({
+          root: './test/templates',
+          cwd: './test/templates',
+          encoding: 'utf8'
+        })
+      ]
+    })
+  ]).process(actual).then(result => clean(result.html));
 
   expect(html).toBe(expected);
 });
