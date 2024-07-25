@@ -7,7 +7,7 @@
   "author": "Damir Grgic <damir@tuta.io> (https://github.com/thewebartisan7)",
   "main": "src",
   "engines": {
-    "node": ">=10"
+    "node": ">=18"
   },
   "scripts": {
     "dev": "vitest",
