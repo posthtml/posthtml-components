@@ -60,7 +60,7 @@ export type PostHTMLComponents = {
    *
    * @default 'html'
    */
-  fileExtension?: string;
+  fileExtension?: string|string[];
 
   /**
    * Name of the tag that will be replaced with the content that is passed to the component.
