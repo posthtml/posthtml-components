@@ -1,84 +1,100 @@
-import { test, expect } from 'vitest'
-import plugin from '../src/index.js';
-import posthtml from 'posthtml';
+import { test, expect } from 'vitest';
+import { process } from './process.js';
 
-const clean = html => html.replace(/(\n|\t)/g, '').trim();
-
-test('Must fail when namespace is unknown', async () => {
-  const actual = `<div><x-unknown-namespace::button>Submit</x-unknown-namespace::button></div>`;
-
-  await expect(() => posthtml([plugin({ root: './test/templates', strict: true })]).process(actual).then(result => clean(result.html)))
-    .rejects.toThrow()
+test('Throws if namespace is unknown', async () => {
+  await expect(() => process(
+    `<div><x-unknown-namespace::button>Submit</x-unknown-namespace::button></div>`,
+    { root: './test/templates', strict: true }
+  )).rejects.toThrow();
 });
 
-test('Must return node as-is when namespace is unknown with strict mode disabled', async () => {
-  const actual = `<div><x-unknown-namespace::button>Submit</x-unknown-namespace::button></div>`;
-  const expected = `<div><x-unknown-namespace::button>Submit</x-unknown-namespace::button></div>`;
-
-  const html = await posthtml([plugin({root: './test/templates', strict: false})]).process(actual).then(result => clean(result.html));
-
-  expect(html).toBe(expected);
+test('Throws when push tag missing name attribute', async () => {
+  await expect(() => process(
+    `<div><push></push></div>`,
+    {
+      root: './test/templates',
+      strict: true
+    }
+  )).rejects.toThrow();
 });
 
-test('Must return node as-is when namespace is empty with strict mode disabled', async () => {
+test('Throws when push tag missing name attribute value', async () => {
+  await expect(() => process(
+    `<div><push name></push></div>`,
+    { root: './test/templates', strict: true }
+  )).rejects.toThrow();
+});
+
+test('Throws when component is not found (strict mode enabled)', async () => {
+  await expect(() => process(
+    `<div><component src="not-found.html">Submit</component></div>`,
+    {
+      root: './test/templates/empty-root',
+      tag: 'component',
+      strict: true,
+    }
+  )).rejects.toThrow();
+});
+
+test('Throws when component is not found in namespace (strict mode enabled)', async () => {
+  await expect(() => process(
+    `<div><x-empty-namespace::button>Submit</x-empty-namespace::button></div>`,
+    {
+      root: './test/templates',
+      strict: true,
+      namespaces: [
+        {
+          name: 'empty-namespace',
+          root: './test/templates/empty-namespace',
+        }
+      ]
+    }
+  )).rejects.toThrow();
+});
+
+test('Returns node as-is when namespace is unknown (strict mode disabled)', async () => {
+  const actual = `<div><x-unknown-namespace::button>Submit</x-unknown-namespace::button></div>`;
+
+  process(actual, { root: './test/templates', strict: false })
+    .then(html => {
+      expect(html).toBe(actual);
+    });
+});
+
+test('Returns node as-is when namespace is empty (strict mode disabled)', async () => {
   const actual = `<div><x-empty-namespace::button>Submit</x-empty-namespace::button></div>`;
-  const expected = `<div><x-empty-namespace::button>Submit</x-empty-namespace::button></div>`;
 
-  const html = await posthtml([plugin({root: './test/templates', strict: false, namespaces: {name: 'empty-namespace', root: './test/templates/empty-namespace'}})]).process(actual).then(result => clean(result.html));
-
-  expect(html).toBe(expected);
+  process(actual,
+    {
+      root: './test/templates',
+      strict: false,
+      namespaces: [
+        {
+          name: 'empty-namespace',
+          root: './test/templates/empty-namespace',
+        }
+      ]
+    }
+  )
+    .then(html => {
+      expect(html).toBe(actual);
+    });
 });
 
-test('Must return node as-is when x-tag is not found with strict mode disabled', async () => {
+test('Returns node as-is when x-tag is not found (strict mode disabled)', async () => {
   const actual = `<div><x-button>Submit</x-button></div>`;
-  const expected = `<div><x-button>Submit</x-button></div>`;
 
-  const html = await posthtml([plugin({root: './test/templates/empty-root', strict: false})]).process(actual).then(result => clean(result.html));
-
-  expect(html).toBe(expected);
+  process(actual, { root: './test/templates/empty-root', strict: false })
+    .then(html => {
+      expect(html).toBe(actual);
+    });
 });
 
-test('Must return node as-is when component is not found with strict mode disabled', async () => {
-  const actual = `<div><component src="not-found.html">Submit</component></div>`;
-  const expected = `<div><component src="not-found.html">Submit</component></div>`;
-
-  const html = await posthtml([plugin({tag: 'component', strict: false})]).process(actual).then(result => clean(result.html));
-
-  expect(html).toBe(expected);
-});
-
-test('Must fail when component is not found with strict mode enabled', async () => {
+test('Returns node as-is when component is not found (strict mode disabled)', async () => {
   const actual = `<div><component src="not-found.html">Submit</component></div>`;
 
-  await expect(() => posthtml([plugin({ root: './test/templates/empty-root', tag: 'component', strict: true })]).process(actual).then(result => clean(result.html)))
-    .rejects.toThrow()
-});
-
-test('Must fail when component is not found in defined namespace with strict mode enabled', async () => {
-  const actual = `<div><x-empty-namespace::button>Submit</x-empty-namespace::button></div>`;
-
-  await expect(() => posthtml([
-    plugin({root: './test/templates', strict: true, namespaces: [{name: 'empty-namespace', root: './test/templates/empty-namespace'}]})
-  ])
-    .process(actual)
-    .then(result => clean(result.html))
-  ).rejects.toThrow()
-});
-
-test('Must fail when push tag missing name attribute', async () => {
-  const actual = `<div><push></push></div>`;
-
-  await expect(() => posthtml([
-    plugin({root: './test/templates', strict: true})
-  ])
-    .process(actual)
-    .then(result => clean(result.html))
-  ).rejects.toThrow();
-});
-
-test('Must fail when push tag missing name attribute value', async () => {
-  const actual = `<div><push name></push></div>`;
-
-  await expect(async () => posthtml([plugin({root: './test/templates', strict: true})]).process(actual).then(result => clean(result.html)))
-    .rejects.toThrow();
+  process(actual, { tag: 'component', strict: false })
+    .then(html => {
+      expect(html).toBe(actual);
+    });
 });

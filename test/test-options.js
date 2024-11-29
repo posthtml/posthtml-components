@@ -1,4 +1,4 @@
-import { test, expect } from 'vitest'
+import { test, expect } from 'vitest';
 import { process } from './process.js';
 
 test('`fileExtension` as string', async () => {
