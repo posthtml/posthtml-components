@@ -74,17 +74,26 @@ module.exports = (options = {}) => tree => {
     uniqueId,
     isEnabled: prop => prop === true || prop === ''
   };
-  // Additional element attributes, in case already exist in valid-attributes.js it will replace all attributes
-  // It should be an object with key as tag name and as value a function modifier which receive
-  // the default attributes and return an array of attributes. Example:
-  // { TAG: (attributes) => { attributes[] = 'attribute-name'; return attributes; } }
+
+  /**
+   * Additional element attributes. If they already exist in valid-attributes.js,
+   * it will replace all attributes. It should be an object with tag name as
+   * the key and a function modifier as the value, which will receive the
+   * default attributes and return an array of attributes.
+   *
+   * Example:
+   * { TAG: (attributes) => { attributes[] = 'attribute-name'; return attributes; } }
+   */
   options.elementAttributes = isPlainObject(options.elementAttributes) ? options.elementAttributes : {};
   options.safelistAttributes = Array.isArray(options.safelistAttributes) ? options.safelistAttributes : [];
   options.blocklistAttributes = Array.isArray(options.blocklistAttributes) ? options.blocklistAttributes : [];
 
-  // Merge customizer callback passed to lodash mergeWith
-  //  for merge attribute `props` and all attributes starting with `merge:`
-  //  @see https://lodash.com/docs/4.17.15#mergeWith
+  /**
+   * Merge customizer callback passed to `lodash.mergeWith` for merging
+   * attribute `props` and all attributes starting with `merge:`.
+   *
+   * @see {@link https://lodash.com/docs/4.17.15#mergeWith|Lodash}
+   */
   options.mergeCustomizer = options.mergeCustomizer || ((objectValue, sourceValue) => {
     if (Array.isArray(objectValue)) {
       return objectValue.concat(sourceValue);
@@ -105,6 +114,7 @@ module.exports = (options = {}) => tree => {
 
   if (!Array.isArray(options.matcher)) {
     options.matcher = [];
+
     if (options.tagPrefix) {
       options.matcher.push({tag: options.tagPrefix});
     }
@@ -116,8 +126,10 @@ module.exports = (options = {}) => tree => {
 
   options.folders = Array.isArray(options.folders) ? options.folders : [options.folders];
   options.namespaces = Array.isArray(options.namespaces) ? options.namespaces : [options.namespaces];
+
   options.namespaces.forEach((namespace, index) => {
     options.namespaces[index].root = path.resolve(namespace.root);
+
     if (namespace.fallback) {
       options.namespaces[index].fallback = path.resolve(namespace.fallback);
     }
@@ -148,14 +160,13 @@ module.exports = (options = {}) => tree => {
 };
 /* eslint-enable complexity */
 
-// Used for reset aware props
+// Used to reset aware props
 let processCounter = 0;
 
 /**
  * @param  {Object} options Plugin options
  * @return {Object} PostHTML tree
  */
-
 function processTree(options) {
   const filledSlots = {};
 
@@ -227,15 +238,18 @@ function processTree(options) {
 
       processAttributes(currentNode, attributes, props, options, aware);
 
-      // Remove attributes when value is 'null' or 'undefined'
-      //  so we can conditionally add an attribute by setting value to 'undefined' or 'null'.
+      /**
+       * Remove attributes when value is 'null' or 'undefined' so we can
+       * conditionally add an attribute by setting the value to
+       * 'undefined' or 'null'.
+       */
       walk.call(currentNode, node => {
         if (node && node.attrs) {
-          each(node.attrs, (value, key) => {
-            if (['undefined', 'null'].includes(value)) {
+          for (const key in node.attrs) {
+            if (node.attrs[key] === 'undefined' || node.attrs[key] === 'null') {
               delete node.attrs[key];
             }
-          });
+          }
         }
 
         return node;

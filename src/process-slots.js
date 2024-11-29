@@ -2,7 +2,6 @@
 
 const {match} = require('posthtml/lib/api');
 const {render} = require('posthtml-render');
-const each = require('lodash/each');
 const omit = require('lodash/omit');
 
 /**
@@ -25,11 +24,13 @@ function setFilledSlots(currentNode, filledSlots, {fill, slotSeparator, propsSlo
     const props = omit(fillNode.attrs, ['append', 'prepend', 'aware']);
 
     if (props) {
-      each(props, (value, key, attrs) => {
-        try {
-          attrs[key] = JSON.parse(value);
-        } catch {}
-      });
+      for (const key in props) {
+        if (props.hasOwnProperty(key)) {
+          try {
+        props[key] = JSON.parse(props[key]);
+          } catch {}
+        }
+      }
     }
 
     filledSlots[name] = {

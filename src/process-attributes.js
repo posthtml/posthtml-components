@@ -8,7 +8,6 @@ const keys = require('lodash/keys');
 const union = require('lodash/union');
 const pick = require('lodash/pick');
 const difference = require('lodash/difference');
-const each = require('lodash/each');
 const has = require('lodash/has');
 const extend = require('lodash/extend');
 const isString = require('lodash/isString');
@@ -52,15 +51,16 @@ module.exports = (currentNode, attributes, props, options, aware) => {
 
   // Merge or override elementAttributes from options provided
   if (!isEmpty(options.elementAttributes)) {
-    each(options.elementAttributes, (modifier, tagName) => {
+    for (const tagName in options.elementAttributes) {
+      const modifier = options.elementAttributes[tagName];
       if (typeof modifier === 'function' && isString(tagName)) {
-        tagName = tagName.toUpperCase();
-        const attributes = modifier(validAttributes.elementAttributes[tagName]);
+        const upperTagName = tagName.toUpperCase();
+        const attributes = modifier(validAttributes.elementAttributes[upperTagName]);
         if (Array.isArray(attributes)) {
-          validAttributes.elementAttributes[tagName] = attributes;
+          validAttributes.elementAttributes[upperTagName] = attributes;
         }
       }
-    });
+    }
   }
 
   // Attributes to be excluded
@@ -76,15 +76,18 @@ module.exports = (currentNode, attributes, props, options, aware) => {
   const mainNodeAttributes = pick(attributes, validElementAttributes);
 
   // Get additional specified attributes
-  each(attributes, (value, attr) => {
-    each(validAttributes.safelistAttributes, additionalAttr => {
-      if (additionalAttr === attr || (additionalAttr.endsWith('*') && attr.startsWith(additionalAttr.replace('*', '')))) {
-        mainNodeAttributes[attr] = value;
+  for (const attr in attributes) {
+    for (const additionalAttr of validAttributes.safelistAttributes) {
+      if (
+        additionalAttr === attr
+        || (additionalAttr.endsWith('*') && attr.startsWith(additionalAttr.replace('*', '')))
+      ) {
+        mainNodeAttributes[attr] = attributes[attr];
       }
-    });
-  });
+    }
+  }
 
-  each(mainNodeAttributes, (value, key) => {
+  for (const key in mainNodeAttributes) {
     if (['class', 'style'].includes(key)) {
       if (!has(nodeAttrs, key)) {
         nodeAttrs[key] = key === 'class' ? [] : {};
@@ -100,16 +103,16 @@ module.exports = (currentNode, attributes, props, options, aware) => {
     }
 
     delete attributes[key];
-  });
+  }
 
   // The plugin posthtml-attrs-parser compose() method expects a string,
   //  but since we are JSON parsing, values like "-1" become number -1.
   //  So below we convert non string values to string.
-  each(nodeAttrs, (value, key) => {
+  for (const key in nodeAttrs) {
     if (key !== 'compose' && !isObject(nodeAttrs[key]) && !isString(nodeAttrs[key])) {
       nodeAttrs[key] = nodeAttrs[key].toString();
     }
-  });
+  }
 
   mainNode.attrs = nodeAttrs.compose();
 };
