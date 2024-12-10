@@ -1,10 +1,9 @@
 'use strict';
 
-const processScript = require('./process-script');
 const pick = require('lodash/pick');
-const each = require('lodash/each');
 const assign = require('lodash/assign');
 const mergeWith = require('lodash/mergeWith');
+const processScript = require('./process-script');
 
 const attributeTypes = ['aware', 'merge'];
 
@@ -23,31 +22,31 @@ module.exports = (currentNode, nextNode, filledSlots, options, componentPath, pr
   let attributes = {...currentNode.attrs};
 
   const attributesByTypeName = {};
-  each(attributeTypes, type => {
+  for (const type of attributeTypes) {
     attributesByTypeName[type] = [];
-  });
+  }
 
-  each(attributes, (value, key, attrs) => {
+  for (const key in attributes) {
     let newKey = key;
-    each(attributeTypes, type => {
+    for (const type of attributeTypes) {
       if (key.startsWith(`${type}:`)) {
         newKey = newKey.replace(`${type}:`, '');
         attributesByTypeName[type].push(newKey);
       }
-    });
+    }
 
     if (newKey !== key) {
-      attrs[newKey] = value;
-      delete attrs[key];
+      attributes[newKey] = attributes[key];
+      delete attributes[key];
     }
-  });
+  }
 
   // Parse JSON attributes
-  each(attributes, (value, key, attrs) => {
+  for (const key in attributes) {
     try {
-      attrs[key] = JSON.parse(value);
+      attributes[key] = JSON.parse(attributes[key]);
     } catch {}
-  });
+  }
 
   // Merge or extend attribute props
   if (attributes[options.propsAttribute]) {
@@ -65,7 +64,17 @@ module.exports = (currentNode, nextNode, filledSlots, options, componentPath, pr
   attributes = mergeWith({}, options.expressions.locals, attributes, options.mergeCustomizer);
 
   // Process props from <script props>
-  const {props} = processScript(nextNode, {props: {...attributes}, $slots: filledSlots, propsScriptAttribute: options.propsScriptAttribute, propsContext: options.propsContext, utilities: options.utilities}, componentPath.replace(`.${options.fileExtension}`, '.js'));
+  const {props} = processScript(
+    nextNode,
+    {
+      props: {...attributes},
+      $slots: filledSlots,
+      propsScriptAttribute: options.propsScriptAttribute,
+      propsContext: options.propsContext,
+      utilities: options.utilities
+    },
+    componentPath.replace(`.${options.fileExtension}`, '.js')
+  );
 
   if (props) {
     assign(attributes, props);
