@@ -31,6 +31,40 @@ If you are familiar with Blade, React, Vue or similar, you will find the syntax 
 
 **See also the first [PostHTML Bootstrap UI](https://github.com/thewebartisan7/posthtml-bootstrap-ui) using this plugin and check also the [starter template here](https://github.com/thewebartisan7/posthtml-bootstrap-ui-starter).**
 
+## Options
+
+| Name                     | Type               | Default                                      | Description                                                                      |
+|--------------------------|--------------------|----------------------------------------------|----------------------------------------------------------------------------------|
+| **root**                 | `String`           | `'./'`                                       | Root path where to look for components.                                          |
+| **folders**              | `String[]`         | `['']`                                       | Array of paths relative to `options.root` or defined namespaces.                 |
+| **fileExtension**        | `String\|String[]` | `'html'`                                     | Component file extensions to look for.                                           |
+| **tagPrefix**            | `String`           | `'x-'`                                       | Tag prefix.                                                                      |
+| **tag**                  | `String\|Boolean`  | `false`                                      | Component tag. Use with `options.attribute`. Boolean only `false`.               |
+| **attribute**            | `String`           | `'src'`                                      | Attribute to use for defining path to component file.                            |
+| **namespaces**           | `String[]`         | `[]`                                         | Array of namespace root paths, fallback paths, and custom override paths.        |
+| **namespaceSeparator**   | `String`           | `'::'`                                       | Namespace separator for tag names.                                               |
+| **yield**                | `String`           | `'yield'`                                    | Tag name for injecting main component content.                                   |
+| **slot**                 | `String`           | `'slot'`                                     | Tag name for [slots](#slots)                                                     |
+| **fill**                 | `String`           | `'fill'`                                     | Tag name for filling slots.                                                      |
+| **slotSeparator**        | `String`           | `':'`                                        | Name separator for `<slot>` and `<fill>` tags.                                   |
+| **stack**                | `String`           | `'stack'`                                    | Tag name for [`<stack>`](#stacks).                                               |
+| **push**                 | `String`           | `'push'`                                     | Tag name for `<push>`.                                                           |
+| **propsScriptAttribute** | `String`           | `'props'`                                    | Attribute in `<script props>` for retrieving [component props](#props).          |
+| **propsContext**         | `String`           | `'props'`                                    | Name of the object inside the script for processing props.                       |
+| **propsAttribute**       | `String`           | `'props'`                                    | Attribute name to define props as JSON on a component tag.                       |
+| **propsSlot**            | `String`           | `'props'`                                    | Used to retrieve props passed to slot via `$slots.slotName.props`.               |
+| **parserOptions**        | `Object`           | `{recognizeSelfClosing: true}`               | Pass options to `posthtml-parser`.                                               |
+| **expressions**          | `Object`           | `{}`                                         | Pass options to `posthtml-expressions`.                                          |
+| **plugins**              | `Array`            | `[]`                                         | PostHTML plugins to apply to every parsed component.                             |
+| **matcher**              | `Object`           | `[{tag: options.tagPrefix}]`                 | Array of objects used to match tags.                                             |
+| **attrsParserRules**     | `Object`           | `{}`                                         | Additional rules for attributes parser plugin.                                   |
+| **strict**               | `Boolean`          | `true`                                       | Toggle exception throwing.                                                       |
+| **mergeCustomizer**      | `Function`         | `function`                                   | Callback for lodash `mergeWith` to merge `options.expressions.locals` and props. |
+| **utilities**            | `Object`           | `{merge: _.mergeWith, template: _.template}` | Utility methods passed to `<script props>`.                                      |
+| **elementAttributes**    | `Object`           | `{}`                                         | Object with tag names and function modifiers of `valid-attributes.js`.           |
+| **safelistAttributes**   | `String[]`         | `['data-*']`                                 | Array of attribute names to add to default valid attributes.                     |
+| **blocklistAttributes**  | `String[]`         | `[]`                                         | Array of attribute names to remove from default valid attributes.                |
+
 ## Basic example
 
 Create the component:
@@ -58,7 +92,7 @@ Init PostHTML:
 ```js
 // index.js
 const posthtml = require('posthtml')
-const components = require('posthtml-components')
+const components = require('posthtml-component')
 const { readFileSync, writeFileSync } = require('node:fs')
 
 posthtml([
@@ -101,13 +135,33 @@ You can also define which attributes are considered to be valid, via the plugin'
 
 More details on this in [Attributes](#attributes) section.
 
-### yield tag
+### yield
 
-The `<yield></yield>` tag is where content that you pass to a component will be injected.
+The `<yield>` tag is where content that you pass to a component will be injected.
 
 The plugin configures the PostHTML parser to recognize self-closing tags, so you can also just write is as `<yield />`.
 
 For brevity, we will use self-closing tags in the examples.
+
+### fileExtension
+
+By default, the plugin looks for components with the `.html` extension. You can change this by passing an array of extensions to the `fileExtension` option.
+
+When using an array, if two files with the same name match both extensions, the file matching the first extension in the array will be used.
+
+```js
+const posthtml = require('posthtml')
+const components = require('posthtml-component')
+
+posthtml([
+  components({ 
+    root: './src', // contains layout.html and layout.md
+    fileExtension: ['html', 'md']
+  })
+])
+  .process(`<x-layout />`)
+  .then(result => console.log(result.html)) // layout.html content
+```
 
 ### More examples
 
@@ -115,49 +169,15 @@ See also the `docs-src` folder where you can find more examples.
 
 You can clone this repo and run `npm run build` to compile them.
 
-## Options
-
-| Name                     | Type              | Default                                      | Description                                                                             |
-|--------------------------|-------------------|----------------------------------------------|-----------------------------------------------------------------------------------------|
-| **root**                 | `String`          | `'./'`                                       | Root path for components lookup.                                                        |
-| **folders**              | `String[]`        | `['']`                                       | Array of paths relative to `options.root` or defined namespaces.                        |
-| **tagPrefix**            | `String`          | `'x-'`                                       | Tag prefix.                                                                             |
-| **tag**                  | `String\|Boolean` | `false`                                      | Component tag. Use with `options.attribute`. Boolean only `false`.                      |
-| **attribute**            | `String`          | `'src'`                                      | Component attribute for setting path.                                                   |
-| **namespaces**           | `String[]`        | `[]`                                         | Array of namespace root paths, fallback paths, and custom override paths.               |
-| **namespaceSeparator**   | `String`          | `'::'`                                       | Namespace separator for tag names.                                                      |
-| **fileExtension**        | `String`          | `'html'`                                     | File extension for component files.                                                     |
-| **yield**                | `String`          | `'yield'`                                    | Tag name for injecting main component content.                                          |
-| **slot**                 | `String`          | `'slot'`                                     | Tag name for slots.                                                                     |
-| **fill**                 | `String`          | `'fill'`                                     | Tag name for filling slots.                                                             |
-| **slotSeparator**        | `String`          | `':'`                                        | Name separator for `<slot>` and `<fill>` tags.                                          |
-| **push**                 | `String`          | `'push'`                                     | Tag name for `<push>`.                                                                  |
-| **stack**                | `String`          | `'stack'`                                    | Tag name for `<stack>`.                                                                 |
-| **propsScriptAttribute** | `String`          | `'props'`                                    | Attribute in `<script props>` for retrieving component props.                           |
-| **propsContext**         | `String`          | `'props'`                                    | Name of the object inside the script for processing props.                              |
-| **propsAttribute**       | `String`          | `'props'`                                    | Attribute to define props as JSON.                                                      |
-| **propsSlot**            | `String`          | `'props'`                                    | Used to retrieve props passed to slot via `$slots.slotName.props`.                      |
-| **parserOptions**        | `Object`          | `{recognizeSelfClosing: true}`               | Pass options to `posthtml-parser`.                      |
-| **expressions**          | `Object`          | `{}`                                         | Pass options to `posthtml-expressions`.                  |
-| **plugins**              | `Array`           | `[]`                                         | PostHTML plugins to apply to every parsed component.                                    |
-| **matcher**              | `Object`          | `[{tag: options.tagPrefix}]`                 | Array of objects used to match tags.                                                    |
-| **attrsParserRules**     | `Object`          | `{}`                                         | Additional rules for attributes parser plugin.                                          |
-| **strict**               | `Boolean`         | `true`                                       | Toggle exception throwing.                                                              |
-| **mergeCustomizer**      | `Function`        | `function`                                   | Callback for lodash `mergeWith` to merge `options.expressions.locals` and props.        |
-| **utilities**            | `Object`          | `{merge: _.mergeWith, template: _.template}` | Utility methods passed to `<script props>`. |
-| **elementAttributes**    | `Object`          | `{}`                                         | Object with tag names and function modifiers of `valid-attributes.js`.                  |
-| **safelistAttributes**   | `String[]`        | `['data-*']`                                 | Array of attribute names to add to default valid attributes.                            |
-| **blocklistAttributes**  | `String[]`        | `[]`                                         | Array of attribute names to remove from default valid attributes.                       |
-
 ## Features
 
 ### Tag names and x-tags
 
 You can use the components in multiple ways, or also a combination of them.
 
-If you to use components as 'includes', you may define a tag and src attribute name.
+If you want to use components as 'includes', you can define tag and `src` attribute names.
 
-Using our previous button component example, we can define the tag and attribute names and then use it in this way:
+Using our previous button component example, we can define the tag and attribute names and then use it like this:
 
 ```hbs
 <!-- src/index.html -->
@@ -174,7 +194,7 @@ Init PostHTML:
 // index.js
 
 require('posthtml')(
-  require('posthtml-components')({ 
+  require('posthtml-component')({ 
     root: './src', 
     tag: 'component', 
     attribute: 'src' 
@@ -183,16 +203,20 @@ require('posthtml')(
   .then(/* ... */)
 ```
 
-If you need more control over tag matching, you can pass an array of matcher or single object via `options.matcher` like this:
+If you need more control over tag matching, you may pass an array of matcher or single object via `options.matcher`:
 
 ```js
 // index.js
 const options = { 
   root: './src', 
-  matcher: [{tag: 'a-tag'}, {tag: 'another-one'}, {tag: new RegExp(`^app-`, 'i')}] 
+  matcher: [
+    {tag: 'a-tag'}, 
+    {tag: 'another-one'}, 
+    {tag: new RegExp(`^app-`, 'i')},
+  ] 
 };
 
-require('posthtml')(require('posthtml-components')(options))
+require('posthtml')(require('posthtml-component')(options))
   .process(/* ... */)
   .then(/* ... */)
 ```
@@ -208,7 +232,7 @@ const options = {
   tagPrefix: 'x-'
 };
 
-require('posthtml')(require('posthtml-components')(options))
+require('posthtml')(require('posthtml-component')(options))
   .process(/* ... */)
   .then(/* ... */)
 ```
@@ -254,12 +278,13 @@ const options = {
   parserOptions: { decodeEntities: true } 
 };
 
-require('posthtml')(require('posthtml-components')(options))
+require('posthtml')(require('posthtml-component')(options))
   .process('some HTML', options.parserOptions)
   .then(/* ... */)
 ```
 
-Important: as you can see, whatever `parserOptions` you pass to the plugin, must also be passed in the `process` method in your code, otherwise your PostHTML build will use `posthtml-parser` defaults and will override anything you've passed to `posthtml-component`.
+> [!IMPORTANT]
+> The `parserOptions` that you pass to the plugin must also be passed in the `process` method in your code, otherwise your PostHTML build will use `posthtml-parser` defaults and will override anything you've passed to `posthtml-component`.
 
 #### Self-closing tags
 
@@ -267,7 +292,7 @@ The plugin supports self-closing tags by default, but you need to make sure to e
 
 ```js
 // index.js
-require('posthtml')(require('posthtml-components')({root: './src'}))
+require('posthtml')(require('posthtml-component')({root: './src'}))
   .process('your HTML...', {recognizeSelfClosing: true})
   .then(/* ... */)
 ```
@@ -287,7 +312,7 @@ const options = {
   folders: ['components', 'layouts'] 
 };
 
-require('posthtml')(require('posthtml-components')(options))
+require('posthtml')(require('posthtml-component')(options))
   .process(/* ... */)
   .then(/* ... */)
 ```
@@ -826,7 +851,7 @@ If default configurations for valid attributes are not right for you, you may co
 const { readFileSync, writeFileSync } = require('fs')
 
 const posthtml = require('posthtml')
-const components = require('posthtml-components')
+const components = require('posthtml-component')
 
 const options = {
   root: './src',  
