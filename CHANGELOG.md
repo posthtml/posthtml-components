@@ -1,3 +1,26 @@
+## 2.1.0-beta.2 (2024-11-29)
+
+* chore: update `fileExtension` type 410d21e
+
+## 2.1.0-beta.1 (2024-11-29)
+
+* test: update tests  2c69ad8
+* feat: support `fileExtension` as array  5175272
+* refactor: use native for loops instead of lodash/each  bcd80ef
+* build(deps-dev): bump @vitest/coverage-v8 from 2.1.5 to 2.1.6  e07feae
+* build(deps-dev): bump @biomejs/biome from 1.9.3 to 1.9.4  6e6323d
+* build(deps): bump posthtml-parser from 0.12.0 to 0.12.1  e4f7e73
+* build(deps): bump style-to-object from 1.0.7 to 1.0.8  ad81c84
+* build(deps-dev): bump markdown-it-anchor from 9.1.0 to 9.2.0  0fbfcfa
+
+## 2.0.0 (2024-07-25)
+
+* **[BREAKING]** Node.js 18+ 907de89
+* **[BREAKING]** renamed `blacklistAttributes` to `blocklistAttributes` 0cd302e
+* migrate to Vitest 8cb2619
+* fixed test for `posthtml-include` latest version 3d168d4
+* feat: add types 7feb3af
+
 ## 2.0.0-beta.2 (2024-07-25)
 
 * 2.0.0-beta.2 ([8078cce](https://github.com/posthtml/posthtml-components/commit/8078cce))
@@ -298,6 +321,3 @@
 * Update readme ([42fa034](https://github.com/posthtml/posthtml-components/commit/42fa034))
 * Update version ([0599426](https://github.com/posthtml/posthtml-components/commit/0599426))
 * Update version ([27ab49c](https://github.com/posthtml/posthtml-components/commit/27ab49c))
-
-
-
