@@ -1,25 +1,44 @@
 ## 2.1.0-beta.2 (2024-11-29)
 
-* chore: update `fileExtension` type 410d21e
+* 2.1.0-beta.2 ([9934eb0](https://github.com/posthtml/posthtml-components/commit/9934eb0))
+* chore: update fileExtension type ([410d21e](https://github.com/posthtml/posthtml-components/commit/410d21e))
+
+
 
 ## 2.1.0-beta.1 (2024-11-29)
 
-* test: update tests  2c69ad8
-* feat: support `fileExtension` as array  5175272
-* refactor: use native for loops instead of lodash/each  bcd80ef
-* build(deps-dev): bump @vitest/coverage-v8 from 2.1.5 to 2.1.6  e07feae
-* build(deps-dev): bump @biomejs/biome from 1.9.3 to 1.9.4  6e6323d
-* build(deps): bump posthtml-parser from 0.12.0 to 0.12.1  e4f7e73
-* build(deps): bump style-to-object from 1.0.7 to 1.0.8  ad81c84
-* build(deps-dev): bump markdown-it-anchor from 9.1.0 to 9.2.0  0fbfcfa
+* 2.1.0-beta.1 ([d0a0373](https://github.com/posthtml/posthtml-components/commit/d0a0373))
+* test: update tests ([2c69ad8](https://github.com/posthtml/posthtml-components/commit/2c69ad8))
+* feat: support fileExtension as array ([5175272](https://github.com/posthtml/posthtml-components/commit/5175272))
+* refactor: use native for loops instead of lodash/each ([bcd80ef](https://github.com/posthtml/posthtml-components/commit/bcd80ef))
+* build(deps-dev): bump @biomejs/biome from 1.8.3 to 1.9.0 ([6ecccaa](https://github.com/posthtml/posthtml-components/commit/6ecccaa))
+* build(deps-dev): bump @biomejs/biome from 1.9.0 to 1.9.1 ([be019df](https://github.com/posthtml/posthtml-components/commit/be019df))
+* build(deps-dev): bump @biomejs/biome from 1.9.1 to 1.9.2 ([f52ec5b](https://github.com/posthtml/posthtml-components/commit/f52ec5b))
+* build(deps-dev): bump @biomejs/biome from 1.9.2 to 1.9.3 ([a55b99e](https://github.com/posthtml/posthtml-components/commit/a55b99e))
+* build(deps-dev): bump @biomejs/biome from 1.9.3 to 1.9.4 ([6e6323d](https://github.com/posthtml/posthtml-components/commit/6e6323d))
+* build(deps-dev): bump @vitest/coverage-v8 from 2.0.4 to 2.0.5 ([d9ea5af](https://github.com/posthtml/posthtml-components/commit/d9ea5af))
+* build(deps-dev): bump @vitest/coverage-v8 from 2.0.5 to 2.1.0 ([a3d5973](https://github.com/posthtml/posthtml-components/commit/a3d5973))
+* build(deps-dev): bump @vitest/coverage-v8 from 2.1.0 to 2.1.1 ([b5ae7a6](https://github.com/posthtml/posthtml-components/commit/b5ae7a6))
+* build(deps-dev): bump @vitest/coverage-v8 from 2.1.1 to 2.1.2 ([8b2bbf8](https://github.com/posthtml/posthtml-components/commit/8b2bbf8))
+* build(deps-dev): bump @vitest/coverage-v8 from 2.1.2 to 2.1.3 ([86d6b45](https://github.com/posthtml/posthtml-components/commit/86d6b45))
+* build(deps-dev): bump @vitest/coverage-v8 from 2.1.3 to 2.1.4 ([7dc7e7b](https://github.com/posthtml/posthtml-components/commit/7dc7e7b))
+* build(deps-dev): bump @vitest/coverage-v8 from 2.1.4 to 2.1.5 ([fc4e035](https://github.com/posthtml/posthtml-components/commit/fc4e035))
+* build(deps-dev): bump @vitest/coverage-v8 from 2.1.5 to 2.1.6 ([e07feae](https://github.com/posthtml/posthtml-components/commit/e07feae))
+* build(deps-dev): bump markdown-it-anchor from 9.0.1 to 9.1.0 ([99c64b2](https://github.com/posthtml/posthtml-components/commit/99c64b2))
+* build(deps-dev): bump markdown-it-anchor from 9.1.0 to 9.2.0 ([0fbfcfa](https://github.com/posthtml/posthtml-components/commit/0fbfcfa))
+* build(deps): bump posthtml-parser from 0.12.0 to 0.12.1 ([e4f7e73](https://github.com/posthtml/posthtml-components/commit/e4f7e73))
+* build(deps): bump style-to-object from 1.0.6 to 1.0.7 ([594f776](https://github.com/posthtml/posthtml-components/commit/594f776))
+* build(deps): bump style-to-object from 1.0.7 to 1.0.8 ([ad81c84](https://github.com/posthtml/posthtml-components/commit/ad81c84))
+
+
 
 ## 2.0.0 (2024-07-25)
 
-* **[BREAKING]** Node.js 18+ 907de89
-* **[BREAKING]** renamed `blacklistAttributes` to `blocklistAttributes` 0cd302e
-* migrate to Vitest 8cb2619
-* fixed test for `posthtml-include` latest version 3d168d4
-* feat: add types 7feb3af
+* 2.0.0 ([d3e146c](https://github.com/posthtml/posthtml-components/commit/d3e146c))
+* chore: update changelog script ([6df24e0](https://github.com/posthtml/posthtml-components/commit/6df24e0))
+* chore: update changelog.md ([3a8c764](https://github.com/posthtml/posthtml-components/commit/3a8c764))
+
+
 
 ## 2.0.0-beta.2 (2024-07-25)
 
@@ -321,3 +340,6 @@
 * Update readme ([42fa034](https://github.com/posthtml/posthtml-components/commit/42fa034))
 * Update version ([0599426](https://github.com/posthtml/posthtml-components/commit/0599426))
 * Update version ([27ab49c](https://github.com/posthtml/posthtml-components/commit/27ab49c))
+
+
+
