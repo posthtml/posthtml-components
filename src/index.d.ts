@@ -182,6 +182,7 @@ export type PostHTMLComponents = {
    *
    *
    */
+  // biome-ignore lint: using `any` until we can do better
   mergeCustomizer?: (objValue: any, srcValue: any) => any;
 
   /**

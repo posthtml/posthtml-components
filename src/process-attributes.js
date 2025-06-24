@@ -1,5 +1,3 @@
-'use strict';
-
 const {match} = require('posthtml/lib/api');
 const parseAttrs = require('posthtml-attrs-parser');
 const styleToObject = require('style-to-object').default;

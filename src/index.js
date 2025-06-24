@@ -1,7 +1,5 @@
-'use strict';
-
-const {readFileSync, existsSync} = require('fs');
-const path = require('path');
+const {readFileSync, existsSync} = require('node:fs');
+const path = require('node:path');
 const {parser} = require('posthtml-parser');
 const {match, walk} = require('posthtml/lib/api');
 const expressions = require('posthtml-expressions');
@@ -244,7 +242,7 @@ function processTree(options) {
        * 'undefined' or 'null'.
        */
       walk.call(currentNode, node => {
-        if (node && node.attrs) {
+        if (node?.attrs) {
           for (const key in node.attrs) {
             if (node.attrs[key] === 'undefined' || node.attrs[key] === 'null') {
               delete node.attrs[key];

@@ -1,5 +1,3 @@
-'use strict';
-
 const pick = require('lodash/pick');
 const assign = require('lodash/assign');
 const mergeWith = require('lodash/mergeWith');
