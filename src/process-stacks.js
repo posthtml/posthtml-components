@@ -1,5 +1,3 @@
-'use strict';
-
 const {match} = require('posthtml/lib/api');
 const {render} = require('posthtml-render');
 const get = require('lodash/get');

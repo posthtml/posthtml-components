@@ -1,7 +1,5 @@
-'use strict';
-
-const vm = require('vm');
-const {existsSync, readFileSync} = require('fs');
+const vm = require('node:vm');
+const {existsSync, readFileSync} = require('node:fs');
 const {render} = require('posthtml-render');
 const {match} = require('posthtml/lib/api');
 

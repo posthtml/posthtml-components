@@ -1,7 +1,5 @@
-'use strict';
-
-const path = require('path');
-const {existsSync} = require('fs');
+const path = require('node:path');
+const {existsSync} = require('node:fs');
 
 const folderSeparator = '.';
 
