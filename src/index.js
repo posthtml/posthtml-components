@@ -147,7 +147,7 @@ module.exports = (options = {}) => tree => {
   return processStacks(
     processPushes(
       processTree(options)(
-        expressions(options.expressions)(tree)
+        expressions(options.expressions)(tree), tree.messages
       ),
       pushedContent,
       options.push
@@ -168,7 +168,7 @@ let processCounter = 0;
 function processTree(options) {
   const filledSlots = {};
 
-  return tree => {
+  return (tree, messages) => {
     log(`Processing tree number ${processCounter}..`, 'processTree');
 
     if (options.plugins.length > 0) {
@@ -183,6 +183,13 @@ function processTree(options) {
       }
 
       const componentPath = getComponentPath(currentNode, options);
+
+      if (messages) {
+        messages.push({
+          type: 'dependency',
+          file: componentPath
+        });
+      }
 
       if (!componentPath) {
         return currentNode;
@@ -222,7 +229,7 @@ function processTree(options) {
         return currentNode.content || nextNode.content;
       });
 
-      nextNode = processTree(options)(nextNode);
+      nextNode = processTree(options)(nextNode, messages);
 
       // Process <fill> tags
       processFillContent(nextNode, filledSlots, options);
