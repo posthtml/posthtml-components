@@ -1,3 +1,35 @@
+## <small>2.1.1 (2025-06-24)</small>
+
+* 2.1.1 ([4b5815c](https://github.com/posthtml/posthtml-components/commit/4b5815c))
+* chore: apply linter fixes ([0600fb2](https://github.com/posthtml/posthtml-components/commit/0600fb2))
+* chore: update changelog.md ([a424bae](https://github.com/posthtml/posthtml-components/commit/a424bae))
+* build(deps-dev): bump @biomejs/biome from 1.9.4 to 2.0.5 ([bfd14de](https://github.com/posthtml/posthtml-components/commit/bfd14de))
+* build(deps-dev): bump @vitest/coverage-v8 from 2.1.8 to 3.0.4 ([de1cb19](https://github.com/posthtml/posthtml-components/commit/de1cb19))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.0.4 to 3.0.5 ([825f1b9](https://github.com/posthtml/posthtml-components/commit/825f1b9))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.0.5 to 3.0.6 ([0c70de7](https://github.com/posthtml/posthtml-components/commit/0c70de7))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.0.6 to 3.0.7 ([3dc685a](https://github.com/posthtml/posthtml-components/commit/3dc685a))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.0.7 to 3.0.8 ([88dbcdf](https://github.com/posthtml/posthtml-components/commit/88dbcdf))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.0.8 to 3.0.9 ([cbe9937](https://github.com/posthtml/posthtml-components/commit/cbe9937))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.0.9 to 3.1.1 ([dd85c90](https://github.com/posthtml/posthtml-components/commit/dd85c90))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.1.1 to 3.1.2 ([5fd2983](https://github.com/posthtml/posthtml-components/commit/5fd2983))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.1.2 to 3.1.3 ([26679aa](https://github.com/posthtml/posthtml-components/commit/26679aa))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.1.3 to 3.1.4 ([e9ea4cb](https://github.com/posthtml/posthtml-components/commit/e9ea4cb))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.1.4 to 3.2.0 ([929081a](https://github.com/posthtml/posthtml-components/commit/929081a))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.2.0 to 3.2.1 ([e37042d](https://github.com/posthtml/posthtml-components/commit/e37042d))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.2.1 to 3.2.2 ([51ef8c0](https://github.com/posthtml/posthtml-components/commit/51ef8c0))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.2.2 to 3.2.3 ([80337ae](https://github.com/posthtml/posthtml-components/commit/80337ae))
+* build(deps-dev): bump @vitest/coverage-v8 from 3.2.3 to 3.2.4 ([fac7eb9](https://github.com/posthtml/posthtml-components/commit/fac7eb9))
+* build(deps-dev): bump highlight.js from 11.10.0 to 11.11.1 ([c5c75e7](https://github.com/posthtml/posthtml-components/commit/c5c75e7))
+* build(deps-dev): bump posthtml-markdownit from 3.1.0 to 3.1.1 ([5427633](https://github.com/posthtml/posthtml-components/commit/5427633))
+* build(deps-dev): bump vitest from 2.1.8 to 3.0.4 ([da4f59e](https://github.com/posthtml/posthtml-components/commit/da4f59e))
+* build(deps-dev): bump vitest from 3.0.4 to 3.0.5 ([7086ad9](https://github.com/posthtml/posthtml-components/commit/7086ad9))
+* build(deps-dev): bump vitest from 3.0.5 to 3.0.6 ([3f2c91b](https://github.com/posthtml/posthtml-components/commit/3f2c91b))
+* build(deps-dev): bump vitest from 3.0.6 to 3.0.7 ([892f858](https://github.com/posthtml/posthtml-components/commit/892f858))
+* build(deps-dev): bump vitest from 3.0.7 to 3.0.8 ([363994e](https://github.com/posthtml/posthtml-components/commit/363994e))
+* build(deps): bump posthtml-attrs-parser from 1.1.1 to 1.1.2 ([33c9cca](https://github.com/posthtml/posthtml-components/commit/33c9cca))
+
+
+
 ## 2.1.0 (2024-12-16)
 
 * 2.1.0 ([2141b87](https://github.com/posthtml/posthtml-components/commit/2141b87))
