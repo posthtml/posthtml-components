@@ -166,8 +166,6 @@ let processCounter = 0;
  * @return {Object} PostHTML tree
  */
 function processTree(options) {
-  const filledSlots = {};
-
   return (tree, messages) => {
     log(`Processing tree number ${processCounter}..`, 'processTree');
 
@@ -176,6 +174,8 @@ function processTree(options) {
     }
 
     match.call(tree, options.matcher, currentNode => {
+      const filledSlots = {};
+
       log(`Match found for tag "${currentNode.tag}"..`, 'processTree');
 
       if (!currentNode.attrs) {
