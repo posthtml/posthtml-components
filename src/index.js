@@ -166,8 +166,6 @@ let processCounter = 0;
  * @return {Object} PostHTML tree
  */
 function processTree(options) {
-  const filledSlots = {};
-
   return (tree, messages) => {
     log(`Processing tree number ${processCounter}..`, 'processTree');
 
@@ -176,6 +174,8 @@ function processTree(options) {
     }
 
     match.call(tree, options.matcher, currentNode => {
+      const filledSlots = {};
+
       log(`Match found for tag "${currentNode.tag}"..`, 'processTree');
 
       if (!currentNode.attrs) {
@@ -229,13 +229,13 @@ function processTree(options) {
         return currentNode.content || nextNode.content;
       });
 
+      // Process <slot> tags
+      processSlotContent(nextNode, filledSlots, options);
+
       nextNode = processTree(options)(nextNode, messages);
 
       // Process <fill> tags
       processFillContent(nextNode, filledSlots, options);
-
-      // Process <slot> tags
-      processSlotContent(nextNode, filledSlots, options);
 
       // Remove component tag and replace content with <yield>
       currentNode.tag = false;
