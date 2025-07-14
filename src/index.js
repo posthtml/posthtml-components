@@ -229,13 +229,13 @@ function processTree(options) {
         return currentNode.content || nextNode.content;
       });
 
+      // Process <slot> tags
+      processSlotContent(nextNode, filledSlots, options);
+
       nextNode = processTree(options)(nextNode, messages);
 
       // Process <fill> tags
       processFillContent(nextNode, filledSlots, options);
-
-      // Process <slot> tags
-      processSlotContent(nextNode, filledSlots, options);
 
       // Remove component tag and replace content with <yield>
       currentNode.tag = false;
