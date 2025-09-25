@@ -1,6 +1,6 @@
 {
   "name": "posthtml-component",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Laravel Blade-inspired components for PostHTML with slots, attributes as props, custom tags and more.",
   "license": "MIT",
   "repository": "posthtml/posthtml-components",
