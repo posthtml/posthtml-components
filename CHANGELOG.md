@@ -1,3 +1,14 @@
+## 2.2.0 (2025-07-10)
+
+* 2.2.0 ([d5c2cbd](https://github.com/posthtml/posthtml-components/commit/d5c2cbd))
+* Add support for Parcel hot reloading (Fix #19) ([23942a8](https://github.com/posthtml/posthtml-components/commit/23942a8)), closes [#19](https://github.com/posthtml/posthtml-components/issues/19)
+* chore: update changelog.md ([b9433f9](https://github.com/posthtml/posthtml-components/commit/b9433f9))
+* build(deps-dev): bump @biomejs/biome from 2.0.5 to 2.0.6 ([deee00d](https://github.com/posthtml/posthtml-components/commit/deee00d))
+* build(deps-dev): bump @biomejs/biome from 2.0.6 to 2.1.1 ([7ca30fa](https://github.com/posthtml/posthtml-components/commit/7ca30fa))
+* build(deps-dev): bump posthtml-markdownit from 3.1.1 to 3.1.2 ([1550362](https://github.com/posthtml/posthtml-components/commit/1550362))
+
+
+
 ## <small>2.1.1 (2025-06-24)</small>
 
 * 2.1.1 ([4b5815c](https://github.com/posthtml/posthtml-components/commit/4b5815c))
