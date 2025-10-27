@@ -49,6 +49,6 @@
     "posthtml-beautify": "^0.7.0",
     "posthtml-include": "^2.0.1",
     "posthtml-markdownit": "^3.1.0",
-    "vitest": "^3.0.4"
+    "vitest": "^4.0.3"
   }
 }
