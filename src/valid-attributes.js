@@ -890,6 +890,7 @@ module.exports = {
     ],
     'DIV': [
       'accesskey',
+      'align',
       'autocapitalize',
       'autofocus',
       'class',
@@ -3015,6 +3016,7 @@ module.exports = {
     ],
     'TABLE': [
       'accesskey',
+      'align',
       'autocapitalize',
       'autofocus',
       'class',
@@ -3073,6 +3075,7 @@ module.exports = {
     ],
     'TD': [
       'accesskey',
+      'align',
       'autocapitalize',
       'autofocus',
       'class',
@@ -3206,6 +3209,7 @@ module.exports = {
     'TH': [
       'abbr',
       'accesskey',
+      'align',
       'autocapitalize',
       'autofocus',
       'class',
