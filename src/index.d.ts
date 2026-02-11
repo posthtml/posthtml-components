@@ -154,7 +154,7 @@ export type PostHTMLComponents = {
    *
    * @default []
    */
-  plugins?: Array<() => void>;
+  plugins?: Array<() => void>|Record<'before','after', Array<() => void>>;
 
   /**
    * Array of objects used to match tags.
