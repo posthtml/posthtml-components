@@ -1,3 +1,35 @@
+## <small>2.2.2 (2025-11-02)</small>
+
+* 2.2.2 ([286ba78](https://github.com/posthtml/posthtml-components/commit/286ba78))
+* chore: allow align attribute ([1343cfd](https://github.com/posthtml/posthtml-components/commit/1343cfd))
+* chore: update package lock ([5da2d4d](https://github.com/posthtml/posthtml-components/commit/5da2d4d))
+* build(deps-dev): bump @biomejs/biome from 2.2.4 to 2.2.5 ([e8e062d](https://github.com/posthtml/posthtml-components/commit/e8e062d))
+* build(deps-dev): bump @biomejs/biome from 2.2.5 to 2.2.7 ([b17b384](https://github.com/posthtml/posthtml-components/commit/b17b384))
+* build(deps-dev): bump @biomejs/biome from 2.2.7 to 2.3.2 ([e34089c](https://github.com/posthtml/posthtml-components/commit/e34089c))
+* build(deps): bump posthtml from 0.16.6 to 0.16.7 ([86b0fa2](https://github.com/posthtml/posthtml-components/commit/86b0fa2))
+* build(deps): bump style-to-object from 1.0.11 to 1.0.12 ([a823287](https://github.com/posthtml/posthtml-components/commit/a823287))
+* build(deps): bump style-to-object from 1.0.9 to 1.0.11 ([b220ab2](https://github.com/posthtml/posthtml-components/commit/b220ab2))
+* test: update vitest config file extension ([431ff62](https://github.com/posthtml/posthtml-components/commit/431ff62))
+
+
+
+## <small>2.2.1 (2025-09-25)</small>
+
+* 2.2.1 ([0b90292](https://github.com/posthtml/posthtml-components/commit/0b90292))
+* Move filledSlots variable ([476bad0](https://github.com/posthtml/posthtml-components/commit/476bad0))
+* Process slots before processing subtree ([be27e21](https://github.com/posthtml/posthtml-components/commit/be27e21))
+* chore: update changelog.md ([cd9a2a7](https://github.com/posthtml/posthtml-components/commit/cd9a2a7))
+* chore: update package lock ([cea1243](https://github.com/posthtml/posthtml-components/commit/cea1243))
+* build(deps-dev): bump @biomejs/biome from 2.1.1 to 2.1.2 ([5e8bb61](https://github.com/posthtml/posthtml-components/commit/5e8bb61))
+* build(deps-dev): bump @biomejs/biome from 2.1.2 to 2.1.3 ([0d24d70](https://github.com/posthtml/posthtml-components/commit/0d24d70))
+* build(deps-dev): bump @biomejs/biome from 2.1.3 to 2.1.4 ([31809cb](https://github.com/posthtml/posthtml-components/commit/31809cb))
+* build(deps-dev): bump @biomejs/biome from 2.1.4 to 2.2.0 ([f8523aa](https://github.com/posthtml/posthtml-components/commit/f8523aa))
+* build(deps-dev): bump @biomejs/biome from 2.2.0 to 2.2.2 ([19cdd16](https://github.com/posthtml/posthtml-components/commit/19cdd16))
+* build(deps-dev): bump @biomejs/biome from 2.2.2 to 2.2.3 ([9686a40](https://github.com/posthtml/posthtml-components/commit/9686a40))
+* build(deps-dev): bump @biomejs/biome from 2.2.3 to 2.2.4 ([6f90eb9](https://github.com/posthtml/posthtml-components/commit/6f90eb9))
+
+
+
 ## 2.2.0 (2025-07-10)
 
 * 2.2.0 ([d5c2cbd](https://github.com/posthtml/posthtml-components/commit/d5c2cbd))
