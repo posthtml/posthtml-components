@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": "posthtml/posthtml-components",
   "author": "Damir Grgic <damir@tuta.io> (https://github.com/thewebartisan7)",
-  "main": "src",
+  "main": "src/index.js",
   "types": "src/index.d.ts",
   "files": [
     "src"
