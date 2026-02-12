@@ -845,9 +845,17 @@ You can add custom rules to define how attributes are parsed - we use [posthtml-
 
 ### Plugins
 
-You can specify whether plugins are applied before or after the `posthtml-expressions` plugin:
+Use the `plugins` option to apply your own PostHTML plugins to the components.
+
+This can be an array of plugins, or an object with `before` and `after` properties to apply plugins before or after the `posthtml-expressions` plugin runs.
 
 ```js
+// As array
+const options = { 
+  plugins: [/* ... */]
+};
+
+// As object with `before` and `after`
 const options = { 
   plugins: {
     before: [/* ... */],
@@ -856,20 +864,7 @@ const options = {
 };
 ```
 
-For backwards compatibility, passing an array will default to applying plugins after the `posthtml-expressions` plugin. The following options are equivalent:
-
-```js
-const options = { 
-  plugins: [/* ... */]
-};
-
-const options = { 
-  plugins: {
-    before: [/* ... */],
-    after: [],
-  } 
-};
-```
+When using `plugins` as an array, the plugins will be applied after `posthtml-expressions`.
 
 ### Advanced attributes configurations
 
