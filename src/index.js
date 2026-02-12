@@ -140,9 +140,20 @@ module.exports = (options = {}) => tree => {
   options.props = {...options.expressions.locals};
   options.aware = {};
 
+  if (Array.isArray(options.plugins)) {
+    options.plugins = {
+      before: [],
+      after: options.plugins
+    };
+  }
+
   const pushedContent = {};
 
   log('Start of processing..', 'init', 'success');
+
+  if (options.plugins.before.length > 0) {
+      tree = applyPluginsToTree(tree, options.plugins.before);
+  }
 
   return processStacks(
     processPushes(
@@ -169,8 +180,8 @@ function processTree(options) {
   return (tree, messages) => {
     log(`Processing tree number ${processCounter}..`, 'processTree');
 
-    if (options.plugins.length > 0) {
-      tree = applyPluginsToTree(tree, options.plugins);
+    if (options.plugins.after.length > 0) {
+      tree = applyPluginsToTree(tree, options.plugins.after);
     }
 
     match.call(tree, options.matcher, currentNode => {
@@ -217,10 +228,15 @@ function processTree(options) {
       options.expressions.locals = attributes;
       options.expressions.locals.$slots = filledSlots;
       // const plugins = [...options.plugins, expressions(options.expressions)];
+
+      if (options.plugins.before.length > 0) {
+        nextNode = applyPluginsToTree(nextNode, options.plugins.before);
+      }
+
       nextNode = expressions(options.expressions)(nextNode);
 
-      if (options.plugins.length > 0) {
-        nextNode = applyPluginsToTree(nextNode, options.plugins);
+      if (options.plugins.after.length > 0) {
+        nextNode = applyPluginsToTree(nextNode, options.plugins.after);
       }
 
       // Process <yield> tag

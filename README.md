@@ -55,7 +55,7 @@ If you are familiar with Blade, React, Vue or similar, you will find the syntax 
 | **propsSlot**            | `String`           | `'props'`                                    | Used to retrieve props passed to slot via `$slots.slotName.props`.               |
 | **parserOptions**        | `Object`           | `{recognizeSelfClosing: true}`               | Pass options to `posthtml-parser`.                                               |
 | **expressions**          | `Object`           | `{}`                                         | Pass options to `posthtml-expressions`.                                          |
-| **plugins**              | `Array`            | `[]`                                         | PostHTML plugins to apply to every parsed component.                             |
+| **plugins**              | `Array\|Object`    | `[]`                                         | PostHTML plugins to [apply](#plugins) to every parsed component.                 |
 | **matcher**              | `Object`           | `[{tag: options.tagPrefix}]`                 | Array of objects used to match tags.                                             |
 | **attrsParserRules**     | `Object`           | `{}`                                         | Additional rules for attributes parser plugin.                                   |
 | **strict**               | `Boolean`          | `true`                                       | Toggle exception throwing.                                                       |
@@ -841,6 +841,35 @@ Result:
 ```
 
 You can add custom rules to define how attributes are parsed - we use [posthtml-attrs-parser](https://github.com/posthtml/posthtml-attrs-parser) to handle them.
+
+
+### Plugins
+
+You can specify whether plugins are applied before or after the `posthtml-expressions` plugin:
+
+```js
+const options = { 
+  plugins: {
+    before: [/* ... */],
+    after: [/* ... */],
+  } 
+};
+```
+
+For backwards compatibility, passing an array will default to applying plugins after the `posthtml-expressions` plugin. The following options are equivalent:
+
+```js
+const options = { 
+  plugins: [/* ... */]
+};
+
+const options = { 
+  plugins: {
+    before: [/* ... */],
+    after: [],
+  } 
+};
+```
 
 ### Advanced attributes configurations
 

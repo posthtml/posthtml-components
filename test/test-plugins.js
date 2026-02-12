@@ -1,5 +1,8 @@
 import { test, expect } from 'vitest';
 import { process } from './process.js';
+import { walk } from 'posthtml/lib/api';
+
+const plugin = tree => walk.call(tree, node => typeof node === 'string' && node === "{{title}}"? "{{replaced}}": node);
 
 test('posthtml-include', async () => {
   process(
@@ -19,6 +22,40 @@ test('posthtml-include', async () => {
   )
     .then(html => {
       expect(html).toBe('<div><p>Included file</p></div>');
+    });
+});
+
+test('Run plugin before expressions', async () => {
+  process(
+    `<component src="components/component-locals.html"></component>`,
+    {
+      root: './test/templates',
+      tag: 'component',
+      attribute: 'src',
+      plugins: { before: [plugin], after: []},
+      expressions: {
+        strict: false,
+        missingLocal: '{local}',
+      }      
+    }
+  )
+    .then(html => {
+      expect(html).toBe(`<div><h1>{{replaced}}</h1></div><div>Default body</div>`);
+    });
+});
+
+test('Run plugin after expressions', async () => {
+  process(
+    `<component src="components/component-locals.html"></component>`,
+    {
+      root: './test/templates',
+      tag: 'component',
+      attribute: 'src',
+      plugins: { before: [], after: [plugin]},
+    }
+  )
+    .then(html => {
+      expect(html).toBe(`<div><h1>Default title</h1></div><div>Default body</div>`);
     });
 });
 
